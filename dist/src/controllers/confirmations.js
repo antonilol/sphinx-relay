@@ -176,7 +176,7 @@ function receiveHeartbeat(payload) {
     });
 }
 exports.receiveHeartbeat = receiveHeartbeat;
-let heartbeats = {};
+const heartbeats = {};
 function healthcheck(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!req.owner)
@@ -209,7 +209,7 @@ function healthcheck(req, res) {
             return;
         }
         let i = 0;
-        let interval = setInterval(() => {
+        const interval = setInterval(() => {
             if (i >= 15) {
                 clearInterval(interval);
                 delete heartbeats[pubkey];

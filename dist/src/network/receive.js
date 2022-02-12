@@ -82,7 +82,7 @@ function onReceive(payload, dest) {
         // console.log("===> onReceive", JSON.stringify(payload, null, 2));
         if (!(payload.type || payload.type === 0))
             return logger_1.sphinxLogger.error(`no payload.type`);
-        let owner = yield models_1.models.Contact.findOne({
+        const owner = yield models_1.models.Contact.findOne({
             where: { isOwner: true, publicKey: dest },
         });
         if (!owner)
@@ -457,7 +457,7 @@ function saveAnonymousKeysend(inv, memo, sender_pubkey, tenant) {
             }
         }
         const amount = (inv.value && parseInt(inv.value)) || 0;
-        var date = new Date();
+        const date = new Date();
         date.setMilliseconds(0);
         const msg = yield models_1.models.Message.create({
             chatId: 0,
@@ -480,7 +480,7 @@ function saveAnonymousKeysend(inv, memo, sender_pubkey, tenant) {
         }, tenant);
     });
 }
-let hashCache = {};
+const hashCache = {};
 function parseKeysendInvoice(i) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

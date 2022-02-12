@@ -36,10 +36,10 @@ function connect(server) {
         },
     });
     io.use((client, next) => __awaiter(this, void 0, void 0, function* () {
-        let userToken = client.handshake.headers['x-user-token'];
-        let x_transport_token = client.handshake.headers['x-transport-token'];
+        const userToken = client.handshake.headers['x-user-token'];
+        const x_transport_token = client.handshake.headers['x-transport-token'];
         const transportPrivateKey = fs.readFileSync(config.transportPrivateKeyLocation);
-        let userTokenFromTransportToken = crypto
+        const userTokenFromTransportToken = crypto
             .privateDecrypt(transportPrivateKey, x_transport_token)
             .toString()
             .split('|')[0];

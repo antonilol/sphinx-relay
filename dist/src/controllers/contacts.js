@@ -62,8 +62,8 @@ const getContacts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         },
     });
     const contactsResponse = contacts.map((contact) => {
-        let contactJson = jsonUtils.contactToJson(contact);
-        let invite = invites.find((invite) => invite.contactId == contact.id);
+        const contactJson = jsonUtils.contactToJson(contact);
+        const invite = invites.find((invite) => invite.contactId == contact.id);
         if (invite) {
             contactJson.invite = jsonUtils.inviteToJson(invite);
         }
@@ -203,13 +203,13 @@ const generateToken = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         }
     }
     let token = '';
-    let xTransportToken = req.headers['x-transport-token'];
+    const xTransportToken = req.headers['x-transport-token'];
     if (!xTransportToken) {
         token = req.body['token'];
     }
     else {
         const transportTokenKeys = fs.readFileSync(config.transportPrivateKeyLocation, 'utf8');
-        let tokenAndTimestamp = rsa
+        const tokenAndTimestamp = rsa
             .decrypt(transportTokenKeys, xTransportToken)
             .split('|');
         token = tokenAndTimestamp[0];
@@ -228,13 +228,7 @@ const generateToken = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if ((0, proxy_1.isProxy)()) {
             tribes.subscribe(`${pubkey}/#`, network.receiveMqttMessage); // add MQTT subsription
         }
-        //  create transport token and send back to client
-        // save private key and send public key
         owner.update({ authToken: hash });
-        // Send transport pubkey
-        (0, res_1.success)(res, {
-            id: (owner && owner.id) || 0,
-        });
     }
     (0, res_1.success)(res, {
         id: (owner && owner.id) || 0,
@@ -253,7 +247,7 @@ const updateContact = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             query: req.query,
         },
     ], logger_1.logging.Network);
-    let attrs = extractAttrs(req.body);
+    const attrs = extractAttrs(req.body);
     const contact = yield models_1.models.Contact.findOne({
         where: { id: req.params.id, tenant },
     });
@@ -327,7 +321,7 @@ const createContact = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             query: req.query,
         },
     ], logger_1.logging.Network);
-    let attrs = extractAttrs(req.body);
+    const attrs = extractAttrs(req.body);
     const owner = req.owner;
     const existing = attrs['public_key'] &&
         (yield models_1.models.Contact.findOne({
@@ -525,7 +519,7 @@ const receiveConfirmContactKey = (payload) => __awaiter(void 0, void 0, void 0, 
 });
 exports.receiveConfirmContactKey = receiveConfirmContactKey;
 function extractAttrs(body) {
-    let fields_to_update = [
+    const fields_to_update = [
         'public_key',
         'node_alias',
         'alias',
@@ -540,7 +534,7 @@ function extractAttrs(body) {
         'route_hint',
         'price_to_meet',
     ];
-    let attrs = {};
+    const attrs = {};
     Object.keys(body).forEach((key) => {
         if (fields_to_update.includes(key)) {
             attrs[key] = body[key];

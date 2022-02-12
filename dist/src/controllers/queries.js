@@ -23,7 +23,7 @@ const node_fetch_1 = require("node-fetch");
 const helpers = require("../helpers");
 const proxy_1 = require("../utils/proxy");
 const logger_1 = require("../utils/logger");
-let queries = {};
+const queries = {};
 const POLL_MINS = 10;
 let hub_pubkey = '';
 const hub_url = 'https://hub.sphinx.chat/api/v1/';
@@ -275,7 +275,7 @@ function queryOnchainAddress(req, res) {
             return;
         }
         let i = 0;
-        let interval = setInterval(() => {
+        const interval = setInterval(() => {
             if (i >= 15) {
                 clearInterval(interval);
                 delete queries[uuid];

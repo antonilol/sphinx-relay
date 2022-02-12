@@ -22,9 +22,9 @@ const loadWalletKit = () => {
     }
     else {
         try {
-            var credentials = Lightning.loadCredentials();
-            var lnrpcDescriptor = grpc.load('proto/walletkit.proto');
-            var walletkit = lnrpcDescriptor.walletrpc;
+            const credentials = Lightning.loadCredentials();
+            const lnrpcDescriptor = grpc.load('proto/walletkit.proto');
+            const walletkit = lnrpcDescriptor.walletrpc;
             walletClient = new walletkit.WalletKit(LND_IP + ':' + config.lnd_port, credentials);
             return walletClient;
         }
@@ -37,7 +37,7 @@ exports.loadWalletKit = loadWalletKit;
 function listUnspent() {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-            let walletkit = yield (0, exports.loadWalletKit)();
+            const walletkit = yield (0, exports.loadWalletKit)();
             try {
                 const opts = { min_confs: 0, max_confs: 10000 };
                 walletkit.listUnspent(opts, function (err, res) {

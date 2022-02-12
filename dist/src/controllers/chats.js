@@ -67,7 +67,7 @@ function kickChatMember(req, res) {
             return (0, res_1.failure)(res, 'missing param');
         }
         // remove chat.contactIds
-        let chat = yield models_1.models.Chat.findOne({ where: { id: chatId, tenant } });
+        const chat = yield models_1.models.Chat.findOne({ where: { id: chatId, tenant } });
         const contactIds = JSON.parse(chat.contactIds || '[]');
         const newContactIds = contactIds.filter((cid) => cid !== contactId);
         yield chat.update({ contactIds: JSON.stringify(newContactIds) });
@@ -110,7 +110,7 @@ function receiveGroupKick(payload) {
         // 	name:''
         // })
         // await models.Message.destroy({ where: { chatId: chat.id } })
-        var date = new Date();
+        let date = new Date();
         date.setMilliseconds(0);
         if (date_string)
             date = new Date(date_string);
@@ -283,7 +283,7 @@ function addGroupMembers(req, res) {
         const { id } = req.params;
         const members = {}; //{pubkey:{key,alias}, ...}
         const owner = req.owner;
-        let chat = yield models_1.models.Chat.findOne({ where: { id, tenant } });
+        const chat = yield models_1.models.Chat.findOne({ where: { id, tenant } });
         const contactIds = JSON.parse(chat.contactIds || '[]');
         // for all members (existing and new)
         members[owner.publicKey] = { key: owner.contactKey, alias: owner.alias };
@@ -388,7 +388,7 @@ function receiveGroupJoin(payload) {
         if (!chat)
             return;
         const isTribe = chat_type === constants_1.default.chat_types.tribe;
-        var date = new Date();
+        let date = new Date();
         date.setMilliseconds(0);
         if (date_string)
             date = new Date(date_string);
@@ -537,7 +537,7 @@ function receiveGroupLeave(payload) {
                 }
             }
         }
-        var date = new Date();
+        let date = new Date();
         date.setMilliseconds(0);
         if (date_string)
             date = new Date(date_string);
@@ -596,7 +596,7 @@ function receiveGroupCreateOrInvite(payload) {
         }
         const contacts = [];
         const newContacts = [];
-        for (let [pubkey, member] of Object.entries(chat_members)) {
+        for (const [pubkey, member] of Object.entries(chat_members)) {
             const contact = yield models_1.models.Contact.findOne({
                 where: { publicKey: pubkey, tenant },
             });
@@ -633,7 +633,7 @@ function receiveGroupCreateOrInvite(payload) {
         if (!contactIds.includes(owner.id))
             contactIds.push(owner.id);
         // make chat
-        let date = new Date();
+        const date = new Date();
         date.setMilliseconds(0);
         const chat = yield models_1.models.Chat.create(Object.assign(Object.assign(Object.assign({ uuid: chat_uuid, contactIds: JSON.stringify(contactIds), createdAt: date, updatedAt: date, name: chat_name, type: chat_type || constants_1.default.chat_types.group }, (chat_host && { host: chat_host })), (chat_key && { groupKey: chat_key })), { tenant }));
         if (isTribe) {
@@ -670,13 +670,13 @@ function receiveGroupCreateOrInvite(payload) {
 }
 exports.receiveGroupCreateOrInvite = receiveGroupCreateOrInvite;
 function createGroupChatParams(owner, contactIds, members, name) {
-    let date = new Date();
+    const date = new Date();
     date.setMilliseconds(0);
     if (!(owner && members && contactIds && Array.isArray(contactIds))) {
         return;
     }
     const pubkeys = [];
-    for (let pubkey of Object.keys(members)) {
+    for (const pubkey of Object.keys(members)) {
         // just the key
         pubkeys.push(String(pubkey));
     }

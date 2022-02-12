@@ -5,10 +5,10 @@ import { loadConfig } from '../utils/config'
 const config = loadConfig()
 
 // setup disk storage
-var multer = require('multer')
-var avatarStorage = multer.diskStorage({
+const multer = require('multer')
+const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    let dir = __dirname.includes('/dist/')
+    const dir = __dirname.includes('/dist/')
       ? path.join(__dirname, '..')
       : __dirname
     cb(null, dir + '/../../public/uploads')

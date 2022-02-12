@@ -53,7 +53,7 @@ function purchaseFromOriginalSender(payload, chat, purchaser, owner) {
             where: { originalMuid: muid, tenant },
         });
         const terms = (0, ldat_1.parseLDAT)(mt);
-        let price = terms.meta && terms.meta.amt;
+        const price = terms.meta && terms.meta.amt;
         if (amount < price)
             return; // not enough sats
         if (mediaKey) {
@@ -206,7 +206,7 @@ function downloadAndUploadAndSaveReturningTermsAndKey(payload, chat, sender, own
             const newKey = crypto.randomBytes(20).toString('hex');
             // console.log('[modify] about to encrypt', imgBuf.length, newKey)
             const encImgBase64 = RNCryptor.Encrypt(imgBuf, newKey);
-            var encImgBuffer = Buffer.from(encImgBase64, 'base64');
+            const encImgBuffer = Buffer.from(encImgBase64, 'base64');
             const form = new FormData();
             form.append('file', encImgBuffer, {
                 contentType: typ || 'image/jpg',
@@ -219,7 +219,7 @@ function downloadAndUploadAndSaveReturningTermsAndKey(payload, chat, sender, own
                 headers: Object.assign(Object.assign({}, formHeaders), { Authorization: `Bearer ${token}` }),
                 body: form,
             });
-            let json = yield resp.json();
+            const json = yield resp.json();
             if (!json.muid)
                 throw new Error('no muid');
             // PUT NEW TERMS, to finish in personalizeMessage
@@ -232,7 +232,7 @@ function downloadAndUploadAndSaveReturningTermsAndKey(payload, chat, sender, own
                 meta: Object.assign({}, (amt && { amt })),
             };
             const encKey = rsa.encrypt(chat.groupKey, newKey.slice());
-            var date = new Date();
+            const date = new Date();
             date.setMilliseconds(0);
             yield sleep(1);
             yield models_1.models.MediaKey.create({

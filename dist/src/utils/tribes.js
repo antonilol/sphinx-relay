@@ -26,7 +26,7 @@ const logger_1 = require("./logger");
 const helpers_1 = require("../helpers");
 const config = (0, config_1.loadConfig)();
 // {pubkey: {host: Client} }
-let clients = {};
+const clients = {};
 const optz = { qos: 0 };
 // this runs at relay startup
 function connect(onMessage) {

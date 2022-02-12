@@ -6,17 +6,17 @@ import { spawn } from 'child_process'
 import { loadConfig } from '../utils/config'
 import { sphinxLogger } from '../utils/logger'
 import { getTribeOwnersChatByUUID } from '../utils/tribes'
+import validate from 'bitcoin-address-validation'
 
 const config = loadConfig()
 
-var validate = require('bitcoin-address-validation')
 const msg_types = Sphinx.MSG_TYPE
 
 let initted = false
 
 // const baseurl = 'https://localhost:8080'
 
-export function init() {
+export function init(): void {
   if (initted) return
   initted = true
 
@@ -130,7 +130,7 @@ export function init() {
           `--addr=${addy}`,
         ]
         sphinxLogger.info(`=> SPAWN ${cmd} ${args}`)
-        let childProcess = spawn(cmd, args)
+        const childProcess = spawn(cmd, args)
         childProcess.stdout.on('data', function (data) {
           const stdout = data.toString()
           sphinxLogger.info(`LOOPBOT stdout: ${stdout}`)

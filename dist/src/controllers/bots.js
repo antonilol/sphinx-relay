@@ -449,7 +449,7 @@ function receiveBotRes(payload) {
             });
             if (!chat)
                 return logger_1.sphinxLogger.error('=> receiveBotRes as sub error no chat');
-            var date = new Date();
+            let date = new Date();
             date.setMilliseconds(0);
             if (date_string)
                 date = new Date(date_string);
