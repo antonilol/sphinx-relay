@@ -61,7 +61,7 @@ function getTribeOwnersChatByUUID(uuid) {
 exports.getTribeOwnersChatByUUID = getTribeOwnersChatByUUID;
 function initializeClient(pubkey, host, onMessage) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
             let connected = false;
             function reconnect() {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -457,18 +457,13 @@ exports.putstats = putstats;
 function genSignedTimestamp(ownerPubkey) {
     return __awaiter(this, void 0, void 0, function* () {
         // console.log('genSignedTimestamp')
-        try {
-            const now = moment().unix();
-            const tsBytes = Buffer.from(now.toString(16), 'hex');
-            const sig = yield LND.signBuffer(tsBytes, ownerPubkey);
-            const sigBytes = zbase32.decode(sig);
-            const totalLength = tsBytes.length + sigBytes.length;
-            const buf = Buffer.concat([tsBytes, sigBytes], totalLength);
-            return urlBase64(buf);
-        }
-        catch (e) {
-            throw e;
-        }
+        const now = moment().unix();
+        const tsBytes = Buffer.from(now.toString(16), 'hex');
+        const sig = yield LND.signBuffer(tsBytes, ownerPubkey);
+        const sigBytes = zbase32.decode(sig);
+        const totalLength = tsBytes.length + sigBytes.length;
+        const buf = Buffer.concat([tsBytes, sigBytes], totalLength);
+        return urlBase64(buf);
     });
 }
 exports.genSignedTimestamp = genSignedTimestamp;

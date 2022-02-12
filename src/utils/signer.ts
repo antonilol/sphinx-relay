@@ -13,30 +13,26 @@ export const loadSigner = () => {
   if (signerClient) {
     return signerClient
   } else {
-    try {
-      const credentials = Lightning.loadCredentials('signer.macaroon')
-      const lnrpcDescriptor = grpc.load('proto/signer.proto')
-      const signer: any = lnrpcDescriptor.signrpc
-      signerClient = new signer.Signer(
-        LND_IP + ':' + config.lnd_port,
-        credentials
-      )
-      return signerClient
-    } catch (e) {
-      throw e
-    }
+    const credentials = Lightning.loadCredentials('signer.macaroon')
+    const lnrpcDescriptor = grpc.load('proto/signer.proto')
+    const signer: any = lnrpcDescriptor.signrpc
+    signerClient = new signer.Signer(
+      LND_IP + ':' + config.lnd_port,
+      credentials
+    )
+    return signerClient
   }
 }
 
-export const signMessage = (msg) => {
-  return new Promise(async (resolve, reject) => {
-    const signer = await loadSigner()
+export async function signMessage(msg: string) {
+	const signer = await loadSigner()
+  return new Promise((resolve, reject) => {
     try {
       const options = {
         msg: ByteBuffer.fromHex(msg),
         key_loc: { key_family: 6, key_index: 0 },
       }
-      signer.signMessage(options, function (err, sig) {
+      signer.signMessage(options, function(err, sig) {
         if (err || !sig.signature) {
           reject(err)
         } else {
@@ -50,9 +46,9 @@ export const signMessage = (msg) => {
   })
 }
 
-export const signBuffer = (msg) => {
-  return new Promise(async (resolve, reject) => {
-    const signer = await loadSigner()
+export async function signBuffer(msg: Buffer) {
+	const signer = await loadSigner()
+  return new Promise((resolve, reject) => {
     try {
       const options = { msg }
       signer.signMessage(options, function (err, sig) {
@@ -69,9 +65,9 @@ export const signBuffer = (msg) => {
   })
 }
 
-function verifyMessage(msg, sig, pubkey): Promise<{ [k: string]: any }> {
-  return new Promise(async (resolve, reject) => {
-    const signer = await loadSigner()
+async function verifyMessage(msg, sig, pubkey): Promise<{ [k: string]: any }> {
+	const signer = await loadSigner()
+  return new Promise((resolve, reject) => {
     if (msg.length === 0) {
       return reject('invalid msg')
     }
@@ -100,13 +96,9 @@ function verifyMessage(msg, sig, pubkey): Promise<{ [k: string]: any }> {
   })
 }
 
-export async function signAscii(ascii) {
-  try {
-    const sig = await signMessage(ascii_to_hexa(ascii))
-    return sig
-  } catch (e) {
-    throw e
-  }
+export async function signAscii(ascii: string) {
+  const sig = await signMessage(ascii_to_hexa(ascii))
+  return sig
 }
 
 export async function verifyAscii(
@@ -114,15 +106,11 @@ export async function verifyAscii(
   sig: Buffer,
   pubkey: string
 ): Promise<{ [k: string]: any }> {
-  try {
-    const r = await verifyMessage(ascii_to_hexa(ascii), sig, pubkey)
-    return r
-  } catch (e) {
-    throw e
-  }
+  const r = await verifyMessage(ascii_to_hexa(ascii), sig, pubkey)
+  return r
 }
 
-function ascii_to_hexa(str) {
+function ascii_to_hexa(str: string) {
   const arr1 = <string[]>[]
   for (let n = 0, l = str.length; n < l; n++) {
     const hex = Number(str.charCodeAt(n)).toString(16)

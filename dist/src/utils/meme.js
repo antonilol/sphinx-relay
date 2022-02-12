@@ -64,31 +64,26 @@ function getMediaToken(ownerPubkey, host) {
             protocol = 'http';
         const theURL = host ? `${protocol}://${host}/` : mediaURL;
         yield helpers.sleep(300);
-        try {
-            const res = yield rp.get(theURL + 'ask');
-            const r = JSON.parse(res);
-            if (!(r && r.challenge && r.id)) {
-                throw new Error('no challenge');
-            }
-            const sig = yield Lightning.signBuffer(Buffer.from(r.challenge, 'base64'), ownerPubkey);
-            if (!sig)
-                throw new Error('no signature');
-            const pubkey = ownerPubkey;
-            const sigBytes = zbase32.decode(sig);
-            const sigBase64 = (0, ldat_1.urlBase64FromBytes)(sigBytes);
-            logger_1.sphinxLogger.info(`[meme] verify ${pubkey}`, logger_1.logging.Meme);
-            const bod = yield rp.post(theURL + 'verify', {
-                form: { id: r.id, sig: sigBase64, pubkey },
-            });
-            const body = JSON.parse(bod);
-            if (!(body && body.token)) {
-                throw new Error('no token');
-            }
-            return body.token;
+        const res = yield rp.get(theURL + 'ask');
+        const r = JSON.parse(res);
+        if (!(r && r.challenge && r.id)) {
+            throw new Error('no challenge');
         }
-        catch (e) {
-            throw e;
+        const sig = yield Lightning.signBuffer(Buffer.from(r.challenge, 'base64'), ownerPubkey);
+        if (!sig)
+            throw new Error('no signature');
+        const pubkey = ownerPubkey;
+        const sigBytes = zbase32.decode(sig);
+        const sigBase64 = (0, ldat_1.urlBase64FromBytes)(sigBytes);
+        logger_1.sphinxLogger.info(`[meme] verify ${pubkey}`, logger_1.logging.Meme);
+        const bod = yield rp.post(theURL + 'verify', {
+            form: { id: r.id, sig: sigBase64, pubkey },
+        });
+        const body = JSON.parse(bod);
+        if (!(body && body.token)) {
+            throw new Error('no token');
         }
+        return body.token;
     });
 }
 exports.getMediaToken = getMediaToken;

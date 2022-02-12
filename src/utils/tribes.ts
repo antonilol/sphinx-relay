@@ -22,7 +22,7 @@ const clients: { [k: string]: { [k: string]: mqtt.Client } } = {}
 const optz: IClientSubscribeOptions = { qos: 0 }
 
 // this runs at relay startup
-export async function connect(onMessage: Function) {
+export async function connect(onMessage: (topic: string, message: Buffer) => void) {
   initAndSubscribeTopics(onMessage)
 }
 
@@ -50,8 +50,8 @@ export async function getTribeOwnersChatByUUID(uuid: string) {
   }
 }
 
-async function initializeClient(pubkey, host, onMessage): Promise<mqtt.Client> {
-  return new Promise(async (resolve, reject) => {
+async function initializeClient(pubkey: string, host, onMessage?: (topic: string, message: Buffer) => void): Promise<mqtt.Client> {
+  return new Promise(async resolve => {
     let connected = false
     async function reconnect() {
       try {
@@ -123,7 +123,7 @@ async function initializeClient(pubkey, host, onMessage): Promise<mqtt.Client> {
 async function lazyClient(
   pubkey: string,
   host: string,
-  onMessage?: Function
+  onMessage?: (topic: string, message: Buffer) => void
 ): Promise<mqtt.Client> {
   if (
     clients[pubkey] &&
@@ -136,7 +136,7 @@ async function lazyClient(
   return cl
 }
 
-async function initAndSubscribeTopics(onMessage: Function) {
+async function initAndSubscribeTopics(onMessage: (topic: string, message: Buffer) => void) {
   const host = getHost()
   try {
     if (isProxy()) {
@@ -166,7 +166,7 @@ async function initAndSubscribeTopics(onMessage: Function) {
 async function subExtraHostsForTenant(
   tenant: number,
   pubkey: string,
-  onMessage: Function
+  onMessage: (topic: string, message: Buffer) => void
 ) {
   const host = getHost()
   const externalTribes = await models.Chat.findAll({
@@ -203,7 +203,7 @@ export function printTribesClients() {
 export async function addExtraHost(
   pubkey: string,
   host: string,
-  onMessage: Function
+  onMessage: (topic: string, message: Buffer) => void
 ) {
   // console.log("ADD EXTRA HOST", printTribesClients(), host);
   if (getHost() === host) return // not for default host
@@ -212,7 +212,7 @@ export async function addExtraHost(
   client.subscribe(`${pubkey}/#`, optz)
 }
 
-function mqttURL(h) {
+function mqttURL(h: string) {
   let host = config.mqtt_host || h
   let protocol = 'tls'
   if (config.tribes_insecure) {
@@ -259,7 +259,7 @@ async function updateTribeStats(myPubkey) {
   }
 }
 
-export async function subscribe(topic, onMessage: Function) {
+export async function subscribe(topic: string, onMessage: (topic: string, message: Buffer) => void) {
   const pubkey = topic.split('/')[0]
   if (pubkey.length !== 66) return
   const host = getHost()
@@ -472,17 +472,13 @@ export async function putstats({
 
 export async function genSignedTimestamp(ownerPubkey: string) {
   // console.log('genSignedTimestamp')
-  try {
-    const now = moment().unix()
-    const tsBytes = Buffer.from(now.toString(16), 'hex')
-    const sig = await LND.signBuffer(tsBytes, ownerPubkey)
-    const sigBytes = zbase32.decode(sig)
-    const totalLength = tsBytes.length + sigBytes.length
-    const buf = Buffer.concat([tsBytes, sigBytes], totalLength)
-    return urlBase64(buf)
-  } catch (e) {
-    throw e
-  }
+  const now = moment().unix()
+  const tsBytes = Buffer.from(now.toString(16), 'hex')
+  const sig = await LND.signBuffer(tsBytes, ownerPubkey)
+  const sigBytes = zbase32.decode(sig)
+  const totalLength = tsBytes.length + sigBytes.length
+  const buf = Buffer.concat([tsBytes, sigBytes], totalLength)
+  return urlBase64(buf)
 }
 
 export async function verifySignedTimestamp(stsBase64) {

@@ -47,20 +47,23 @@ function decrypt(privateKey, enc) {
 }
 exports.decrypt = decrypt;
 function genKeys() {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
         crypto.generateKeyPair('rsa', {
             modulusLength: 2048,
         }, (err, publicKey, privKey) => {
+            if (err) {
+                // TODO handle error
+            }
             const pubPEM = publicKey.export({
                 type: 'pkcs1',
                 format: 'pem',
             });
-            const pubBase64 = cert.unpub(pubPEM);
+            const pubBase64 = cert.unpub(pubPEM.toString());
             const privPEM = privKey.export({
                 type: 'pkcs1',
                 format: 'pem',
             });
-            const privBase64 = cert.unpriv(privPEM);
+            const privBase64 = cert.unpriv(privPEM.toString());
             resolve({
                 public: pubBase64,
                 private: privBase64,
@@ -73,18 +76,21 @@ function testRSA() {
     crypto.generateKeyPair('rsa', {
         modulusLength: 2048,
     }, (err, publicKey, privateKey) => {
+        if (err) {
+            // TODO handle error
+        }
         const pubPEM = publicKey.export({
             type: 'pkcs1',
             format: 'pem',
         });
-        const pub = cert.unpub(pubPEM);
+        const pub = cert.unpub(pubPEM.toString());
         const msg = 'hi';
         const enc = encrypt(pub, msg);
         const privPEM = privateKey.export({
             type: 'pkcs1',
             format: 'pem',
         });
-        const priv = cert.unpriv(privPEM);
+        const priv = cert.unpriv(privPEM.toString());
         const dec = decrypt(priv, enc);
         console.log(`SUCESS: ${msg === dec}`);
     });

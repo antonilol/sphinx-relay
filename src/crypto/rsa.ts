@@ -49,24 +49,27 @@ export function decrypt(privateKey, enc) {
   }
 }
 
-export function genKeys(): Promise<{ [k: string]: string }> {
-  return new Promise((resolve, reject) => {
+export function genKeys(): Promise<{ public: string, private: string }> {
+  return new Promise(resolve => {
     crypto.generateKeyPair(
       'rsa',
       {
         modulusLength: 2048,
       },
       (err, publicKey, privKey) => {
+				if (err) {
+					// TODO handle error
+				}
         const pubPEM = publicKey.export({
           type: 'pkcs1',
           format: 'pem',
         })
-        const pubBase64 = cert.unpub(pubPEM)
+        const pubBase64 = cert.unpub(pubPEM.toString())
         const privPEM = privKey.export({
           type: 'pkcs1',
           format: 'pem',
         })
-        const privBase64 = cert.unpriv(privPEM)
+        const privBase64 = cert.unpriv(privPEM.toString())
         resolve({
           public: pubBase64,
           private: privBase64,
@@ -83,11 +86,14 @@ export function testRSA() {
       modulusLength: 2048,
     },
     (err, publicKey, privateKey) => {
+			if (err) {
+				// TODO handle error
+			}
       const pubPEM = publicKey.export({
         type: 'pkcs1',
         format: 'pem',
       })
-      const pub = cert.unpub(pubPEM)
+      const pub = cert.unpub(pubPEM.toString())
 
       const msg = 'hi'
       const enc = encrypt(pub, msg)
@@ -96,7 +102,7 @@ export function testRSA() {
         type: 'pkcs1',
         format: 'pem',
       })
-      const priv = cert.unpriv(privPEM)
+      const priv = cert.unpriv(privPEM.toString())
 
       const dec = decrypt(priv, enc)
       console.log(`SUCESS: ${msg === dec}`)
@@ -105,19 +111,19 @@ export function testRSA() {
 }
 
 const cert = {
-  unpub: function (key) {
+  unpub: function (key: string) {
     let s = key
     s = s.replace('-----BEGIN RSA PUBLIC KEY-----', '')
     s = s.replace('-----END RSA PUBLIC KEY-----', '')
     return s.replace(/[\r\n]+/gm, '')
   },
-  unpriv: function (key) {
+  unpriv: function (key: string) {
     let s = key
     s = s.replace('-----BEGIN RSA PRIVATE KEY-----', '')
     s = s.replace('-----END RSA PRIVATE KEY-----', '')
     return s.replace(/[\r\n]+/gm, '')
   },
-  pub: function (key) {
+  pub: function (key: string) {
     return (
       '-----BEGIN RSA PUBLIC KEY-----\n' +
       key +
@@ -125,7 +131,7 @@ const cert = {
       '-----END RSA PUBLIC KEY-----'
     )
   },
-  priv: function (key) {
+  priv: function (key: string) {
     return (
       '-----BEGIN RSA PRIVATE KEY-----\n' +
       key +

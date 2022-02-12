@@ -23,117 +23,108 @@ const loadSigner = () => {
         return signerClient;
     }
     else {
-        try {
-            const credentials = Lightning.loadCredentials('signer.macaroon');
-            const lnrpcDescriptor = grpc.load('proto/signer.proto');
-            const signer = lnrpcDescriptor.signrpc;
-            signerClient = new signer.Signer(LND_IP + ':' + config.lnd_port, credentials);
-            return signerClient;
-        }
-        catch (e) {
-            throw e;
-        }
+        const credentials = Lightning.loadCredentials('signer.macaroon');
+        const lnrpcDescriptor = grpc.load('proto/signer.proto');
+        const signer = lnrpcDescriptor.signrpc;
+        signerClient = new signer.Signer(LND_IP + ':' + config.lnd_port, credentials);
+        return signerClient;
     }
 };
 exports.loadSigner = loadSigner;
-const signMessage = (msg) => {
-    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+function signMessage(msg) {
+    return __awaiter(this, void 0, void 0, function* () {
         const signer = yield (0, exports.loadSigner)();
-        try {
-            const options = {
-                msg: ByteBuffer.fromHex(msg),
-                key_loc: { key_family: 6, key_index: 0 },
-            };
-            signer.signMessage(options, function (err, sig) {
-                if (err || !sig.signature) {
-                    reject(err);
-                }
-                else {
-                    const buf = ByteBuffer.wrap(sig.signature);
-                    resolve(buf.toBase64());
-                }
-            });
-        }
-        catch (e) {
-            reject(e);
-        }
-    }));
-};
+        return new Promise((resolve, reject) => {
+            try {
+                const options = {
+                    msg: ByteBuffer.fromHex(msg),
+                    key_loc: { key_family: 6, key_index: 0 },
+                };
+                signer.signMessage(options, function (err, sig) {
+                    if (err || !sig.signature) {
+                        reject(err);
+                    }
+                    else {
+                        const buf = ByteBuffer.wrap(sig.signature);
+                        resolve(buf.toBase64());
+                    }
+                });
+            }
+            catch (e) {
+                reject(e);
+            }
+        });
+    });
+}
 exports.signMessage = signMessage;
-const signBuffer = (msg) => {
-    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+function signBuffer(msg) {
+    return __awaiter(this, void 0, void 0, function* () {
         const signer = yield (0, exports.loadSigner)();
-        try {
-            const options = { msg };
-            signer.signMessage(options, function (err, sig) {
-                if (err || !sig.signature) {
-                    reject(err);
-                }
-                else {
-                    const buf = ByteBuffer.wrap(sig.signature);
-                    resolve(buf.toBase64());
-                }
-            });
-        }
-        catch (e) {
-            reject(e);
-        }
-    }));
-};
+        return new Promise((resolve, reject) => {
+            try {
+                const options = { msg };
+                signer.signMessage(options, function (err, sig) {
+                    if (err || !sig.signature) {
+                        reject(err);
+                    }
+                    else {
+                        const buf = ByteBuffer.wrap(sig.signature);
+                        resolve(buf.toBase64());
+                    }
+                });
+            }
+            catch (e) {
+                reject(e);
+            }
+        });
+    });
+}
 exports.signBuffer = signBuffer;
 function verifyMessage(msg, sig, pubkey) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return __awaiter(this, void 0, void 0, function* () {
         const signer = yield (0, exports.loadSigner)();
-        if (msg.length === 0) {
-            return reject('invalid msg');
-        }
-        if (sig.length !== 96) {
-            return reject('invalid sig');
-        }
-        if (pubkey.length !== 66) {
-            return reject('invalid pubkey');
-        }
-        try {
-            const options = {
-                msg: ByteBuffer.fromHex(msg),
-                signature: ByteBuffer.fromBase64(sig),
-                pubkey: ByteBuffer.fromHex(pubkey),
-            };
-            signer.verifyMessage(options, function (err, res) {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(res);
-                }
-            });
-        }
-        catch (e) {
-            reject(e);
-        }
-    }));
+        return new Promise((resolve, reject) => {
+            if (msg.length === 0) {
+                return reject('invalid msg');
+            }
+            if (sig.length !== 96) {
+                return reject('invalid sig');
+            }
+            if (pubkey.length !== 66) {
+                return reject('invalid pubkey');
+            }
+            try {
+                const options = {
+                    msg: ByteBuffer.fromHex(msg),
+                    signature: ByteBuffer.fromBase64(sig),
+                    pubkey: ByteBuffer.fromHex(pubkey),
+                };
+                signer.verifyMessage(options, function (err, res) {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(res);
+                    }
+                });
+            }
+            catch (e) {
+                reject(e);
+            }
+        });
+    });
 }
 function signAscii(ascii) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const sig = yield (0, exports.signMessage)(ascii_to_hexa(ascii));
-            return sig;
-        }
-        catch (e) {
-            throw e;
-        }
+        const sig = yield signMessage(ascii_to_hexa(ascii));
+        return sig;
     });
 }
 exports.signAscii = signAscii;
 function verifyAscii(ascii, sig, pubkey) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const r = yield verifyMessage(ascii_to_hexa(ascii), sig, pubkey);
-            return r;
-        }
-        catch (e) {
-            throw e;
-        }
+        const r = yield verifyMessage(ascii_to_hexa(ascii), sig, pubkey);
+        return r;
     });
 }
 exports.verifyAscii = verifyAscii;

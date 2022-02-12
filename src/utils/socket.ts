@@ -6,7 +6,7 @@ import { sphinxLogger} from '../utils/logger'
 
 const config = loadConfig()
 // import * as WebSocket from 'ws'
-const socketio = require('socket.io')
+import * as socketio from 'socket.io'
 
 type ClientMap = Record<number, any[]>
 // { ownerID: [client1, client2] }

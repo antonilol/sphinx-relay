@@ -52,33 +52,29 @@ export async function getMediaToken(ownerPubkey: string, host?: string) {
   if (host?.includes('meme.sphinx:5555')) protocol = 'http'
   const theURL = host ? `${protocol}://${host}/` : mediaURL
   await helpers.sleep(300)
-  try {
-    const res = await rp.get(theURL + 'ask')
-    const r = JSON.parse(res)
-    if (!(r && r.challenge && r.id)) {
-      throw new Error('no challenge')
-    }
-    const sig = await Lightning.signBuffer(
-      Buffer.from(r.challenge, 'base64'),
-      ownerPubkey
-    )
-
-    if (!sig) throw new Error('no signature')
-    const pubkey: string = ownerPubkey
-
-    const sigBytes = zbase32.decode(sig)
-    const sigBase64 = urlBase64FromBytes(sigBytes)
-
-    sphinxLogger.info(`[meme] verify ${pubkey}`, logging.Meme)
-    const bod = await rp.post(theURL + 'verify', {
-      form: { id: r.id, sig: sigBase64, pubkey },
-    })
-    const body = JSON.parse(bod)
-    if (!(body && body.token)) {
-      throw new Error('no token')
-    }
-    return body.token
-  } catch (e) {
-    throw e
+  const res = await rp.get(theURL + 'ask')
+  const r = JSON.parse(res)
+  if (!(r && r.challenge && r.id)) {
+    throw new Error('no challenge')
   }
+  const sig = await Lightning.signBuffer(
+    Buffer.from(r.challenge, 'base64'),
+    ownerPubkey
+  )
+
+  if (!sig) throw new Error('no signature')
+  const pubkey: string = ownerPubkey
+
+  const sigBytes = zbase32.decode(sig)
+  const sigBase64 = urlBase64FromBytes(sigBytes)
+
+  sphinxLogger.info(`[meme] verify ${pubkey}`, logging.Meme)
+  const bod = await rp.post(theURL + 'verify', {
+    form: { id: r.id, sig: sigBase64, pubkey },
+  })
+  const body = JSON.parse(bod)
+  if (!(body && body.token)) {
+    throw new Error('no token')
+  }
+  return body.token
 }
