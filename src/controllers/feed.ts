@@ -46,8 +46,7 @@ export const streamFeed = async (req, res) => {
     let meta
     try {
       meta = JSON.parse(text)
-    } catch (e) {}
-    if (!meta) {
+    } catch (e) {
       return failure(res, 'no meta')
     }
     if (meta && meta.itemID) {

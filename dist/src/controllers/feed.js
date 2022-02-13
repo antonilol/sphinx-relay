@@ -28,8 +28,7 @@ const streamFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         try {
             meta = JSON.parse(text);
         }
-        catch (e) { }
-        if (!meta) {
+        catch (e) {
             return (0, res_1.failure)(res, 'no meta');
         }
         if (meta && meta.itemID) {

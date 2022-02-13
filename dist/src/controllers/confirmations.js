@@ -70,7 +70,9 @@ function receiveConfirmation(payload) {
                         try {
                             statusMap = JSON.parse(message.statusMap || '{}');
                         }
-                        catch (e) { }
+                        catch (e) {
+                            // dont care about the error
+                        }
                         statusMap[sender.id] = constants_1.default.statuses.received;
                         yield message.update({
                             status: constants_1.default.statuses.received,
@@ -127,7 +129,9 @@ function tribeOwnerAutoConfirmation(msg_id, chat_uuid, tenant) {
             try {
                 statusMap = JSON.parse(message.statusMap || '{}');
             }
-            catch (e) { }
+            catch (e) {
+                // dont care about the error
+            }
             statusMap['chat'] = constants_1.default.statuses.received;
             yield message.update({
                 status: constants_1.default.statuses.received,

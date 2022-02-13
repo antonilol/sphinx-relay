@@ -526,7 +526,9 @@ function receiveGroupLeave(payload) {
                             where: { chatId: chat.id, contactId: sender.id, tenant },
                         });
                     }
-                    catch (e) { }
+                    catch (e) {
+                        // dont care about the error
+                    }
                     tribes.putstats({
                         chatId: chat.id,
                         uuid: chat.uuid,

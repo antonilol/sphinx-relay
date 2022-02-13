@@ -228,7 +228,9 @@ export async function receiveMemberRequest(payload) {
     if (theChat) {
       await theChat.update({ updatedAt: date })
     }
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 
   const msg: { [k: string]: any } = {
     chatId: chat.id,
@@ -588,7 +590,9 @@ export async function replayChatHistory(chat, contact, ownerRecord) {
       let content = ''
       try {
         content = JSON.parse(m.remoteMessageContent)
-      } catch (e) {}
+      } catch (e) {
+        // dont care about the error
+      }
 
       let mdate = m.date
       if (!mdate) mdate = new Date()

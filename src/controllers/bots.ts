@@ -152,7 +152,9 @@ export async function installBotAsTribeAdmin(chat, bot_json) {
       try {
         // could fail
         await models.ChatBot.create(chatBot)
-      } catch (e) {}
+      } catch (e) {
+        // dont care about the error
+      }
     }
   }
 }

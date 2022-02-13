@@ -7,9 +7,9 @@ import constants from '../constants'
 import { success, failure200, failure } from '../utils/res'
 import { logging, sphinxLogger } from '../utils/logger'
 
-/* 
+/*
  if in tribe: dont send
- UNLESS tribe admin: 
+ UNLESS tribe admin:
    then send only to the og sender
 */
 export function sendConfirmation({
@@ -72,7 +72,9 @@ export async function receiveConfirmation(payload) {
         let statusMap = {}
         try {
           statusMap = JSON.parse(message.statusMap || '{}')
-        } catch (e) {}
+        } catch (e) {
+          // dont care about the error
+        }
         statusMap[sender.id] = constants.statuses.received
 
         await message.update({
@@ -133,7 +135,9 @@ export async function tribeOwnerAutoConfirmation(msg_id, chat_uuid, tenant) {
     let statusMap = {}
     try {
       statusMap = JSON.parse(message.statusMap || '{}')
-    } catch (e) {}
+    } catch (e) {
+      // dont care about the error
+    }
     statusMap['chat'] = constants.statuses.received
 
     await message.update({

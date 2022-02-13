@@ -182,25 +182,27 @@ export function init(): void {
       }
       switch (cmd) {
         case 'help':
-          const embed = new Sphinx.MessageEmbed()
-            .setAuthor('LoopBot')
-            .setTitle('LoopBot Commands:')
-            .addFields([
-              {
-                name: 'Send to your on-chain address',
-                value: '/loopout {ADDRESS} {AMOUNT}',
-              },
-              { name: 'Set Channel', value: '/loopout setchan=***' },
-              { name: 'Help', value: '/loopout help' },
-            ])
-            .setThumbnail(botSVG)
-          message.channel.send({ embed })
+          message.channel.send({
+            embed: new Sphinx.MessageEmbed()
+              .setAuthor('LoopBot')
+              .setTitle('LoopBot Commands:')
+              .addFields([
+                {
+                  name: 'Send to your on-chain address',
+                  value: '/loopout {ADDRESS} {AMOUNT}',
+                },
+                { name: 'Set Channel', value: '/loopout setchan=***' },
+                { name: 'Help', value: '/loopout help' },
+              ])
+              .setThumbnail(botSVG)
+            })
           return
         default:
-          const embed2 = new Sphinx.MessageEmbed()
-            .setAuthor('LoopBot')
-            .setDescription('Command not recognized')
-          message.channel.send({ embed: embed2 })
+          message.channel.send({
+            embed: new Sphinx.MessageEmbed()
+              .setAuthor('LoopBot')
+              .setDescription('Command not recognized')
+            })
           return
       }
     } // end else
