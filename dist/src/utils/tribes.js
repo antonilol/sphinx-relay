@@ -262,7 +262,9 @@ function updateTribeStats(myPubkey) {
                     owner_pubkey: myPubkey,
                 });
             }
-            catch (e) { }
+            catch (e) {
+                // dont care about the error
+            }
         }));
         if (myTribes.length) {
             logger_1.sphinxLogger.info(`[tribes] updated stats for ${myTribes.length} tribes`, logger_1.logging.Tribes);

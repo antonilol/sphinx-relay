@@ -45,7 +45,9 @@ export default async function migrate() {
       created_at DATETIME,
       updated_at DATETIME
     )`)
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 
   addTableColumn('sphinx_accountings', 'funding_txid')
 
@@ -85,13 +87,17 @@ export default async function migrate() {
       created_at DATETIME,
       updated_at DATETIME
     )`)
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 
   try {
     await sequelize.query(
       `CREATE UNIQUE INDEX chat_bot_index ON sphinx_chat_bots(chat_id, bot_uuid);`
     )
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 
   addTableColumn('sphinx_bots', 'webhook')
   addTableColumn('sphinx_bots', 'uuid')
@@ -107,7 +113,9 @@ export default async function migrate() {
       created_at DATETIME,
       updated_at DATETIME
     )`)
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 
   addTableColumn('sphinx_bot_members', 'bot_id')
 
@@ -122,7 +130,9 @@ export default async function migrate() {
       created_at DATETIME,
       updated_at DATETIME
     )`)
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 
   addTableColumn('sphinx_chats', 'app_url')
   addTableColumn('sphinx_chats', 'feed_url')
@@ -131,7 +141,9 @@ export default async function migrate() {
     await sequelize.query(
       `CREATE UNIQUE INDEX chat_member_index ON sphinx_chat_members(chat_id, contact_id);`
     )
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 
   addTableColumn('sphinx_chats', 'private', 'BOOLEAN')
   addTableColumn('sphinx_chats', 'unlisted', 'BOOLEAN')
@@ -143,7 +155,9 @@ export default async function migrate() {
     await sequelize.query(
       `CREATE INDEX idx_messages_sender ON sphinx_messages (sender);`
     )
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 
   addTableColumn('sphinx_contacts', 'notification_sound')
   addTableColumn('sphinx_contacts', 'from_group', 'BOOLEAN')
@@ -182,7 +196,9 @@ export default async function migrate() {
       transport_token TEXT,
 			created_at DATETIME
     )`)
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 }
 
 async function addTenant(tableName) {

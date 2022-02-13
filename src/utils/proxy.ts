@@ -159,7 +159,9 @@ export async function loadProxyLightning(ownerPubkey?: string) {
     } else {
       try {
         macname = await getProxyRootPubkey()
-      } catch (e) {}
+      } catch (e) {
+        // dont care about the error
+      }
     }
     const credentials = loadProxyCredentials(macname)
     const lnrpcDescriptor = grpc.load('proto/rpc_proxy.proto')

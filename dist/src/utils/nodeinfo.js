@@ -54,7 +54,7 @@ function proxynodeinfo(pk) {
 }
 exports.proxynodeinfo = proxynodeinfo;
 function nodeinfo() {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return __awaiter(this, void 0, void 0, function* () {
         const nzp = yield listNonZeroPolicies();
         let owner_pubkey;
         let info;
@@ -84,8 +84,7 @@ function nodeinfo() {
                 wallet_locked: true,
                 last_active: lastActive,
             };
-            resolve(node);
-            return;
+            return node;
         }
         let owner;
         try {
@@ -106,7 +105,9 @@ function nodeinfo() {
         try {
             public_ip = yield publicIp.v4();
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
         const commitHash = yield (0, gitinfo_1.checkCommitHash)();
         const tag = yield (0, gitinfo_1.checkTag)();
         const clean = yield isClean();
@@ -158,12 +159,12 @@ function nodeinfo() {
                     ? NodeType.NODE_GREENLIGHT
                     : NodeType.NODE_PUBLIC,
             };
-            resolve(node);
+            return node;
         }
         catch (e) {
             logger_1.sphinxLogger.error(`=> ${e}`);
         }
-    }));
+    });
 }
 exports.nodeinfo = nodeinfo;
 function isClean() {

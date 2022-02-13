@@ -249,7 +249,9 @@ async function updateTribeStats(myPubkey) {
         chatId: tribe.id,
         owner_pubkey: myPubkey,
       })
-    } catch (e) {}
+    } catch (e) {
+      // dont care about the error
+    }
   })
   if (myTribes.length) {
     sphinxLogger.info(

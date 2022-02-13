@@ -78,8 +78,8 @@ export async function purchaseFromOriginalSender(
       sender: owner,
       type: constants.message_types.purchase_accept,
       message: msg,
-      success: () => {},
-      failure: () => {},
+      success: void 0,
+      failure: void 0,
     })
     // PAY THE OG POSTER HERE!!!
     sendMessage({
@@ -92,8 +92,8 @@ export async function purchaseFromOriginalSender(
         mediaToken: mt,
         skipPaymentProcessing: true,
       },
-      success: () => {},
-      failure: () => {},
+      success: void 0,
+      failure: void 0,
     })
   } else {
     const ogmsg = await models.Message.findOne({
@@ -113,8 +113,8 @@ export async function purchaseFromOriginalSender(
       realSatsContactId: ogmsg.sender,
       message: msg,
       amount: amount,
-      success: () => {},
-      failure: () => {},
+      success: void 0,
+      failure: void 0,
       isForwarded: true,
     })
   }
@@ -185,8 +185,8 @@ export async function sendFinalMemeIfFirstPurchaser(
       mediaType: typ,
       originalMuid: muid,
     },
-    success: () => {},
-    receive: () => {},
+    success: void 0,
+    receive: void 0,
     isForwarded: true,
   })
 }
@@ -230,75 +230,71 @@ export async function downloadAndUploadAndSaveReturningTermsAndKey(
   // console.log('[modify] meme token', token)
   // console.log('[modify] terms.host', terms.host)
   // console.log('[modify] mt', mt)
-  try {
-    let protocol = 'https'
-    if (terms.host.includes('localhost')) protocol = 'http'
-    const r = await fetch(`${protocol}://${terms.host}/file/${mt}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    // console.log("[modify] dl RES", r)
-    const buf = await r.buffer()
+  let protocol = 'https'
+  if (terms.host.includes('localhost')) protocol = 'http'
+  const r = await fetch(`${protocol}://${terms.host}/file/${mt}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  // console.log("[modify] dl RES", r)
+  const buf = await r.buffer()
 
-    const decMediaKey = rsa.decrypt(chat.groupPrivateKey, key)
+  const decMediaKey = rsa.decrypt(chat.groupPrivateKey, key)
 
-    // console.log('[modify] about to decrypt', buf.length, decMediaKey)
-    const imgBuf = RNCryptor.Decrypt(buf.toString('base64'), decMediaKey)
+  // console.log('[modify] about to decrypt', buf.length, decMediaKey)
+  const imgBuf = RNCryptor.Decrypt(buf.toString('base64'), decMediaKey)
 
-    const newKey = crypto.randomBytes(20).toString('hex')
+  const newKey = crypto.randomBytes(20).toString('hex')
 
-    // console.log('[modify] about to encrypt', imgBuf.length, newKey)
-    const encImgBase64 = RNCryptor.Encrypt(imgBuf, newKey)
+  // console.log('[modify] about to encrypt', imgBuf.length, newKey)
+  const encImgBase64 = RNCryptor.Encrypt(imgBuf, newKey)
 
-    const encImgBuffer = Buffer.from(encImgBase64, 'base64')
+  const encImgBuffer = Buffer.from(encImgBase64, 'base64')
 
-    const form = new FormData()
-    form.append('file', encImgBuffer, {
-      contentType: typ || 'image/jpg',
-      filename: 'Image.jpg',
-      knownLength: encImgBuffer.length,
-    })
-    const formHeaders = form.getHeaders()
-    const resp = await fetch(`${protocol}://${terms.host}/file`, {
-      method: 'POST',
-      headers: {
-        ...formHeaders, // THIS IS REQUIRED!!!
-        Authorization: `Bearer ${token}`,
-      },
-      body: form,
-    })
+  const form = new FormData()
+  form.append('file', encImgBuffer, {
+    contentType: typ || 'image/jpg',
+    filename: 'Image.jpg',
+    knownLength: encImgBuffer.length,
+  })
+  const formHeaders = form.getHeaders()
+  const resp = await fetch(`${protocol}://${terms.host}/file`, {
+    method: 'POST',
+    headers: {
+      ...formHeaders, // THIS IS REQUIRED!!!
+      Authorization: `Bearer ${token}`,
+    },
+    body: form,
+  })
 
-    const json = await resp.json()
-    if (!json.muid) throw new Error('no muid')
+  const json = await resp.json()
+  if (!json.muid) throw new Error('no muid')
 
-    // PUT NEW TERMS, to finish in personalizeMessage
-    const amt = (terms.meta && terms.meta.amt) || injectedAmount
-    const ttl = terms.meta && terms.meta.ttl
-    const mediaTerms: { [k: string]: any } = {
-      muid: json.muid,
-      ttl: ttl || 31536000,
-      host: '',
-      meta: { ...(amt && { amt }) },
-    }
-
-    const encKey = rsa.encrypt(chat.groupKey, newKey.slice())
-    const date = new Date()
-
-    date.setMilliseconds(0)
-    await sleep(1)
-    await models.MediaKey.create({
-      muid: json.muid,
-      chatId: chat.id,
-      key: encKey,
-      messageId: (payload.message && payload.message.id) || 0,
-      receiver: 0,
-      sender: sender.id, // the og sender (merchant) who is sending the completed media token
-      createdAt: date,
-      originalMuid: ogmuid,
-      mediaType: typ,
-      tenant,
-    })
-    return { mediaTerms, mediaKey: encKey }
-  } catch (e) {
-    throw e
+  // PUT NEW TERMS, to finish in personalizeMessage
+  const amt = (terms.meta && terms.meta.amt) || injectedAmount
+  const ttl = terms.meta && terms.meta.ttl
+  const mediaTerms: { [k: string]: any } = {
+    muid: json.muid,
+    ttl: ttl || 31536000,
+    host: '',
+    meta: { ...(amt && { amt }) },
   }
+
+  const encKey = rsa.encrypt(chat.groupKey, newKey.slice())
+  const date = new Date()
+
+  date.setMilliseconds(0)
+  await sleep(1)
+  await models.MediaKey.create({
+    muid: json.muid,
+    chatId: chat.id,
+    key: encKey,
+    messageId: (payload.message && payload.message.id) || 0,
+    receiver: 0,
+    sender: sender.id, // the og sender (merchant) who is sending the completed media token
+    createdAt: date,
+    originalMuid: ogmuid,
+    mediaType: typ,
+    tenant,
+  })
+  return { mediaTerms, mediaKey: encKey }
 }

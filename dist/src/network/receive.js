@@ -350,8 +350,8 @@ function forwardMessageToTribe(ogpayload, sender, realSatsContactId, amtToForwar
             chat: chat,
             skipPubKey: payload.sender.pub_key,
             realSatsContactId,
-            success: () => { },
-            receive: () => { },
+            success: void 0,
+            receive: void 0,
             isForwarded: true,
             forwardedFromContactId,
         });
@@ -387,7 +387,9 @@ function receiveMqttMessage(topic, message) {
             const dest = arr[0];
             onReceive(payload, dest);
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
     });
 }
 exports.receiveMqttMessage = receiveMqttMessage;
@@ -400,13 +402,8 @@ exports.initTribesSubscriptions = initTribesSubscriptions;
 function parsePayload(data) {
     const li = data.lastIndexOf('}');
     const msg = data.substring(0, li + 1);
-    try {
-        const payload = JSON.parse(msg);
-        return payload || '';
-    }
-    catch (e) {
-        throw e;
-    }
+    const payload = JSON.parse(msg);
+    return payload || '';
 }
 // VERIFY PUBKEY OF SENDER from sig
 function parseAndVerifyPayload(data) {
@@ -538,7 +535,9 @@ function parseKeysendInvoice(i) {
                     sender_pubkey = payload.sender && payload.sender.pub_key;
                 }
             }
-            catch (e) { } // err could be a threaded TLV
+            catch (e) {
+                // err could be a threaded TLV
+            }
         }
         else {
             isKeysendType = true;
@@ -555,7 +554,9 @@ function parseKeysendInvoice(i) {
             try {
                 payload = yield parseAndVerifyPayload(data);
             }
-            catch (e) { }
+            catch (e) {
+                // dont care about the error
+            }
         }
         else {
             const threads = weave(data);

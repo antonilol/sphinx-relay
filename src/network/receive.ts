@@ -366,8 +366,8 @@ async function forwardMessageToTribe(
     chat: chat,
     skipPubKey: payload.sender.pub_key, // dont forward back to self
     realSatsContactId,
-    success: () => {},
-    receive: () => {},
+    success: void 0,
+    receive: void 0,
     isForwarded: true,
     forwardedFromContactId,
   })
@@ -398,7 +398,9 @@ export async function receiveMqttMessage(topic, message) {
     const arr = topic.split('/')
     const dest = arr[0]
     onReceive(payload, dest)
-  } catch (e) {}
+  } catch (e) {
+    // dont care about the error
+  }
 }
 
 export async function initTribesSubscriptions() {
@@ -408,12 +410,8 @@ export async function initTribesSubscriptions() {
 function parsePayload(data) {
   const li = data.lastIndexOf('}')
   const msg = data.substring(0, li + 1)
-  try {
-    const payload = JSON.parse(msg)
-    return payload || ''
-  } catch (e) {
-    throw e
-  }
+  const payload = JSON.parse(msg)
+  return payload || ''
 }
 
 // VERIFY PUBKEY OF SENDER from sig
@@ -542,7 +540,9 @@ export async function parseKeysendInvoice(i: interfaces.Invoice) {
         memo = payload.message && payload.message.content
         sender_pubkey = payload.sender && payload.sender.pub_key
       }
-    } catch (e) {} // err could be a threaded TLV
+    } catch (e) {
+      // err could be a threaded TLV
+    }
   } else {
     isKeysendType = true
   }
@@ -558,7 +558,9 @@ export async function parseKeysendInvoice(i: interfaces.Invoice) {
   if (data[0] === '{') {
     try {
       payload = await parseAndVerifyPayload(data)
-    } catch (e) {}
+    } catch (e) {
+      // dont care about the error
+    }
   } else {
     const threads = weave(data)
     if (threads) payload = await parseAndVerifyPayload(threads)

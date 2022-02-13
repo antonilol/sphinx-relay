@@ -77,8 +77,8 @@ function purchaseFromOriginalSender(payload, chat, purchaser, owner) {
                 sender: owner,
                 type: constants_1.default.message_types.purchase_accept,
                 message: msg,
-                success: () => { },
-                failure: () => { },
+                success: void 0,
+                failure: void 0,
             });
             // PAY THE OG POSTER HERE!!!
             (0, send_1.sendMessage)({
@@ -91,8 +91,8 @@ function purchaseFromOriginalSender(payload, chat, purchaser, owner) {
                     mediaToken: mt,
                     skipPaymentProcessing: true,
                 },
-                success: () => { },
-                failure: () => { },
+                success: void 0,
+                failure: void 0,
             });
         }
         else {
@@ -110,8 +110,8 @@ function purchaseFromOriginalSender(payload, chat, purchaser, owner) {
                 realSatsContactId: ogmsg.sender,
                 message: msg,
                 amount: amount,
-                success: () => { },
-                failure: () => { },
+                success: void 0,
+                failure: void 0,
                 isForwarded: true,
             });
         }
@@ -158,8 +158,8 @@ function sendFinalMemeIfFirstPurchaser(payload, chat, sender, owner) {
             chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: [ogPurchaser.id] }),
             type: msgtypes.purchase_accept,
             message: Object.assign(Object.assign({}, termsAndKey), { mediaType: typ, originalMuid: muid }),
-            success: () => { },
-            receive: () => { },
+            success: void 0,
+            receive: void 0,
             isForwarded: true,
         });
     });
@@ -191,67 +191,62 @@ function downloadAndUploadAndSaveReturningTermsAndKey(payload, chat, sender, own
         // console.log('[modify] meme token', token)
         // console.log('[modify] terms.host', terms.host)
         // console.log('[modify] mt', mt)
-        try {
-            let protocol = 'https';
-            if (terms.host.includes('localhost'))
-                protocol = 'http';
-            const r = yield (0, node_fetch_1.default)(`${protocol}://${terms.host}/file/${mt}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            // console.log("[modify] dl RES", r)
-            const buf = yield r.buffer();
-            const decMediaKey = rsa.decrypt(chat.groupPrivateKey, key);
-            // console.log('[modify] about to decrypt', buf.length, decMediaKey)
-            const imgBuf = RNCryptor.Decrypt(buf.toString('base64'), decMediaKey);
-            const newKey = crypto.randomBytes(20).toString('hex');
-            // console.log('[modify] about to encrypt', imgBuf.length, newKey)
-            const encImgBase64 = RNCryptor.Encrypt(imgBuf, newKey);
-            const encImgBuffer = Buffer.from(encImgBase64, 'base64');
-            const form = new FormData();
-            form.append('file', encImgBuffer, {
-                contentType: typ || 'image/jpg',
-                filename: 'Image.jpg',
-                knownLength: encImgBuffer.length,
-            });
-            const formHeaders = form.getHeaders();
-            const resp = yield (0, node_fetch_1.default)(`${protocol}://${terms.host}/file`, {
-                method: 'POST',
-                headers: Object.assign(Object.assign({}, formHeaders), { Authorization: `Bearer ${token}` }),
-                body: form,
-            });
-            const json = yield resp.json();
-            if (!json.muid)
-                throw new Error('no muid');
-            // PUT NEW TERMS, to finish in personalizeMessage
-            const amt = (terms.meta && terms.meta.amt) || injectedAmount;
-            const ttl = terms.meta && terms.meta.ttl;
-            const mediaTerms = {
-                muid: json.muid,
-                ttl: ttl || 31536000,
-                host: '',
-                meta: Object.assign({}, (amt && { amt })),
-            };
-            const encKey = rsa.encrypt(chat.groupKey, newKey.slice());
-            const date = new Date();
-            date.setMilliseconds(0);
-            yield sleep(1);
-            yield models_1.models.MediaKey.create({
-                muid: json.muid,
-                chatId: chat.id,
-                key: encKey,
-                messageId: (payload.message && payload.message.id) || 0,
-                receiver: 0,
-                sender: sender.id,
-                createdAt: date,
-                originalMuid: ogmuid,
-                mediaType: typ,
-                tenant,
-            });
-            return { mediaTerms, mediaKey: encKey };
-        }
-        catch (e) {
-            throw e;
-        }
+        let protocol = 'https';
+        if (terms.host.includes('localhost'))
+            protocol = 'http';
+        const r = yield (0, node_fetch_1.default)(`${protocol}://${terms.host}/file/${mt}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        // console.log("[modify] dl RES", r)
+        const buf = yield r.buffer();
+        const decMediaKey = rsa.decrypt(chat.groupPrivateKey, key);
+        // console.log('[modify] about to decrypt', buf.length, decMediaKey)
+        const imgBuf = RNCryptor.Decrypt(buf.toString('base64'), decMediaKey);
+        const newKey = crypto.randomBytes(20).toString('hex');
+        // console.log('[modify] about to encrypt', imgBuf.length, newKey)
+        const encImgBase64 = RNCryptor.Encrypt(imgBuf, newKey);
+        const encImgBuffer = Buffer.from(encImgBase64, 'base64');
+        const form = new FormData();
+        form.append('file', encImgBuffer, {
+            contentType: typ || 'image/jpg',
+            filename: 'Image.jpg',
+            knownLength: encImgBuffer.length,
+        });
+        const formHeaders = form.getHeaders();
+        const resp = yield (0, node_fetch_1.default)(`${protocol}://${terms.host}/file`, {
+            method: 'POST',
+            headers: Object.assign(Object.assign({}, formHeaders), { Authorization: `Bearer ${token}` }),
+            body: form,
+        });
+        const json = yield resp.json();
+        if (!json.muid)
+            throw new Error('no muid');
+        // PUT NEW TERMS, to finish in personalizeMessage
+        const amt = (terms.meta && terms.meta.amt) || injectedAmount;
+        const ttl = terms.meta && terms.meta.ttl;
+        const mediaTerms = {
+            muid: json.muid,
+            ttl: ttl || 31536000,
+            host: '',
+            meta: Object.assign({}, (amt && { amt })),
+        };
+        const encKey = rsa.encrypt(chat.groupKey, newKey.slice());
+        const date = new Date();
+        date.setMilliseconds(0);
+        yield sleep(1);
+        yield models_1.models.MediaKey.create({
+            muid: json.muid,
+            chatId: chat.id,
+            key: encKey,
+            messageId: (payload.message && payload.message.id) || 0,
+            receiver: 0,
+            sender: sender.id,
+            createdAt: date,
+            originalMuid: ogmuid,
+            mediaType: typ,
+            tenant,
+        });
+        return { mediaTerms, mediaKey: encKey };
     });
 }
 exports.downloadAndUploadAndSaveReturningTermsAndKey = downloadAndUploadAndSaveReturningTermsAndKey;

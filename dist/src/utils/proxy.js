@@ -176,7 +176,9 @@ function loadProxyLightning(ownerPubkey) {
                 try {
                     macname = yield getProxyRootPubkey();
                 }
-                catch (e) { }
+                catch (e) {
+                    // dont care about the error
+                }
             }
             const credentials = loadProxyCredentials(macname);
             const lnrpcDescriptor = grpc.load('proto/rpc_proxy.proto');

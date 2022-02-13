@@ -191,7 +191,7 @@ export async function sendMessage(params) {
   }
 }
 
-export function signAndSend(
+export async function signAndSend(
   opts,
   owner: { [k: string]: any },
   mqttTopic?: string,
@@ -200,35 +200,32 @@ export function signAndSend(
   // console.log('sign and send!',opts)
   const ownerPubkey = owner.publicKey
   const ownerID = owner.id
-  return new Promise(async function (resolve, reject) {
-    if (!opts || typeof opts !== 'object') {
-      return reject('object plz')
-    }
-    if (!opts.dest) {
-      return reject('no dest pubkey')
-    }
-    let data = JSON.stringify(opts.data || {})
-    opts.amt = opts.amt || 0
+  if (!opts || typeof opts !== 'object') {
+    throw new Error('object plz')
+  }
+  if (!opts.dest) {
+    throw new Error('no dest pubkey')
+  }
+  let data = JSON.stringify(opts.data || {})
+  opts.amt = opts.amt || 0
 
-    const sig = await LND.signAscii(data, ownerPubkey)
-    data = data + sig
+  const sig = await LND.signAscii(data, ownerPubkey)
+  data = data + sig
 
-    // console.log("-> ACTUALLY SEND: topic:", mqttTopic)
-    try {
-      if (mqttTopic) {
-        await tribes.publish(mqttTopic, data, ownerPubkey, function (err) {
-          if (!replayingHistory) {
-            if (mqttTopic) checkIfAutoConfirm(opts.data, ownerID)
-          }
-        })
-      } else {
-        await LND.keysendMessage({ ...opts, data }, ownerPubkey)
+  // console.log("-> ACTUALLY SEND: topic:", mqttTopic)
+  if (mqttTopic) {
+    await tribes.publish(mqttTopic, data, ownerPubkey, function (err) {
+      if (err) {
+        // TODO handle error
       }
-      resolve(true)
-    } catch (e) {
-      reject(e)
-    }
-  })
+      if (!replayingHistory) {
+        if (mqttTopic) checkIfAutoConfirm(opts.data, ownerID)
+      }
+    })
+  } else {
+    await LND.keysendMessage({ ...opts, data }, ownerPubkey)
+  }
+  return true
 }
 
 function checkIfAutoConfirm(data, tenant) {

@@ -50,7 +50,9 @@ function migrate() {
       updated_at DATETIME
     )`);
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
         addTableColumn('sphinx_accountings', 'funding_txid');
         addTableColumn('sphinx_accountings', 'onchain_txid');
         addTableColumn('sphinx_accountings', 'commit_fee', 'BIGINT');
@@ -81,11 +83,15 @@ function migrate() {
       updated_at DATETIME
     )`);
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
         try {
             yield models_1.sequelize.query(`CREATE UNIQUE INDEX chat_bot_index ON sphinx_chat_bots(chat_id, bot_uuid);`);
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
         addTableColumn('sphinx_bots', 'webhook');
         addTableColumn('sphinx_bots', 'uuid');
         addTableColumn('sphinx_bots', 'price_per_use', 'INT');
@@ -100,7 +106,9 @@ function migrate() {
       updated_at DATETIME
     )`);
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
         addTableColumn('sphinx_bot_members', 'bot_id');
         //////////
         try {
@@ -113,13 +121,17 @@ function migrate() {
       updated_at DATETIME
     )`);
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
         addTableColumn('sphinx_chats', 'app_url');
         addTableColumn('sphinx_chats', 'feed_url');
         try {
             yield models_1.sequelize.query(`CREATE UNIQUE INDEX chat_member_index ON sphinx_chat_members(chat_id, contact_id);`);
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
         addTableColumn('sphinx_chats', 'private', 'BOOLEAN');
         addTableColumn('sphinx_chats', 'unlisted', 'BOOLEAN');
         addTableColumn('sphinx_chat_members', 'status', 'BIGINT');
@@ -127,7 +139,9 @@ function migrate() {
         try {
             yield models_1.sequelize.query(`CREATE INDEX idx_messages_sender ON sphinx_messages (sender);`);
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
         addTableColumn('sphinx_contacts', 'notification_sound');
         addTableColumn('sphinx_contacts', 'from_group', 'BOOLEAN');
         addTableColumn('sphinx_contacts', 'private_photo', 'BOOLEAN');
@@ -164,7 +178,9 @@ function migrate() {
 			created_at DATETIME
     )`);
         }
-        catch (e) { }
+        catch (e) {
+            // dont care about the error
+        }
     });
 }
 exports.default = migrate;
