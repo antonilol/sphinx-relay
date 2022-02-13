@@ -138,14 +138,12 @@ function testLDAT() {
 }
 exports.testLDAT = testLDAT;
 function serializeMeta(obj) {
-    const str = [];
-    for (const p in obj) {
-        if (obj.hasOwnProperty(p)) {
-            str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
-        }
-    }
-    str.sort((a, b) => (a > b ? 1 : -1));
-    return str.join('&');
+    return Object.entries(obj)
+        .map(p => {
+        return `${encodeURIComponent(p[0])}=${encodeURIComponent(p[1])}`;
+    })
+        .sort((a, b) => (a > b ? 1 : -1))
+        .join('&');
 }
 function deserializeMeta(str) {
     const json = str && str.length > 2

@@ -155,8 +155,7 @@ function debounce(func, id, delay) {
         tribeCounts[id] = 0;
     tribeCounts[id] += 1;
     bounceTimeouts[id] = setTimeout(() => {
-        func.apply(this, arguments);
-        // setTimeout(()=> tribeCounts[id]=0, 15)
+        func();
         tribeCounts[id] = 0;
     }, delay);
 }

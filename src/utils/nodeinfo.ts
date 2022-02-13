@@ -15,10 +15,10 @@ export enum NodeType {
   NODE_GREENLIGHT = 'node_greenlight',
 }
 
-export function proxynodeinfo(pk: string): Promise<Object> {
-  return new Promise(async (resolve, reject) => {
+export async function proxynodeinfo(pk: string): Promise<{ [key: string]: any }> {
+  const channelList = await Lightning.listChannels({})
+  return new Promise(resolve => {
     try {
-      const channelList = await Lightning.listChannels({})
       if (!channelList) return
       const { channels } = channelList
       const localBalances = channels.map((c) => parseInt(c.local_balance))

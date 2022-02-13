@@ -25,32 +25,34 @@ var NodeType;
     NodeType["NODE_GREENLIGHT"] = "node_greenlight";
 })(NodeType = exports.NodeType || (exports.NodeType = {}));
 function proxynodeinfo(pk) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-        try {
-            const channelList = yield Lightning.listChannels({});
-            if (!channelList)
+    return __awaiter(this, void 0, void 0, function* () {
+        const channelList = yield Lightning.listChannels({});
+        return new Promise(resolve => {
+            try {
+                if (!channelList)
+                    return;
+                const { channels } = channelList;
+                const localBalances = channels.map((c) => parseInt(c.local_balance));
+                const remoteBalances = channels.map((c) => parseInt(c.remote_balance));
+                const largestLocalBalance = Math.max(...localBalances);
+                const largestRemoteBalance = Math.max(...remoteBalances);
+                const totalLocalBalance = localBalances.reduce((a, b) => a + b, 0);
+                resolve({
+                    pubkey: pk,
+                    number_channels: channels.length,
+                    open_channel_data: channels,
+                    largest_local_balance: largestLocalBalance,
+                    largest_remote_balance: largestRemoteBalance,
+                    total_local_balance: totalLocalBalance,
+                    // node_type: 'node_virtual'
+                    node_type: NodeType.NODE_VIRTUAL,
+                });
+            }
+            catch (e) {
                 return;
-            const { channels } = channelList;
-            const localBalances = channels.map((c) => parseInt(c.local_balance));
-            const remoteBalances = channels.map((c) => parseInt(c.remote_balance));
-            const largestLocalBalance = Math.max(...localBalances);
-            const largestRemoteBalance = Math.max(...remoteBalances);
-            const totalLocalBalance = localBalances.reduce((a, b) => a + b, 0);
-            resolve({
-                pubkey: pk,
-                number_channels: channels.length,
-                open_channel_data: channels,
-                largest_local_balance: largestLocalBalance,
-                largest_remote_balance: largestRemoteBalance,
-                total_local_balance: totalLocalBalance,
-                // node_type: 'node_virtual'
-                node_type: NodeType.NODE_VIRTUAL,
-            });
-        }
-        catch (e) {
-            return;
-        }
-    }));
+            }
+        });
+    });
 }
 exports.proxynodeinfo = proxynodeinfo;
 function nodeinfo() {

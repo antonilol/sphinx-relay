@@ -83,7 +83,7 @@ let i = 0
 let ctx = 0
 export async function reconnectToLightning(
   innerCtx: number,
-  callback?: Function | null,
+  callback?: (() => void) | null,
   noCache?: boolean
 ) {
   ctx = innerCtx

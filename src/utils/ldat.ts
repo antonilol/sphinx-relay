@@ -154,15 +154,13 @@ async function testLDAT() {
   sphinxLogger.info(parseLDAT(token2))
 }
 
-function serializeMeta(obj) {
-  const str: string[] = []
-  for (const p in obj) {
-    if (obj.hasOwnProperty(p)) {
-      str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]))
-    }
-  }
-  str.sort((a, b) => (a > b ? 1 : -1))
-  return str.join('&')
+function serializeMeta(obj: { [k: string]: any }) {
+  return Object.entries(obj)
+    .map(p => {
+      return `${encodeURIComponent(p[0])}=${encodeURIComponent(p[1])}`
+    })
+    .sort((a, b) => (a > b ? 1 : -1))
+    .join('&')
 }
 
 function deserializeMeta(str) {

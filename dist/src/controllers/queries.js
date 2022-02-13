@@ -69,7 +69,7 @@ function getPendingAccountings() {
             const utxo = utxos.find((u) => u.address === a.onchainAddress);
             if (utxo) {
                 logger_1.sphinxLogger.info(`[WATCH] UTXO ${utxo}`);
-                const onchainTxid = utxo.outpoint && utxo.outpoint.txid_str;
+                const onchainTxid = utxo.outpoint;
                 ret.push({
                     id: a.id,
                     pubkey: a.pubkey,

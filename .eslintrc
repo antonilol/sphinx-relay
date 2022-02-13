@@ -6,7 +6,8 @@
   ],
   "rules": {
     "no-async-promise-executor": 0,
-    "no-constant-condition": 0
+    "no-constant-condition": 0,
+    "no-empty-function": 0
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

@@ -79,7 +79,7 @@ async function getPendingAccountings(): Promise<Accounting[]> {
     const utxo = utxos.find((u) => u.address === a.onchainAddress)
     if (utxo) {
       sphinxLogger.info(`[WATCH] UTXO ${utxo}`)
-      const onchainTxid = utxo.outpoint && utxo.outpoint.txid_str
+      const onchainTxid = utxo.outpoint
       ret.push(<Accounting>{
         id: a.id,
         pubkey: a.pubkey,

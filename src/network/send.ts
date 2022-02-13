@@ -216,10 +216,7 @@ export async function signAndSend(
 
   // console.log("-> ACTUALLY SEND: topic:", mqttTopic)
   if (mqttTopic) {
-    await tribes.publish(mqttTopic, data, ownerPubkey, function (err) {
-      if (err) {
-        // TODO handle error
-      }
+    await tribes.publish(mqttTopic, data, ownerPubkey, () => {
       if (!replayingHistory) {
         if (mqttTopic) checkIfAutoConfirm(opts.data, ownerID)
       }

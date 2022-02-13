@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.models = exports.sequelize = void 0;
 // parse BIGINTs to number
-require('pg').defaults.parseInt8 = true;
+const pg = require("pg");
+pg.defaults.parseInt8 = true;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const path = require("path");
 const chat_1 = require("./sql/chat");
@@ -22,12 +23,13 @@ const requestsTransportTokens_1 = require("./sql/requestsTransportTokens");
 const minimist = require("minimist");
 const config_1 = require("../utils/config");
 const proxy_1 = require("../utils/proxy");
+const fs_1 = require("fs");
 const argv = minimist(process.argv.slice(2));
 const configFile = argv.db
     ? path.resolve(process.cwd(), argv.db)
     : path.join(__dirname, '../../config/config.json');
 const env = process.env.NODE_ENV || 'development';
-const config = require(configFile)[env];
+const config = JSON.parse((0, fs_1.readFileSync)(configFile).toString())[env];
 const appConfig = (0, config_1.loadConfig)();
 const opts = Object.assign(Object.assign({}, config), { logging: appConfig.sql_log === 'true' ? console.log : false, models: [
         chat_1.default,

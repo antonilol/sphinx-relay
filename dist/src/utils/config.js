@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadConfig = void 0;
 const path = require("path");
 const minimist = require("minimist");
+const fs_1 = require("fs");
 const argv = minimist(process.argv.slice(2));
 if (!argv.config && process.env.RELAY_CONFIG) {
     argv.config = process.env.RELAY_CONFIG;
@@ -11,7 +12,7 @@ const configFile = argv.config
     ? path.resolve(process.cwd(), argv.config)
     : path.join(__dirname, '../../config/app.json');
 const env = process.env.NODE_ENV || 'development';
-const config = require(configFile)[env];
+const config = JSON.parse((0, fs_1.readFileSync)(configFile).toString())[env];
 const ENV = process.env;
 const DEFAULT_HSM_SECRET_PATH = './creds/hsm_secret';
 const DEFAULT_TLS_LOCATION = './creds/ca.pem';

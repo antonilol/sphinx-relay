@@ -371,8 +371,8 @@ function buildBotPayload(msg) {
         reply_id: msg.message.replyUuid,
         channel: {
             id: chat_uuid,
-            send: function () { },
-            pay: function () { },
+            send: () => { },
+            pay: () => { },
         },
         content: msg.message.content,
         amount: msg.message.amount,

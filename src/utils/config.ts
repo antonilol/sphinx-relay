@@ -1,5 +1,6 @@
 import * as path from 'path'
 import * as minimist from 'minimist'
+import { readFileSync } from 'fs'
 
 const argv = minimist(process.argv.slice(2))
 
@@ -12,7 +13,7 @@ const configFile = argv.config
   : path.join(__dirname, '../../config/app.json')
 
 const env = process.env.NODE_ENV || 'development'
-const config = require(configFile)[env]
+const config = JSON.parse(readFileSync(configFile).toString())[env]
 const ENV = process.env
 
 type LightningProvider = 'LND' | 'GREENLIGHT'
