@@ -23,5 +23,4 @@ jobs:
           git config --global user.name "Github Actions"
           git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
           git pull github ${GITHUB_REF} --ff-only
-          git commit -am "automatic linter fixes" || echo "All good, nothing fixed"
-          git push github HEAD:${GITHUB_REF}
+          git commit -am "automatic linter fixes" && git push github HEAD:${GITHUB_REF} || echo "All good, nothing fixed"
