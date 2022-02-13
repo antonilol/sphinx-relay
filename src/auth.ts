@@ -10,7 +10,7 @@ import * as jwtUtils from './utils/jwt'
 import { allowedJwtRoutes } from './scopes'
 import * as rsa from './crypto/rsa'
 
-const fs = require('fs')
+import * as fs from 'fs'
 
 const config = loadConfig()
 

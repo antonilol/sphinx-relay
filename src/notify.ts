@@ -168,13 +168,11 @@ export { sendNotification }
 const bounceTimeouts = {}
 const tribeCounts = {}
 function debounce(func, id, delay) {
-  const context = this
-  const args = arguments
   if (bounceTimeouts[id]) clearTimeout(bounceTimeouts[id])
   if (!tribeCounts[id]) tribeCounts[id] = 0
   tribeCounts[id] += 1
   bounceTimeouts[id] = setTimeout(() => {
-    func.apply(context, args)
+    func.apply(this, arguments)
     // setTimeout(()=> tribeCounts[id]=0, 15)
     tribeCounts[id] = 0
   }, delay)
