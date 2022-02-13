@@ -102,7 +102,9 @@ export async function isBotMsg(
               )
             }
           }
-        } catch (e) {}
+        } catch (e) {
+          // dont care about the error
+        }
       } else {
         // no message types defined, do all?
         if (txt && txt.startsWith(`${botInTribe.botPrefix} `)) {
@@ -133,13 +135,16 @@ async function emitMessageToBot(msg, botInTribe, sender): Promise<boolean> {
       builtinBotEmit(msg)
       return true
     case constants.bot_types.local:
-      const bot = await models.Bot.findOne({
-        where: {
-          uuid: botInTribe.botUuid,
-          tenant,
-        },
-      })
-      return postToBotServer(msg, bot, SphinxBot.MSG_TYPE.MESSAGE)
+      return postToBotServer(
+        msg,
+        await models.Bot.findOne({
+          where: {
+            uuid: botInTribe.botUuid,
+            tenant,
+          },
+        }),
+        SphinxBot.MSG_TYPE.MESSAGE
+      )
     case constants.bot_types.remote:
       return keysendBotCmd(msg, botInTribe, sender)
     default:

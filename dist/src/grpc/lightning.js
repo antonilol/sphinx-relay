@@ -357,9 +357,8 @@ const keysend = (opts, ownerPubkey) => {
                                 reject(payment.payment_error);
                             }
                             else {
-                                if (state === 'IN_FLIGHT') {
-                                }
-                                else if (state === 'FAILED_NO_ROUTE') {
+                                // if (state === 'IN_FLIGHT') {} else
+                                if (state === 'FAILED_NO_ROUTE') {
                                     reject(payment.failure_reason || payment);
                                 }
                                 else if (state === 'FAILED') {

@@ -286,7 +286,7 @@ async function doTheAction(data, owner) {
   }
 }
 
-async function uniqueifyAlias(payload, sender, chat, owner): Promise<Object> {
+async function uniqueifyAlias(payload, sender, chat, owner): Promise<any> {
   if (!chat || !sender || !owner) return payload
   if (!(payload && payload.sender)) return payload
   const senderContactId = sender.id // og msg sender

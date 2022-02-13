@@ -1,9 +1,9 @@
 import { existsSync, readFileSync, writeFile, mkdirSync } from 'fs'
 import * as express from 'express'
 import { sphinxLogger } from './logger'
-const qs = require('qs')
-const axios = require('axios')
-const forge = require('node-forge')
+import * as qs from 'qs'
+import axios from 'axios'
+import * as forge from 'node-forge'
 const apiUrl = 'https://api.zerossl.com'
 
 function sleep(ms) {
@@ -11,7 +11,7 @@ function sleep(ms) {
 }
 
 function generateCsr(keys, endpoint) {
-  var csr = forge.pki.createCertificationRequest()
+  const csr = forge.pki.createCertificationRequest()
   csr.publicKey = keys.publicKey
   csr.setSubject([
     {
@@ -20,11 +20,10 @@ function generateCsr(keys, endpoint) {
     },
   ])
   csr.sign(keys.privateKey)
-  if (!csr.verify()) {
+  if (!csr.verify()) { // <== TODO fix
     throw new Error('=> [ssl] Verification of CSR failed.')
   }
-  var csr = forge.pki.certificationRequestToPem(csr)
-  return csr.trim()
+  return forge.pki.certificationRequestToPem(csr).trim()
 }
 
 async function requestCert(endpoint, csr, apiKey) {
@@ -48,11 +47,11 @@ async function validateCert(port, data, endpoint, apiKey) {
   const validationObject = data.validation.other_methods[endpoint]
   const replacement = new RegExp(`http://${endpoint}`, 'g')
   const path = validationObject.file_validation_url_http.replace(replacement, '')
-  await app.get(path, (req, res) => {
+  app.get(path, (req, res) => {
     res.set('Content-Type', 'text/plain')
     res.send(validationObject.file_validation_content.join('\n'))
   })
-  const server = await app.listen(port, () => {
+  const server = app.listen(port, () => {
     sphinxLogger.info(
       `=> [ssl] validation server started at http://0.0.0.0:${port}`
     )
@@ -68,7 +67,7 @@ async function validateCert(port, data, endpoint, apiKey) {
     sphinxLogger.info(`=> [ssl] checking certificate again...`)
     await sleep(2000)
   }
-  await server.close(() => {
+  server.close(() => {
     sphinxLogger.info(`=> [ssl] validation server stopped.`)
   })
   return

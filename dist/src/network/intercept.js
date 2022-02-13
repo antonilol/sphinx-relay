@@ -97,7 +97,9 @@ function isBotMsg(m, sentByMe, sender, forwardedFromContactId) {
                             }
                         }
                     }
-                    catch (e) { }
+                    catch (e) {
+                        // dont care about the error
+                    }
                 }
                 else {
                     // no message types defined, do all?
@@ -130,13 +132,12 @@ function emitMessageToBot(msg, botInTribe, sender) {
                 (0, builtin_1.builtinBotEmit)(msg);
                 return true;
             case constants_1.default.bot_types.local:
-                const bot = yield models_1.models.Bot.findOne({
+                return (0, bots_1.postToBotServer)(msg, yield models_1.models.Bot.findOne({
                     where: {
                         uuid: botInTribe.botUuid,
                         tenant,
                     },
-                });
-                return (0, bots_1.postToBotServer)(msg, bot, SphinxBot.MSG_TYPE.MESSAGE);
+                }), SphinxBot.MSG_TYPE.MESSAGE);
             case constants_1.default.bot_types.remote:
                 return (0, bots_1.keysendBotCmd)(msg, botInTribe, sender);
             default:

@@ -141,8 +141,8 @@ export const performKeysendMessage = async ({
   route_hint?: string
   amount: number
   msg: { [k: string]: any }
-  success?: Function
-  failure?: Function
+  success?: ({destination_key: string, amount: number}) => void
+  failure?: (error: Error) => void
   sender: any
   extra_tlv?: { [k: string]: any }
 }) => {

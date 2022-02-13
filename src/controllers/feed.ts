@@ -86,8 +86,8 @@ export const streamFeed = async (req, res) => {
           d.route_hint,
           amt,
           text,
-          function () {},
-          function () {},
+          void 0,
+          void 0,
           extra_tlv
         )
       }
@@ -103,8 +103,8 @@ export async function anonymousKeysend(
   route_hint: string,
   amount: number,
   text: string,
-  onSuccess: Function,
-  onFailure: Function,
+  onSuccess: (({destination_key: string, amount: number}) => void) | undefined,
+  onFailure: ((error: Error) => void) | undefined,
   extra_tlv: { [k: string]: string }
 ) {
   const tenant = owner.id
@@ -137,10 +137,14 @@ export async function anonymousKeysend(
         updatedAt: date,
         tenant,
       })
-      onSuccess({ destination_key, amount })
+      if (onSuccess) {
+        onSuccess({ destination_key, amount })
+      }
     },
-    failure: (error) => {
-      onFailure(error)
+    failure: err => {
+      if (onFailure) {
+        onFailure(err)
+      }
     },
     extra_tlv,
   })

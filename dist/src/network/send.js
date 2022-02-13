@@ -83,7 +83,9 @@ function sendMessage(params) {
                     // post last_active to tribes server
                     tribes.putActivity(chat.uuid, chat.host, sender.publicKey);
                 }
-                catch (e) { }
+                catch (e) {
+                    // dont care about the error
+                }
             }
             else {
                 // if tribe, send to owner only

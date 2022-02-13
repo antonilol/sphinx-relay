@@ -13,15 +13,15 @@ exports.getCertificate = void 0;
 const fs_1 = require("fs");
 const express = require("express");
 const logger_1 = require("./logger");
-const qs = require('qs');
-const axios = require('axios');
-const forge = require('node-forge');
+const qs = require("qs");
+const axios_1 = require("axios");
+const forge = require("node-forge");
 const apiUrl = 'https://api.zerossl.com';
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 function generateCsr(keys, endpoint) {
-    var csr = forge.pki.createCertificationRequest();
+    const csr = forge.pki.createCertificationRequest();
     csr.publicKey = keys.publicKey;
     csr.setSubject([
         {
@@ -30,15 +30,14 @@ function generateCsr(keys, endpoint) {
         },
     ]);
     csr.sign(keys.privateKey);
-    if (!csr.verify()) {
+    if (!csr.verify()) { // <== TODO fix
         throw new Error('=> [ssl] Verification of CSR failed.');
     }
-    var csr = forge.pki.certificationRequestToPem(csr);
-    return csr.trim();
+    return forge.pki.certificationRequestToPem(csr).trim();
 }
 function requestCert(endpoint, csr, apiKey) {
     return __awaiter(this, void 0, void 0, function* () {
-        const res = yield axios({
+        const res = yield (0, axios_1.default)({
             method: 'post',
             url: `${apiUrl}/certificates?access_key=${apiKey}`,
             data: qs.stringify({
@@ -59,11 +58,11 @@ function validateCert(port, data, endpoint, apiKey) {
         const validationObject = data.validation.other_methods[endpoint];
         const replacement = new RegExp(`http://${endpoint}`, 'g');
         const path = validationObject.file_validation_url_http.replace(replacement, '');
-        yield app.get(path, (req, res) => {
+        app.get(path, (req, res) => {
             res.set('Content-Type', 'text/plain');
             res.send(validationObject.file_validation_content.join('\n'));
         });
-        const server = yield app.listen(port, () => {
+        const server = app.listen(port, () => {
             logger_1.sphinxLogger.info(`=> [ssl] validation server started at http://0.0.0.0:${port}`);
         });
         yield requestValidation(data.id, apiKey);
@@ -77,7 +76,7 @@ function validateCert(port, data, endpoint, apiKey) {
             logger_1.sphinxLogger.info(`=> [ssl] checking certificate again...`);
             yield sleep(2000);
         }
-        yield server.close(() => {
+        server.close(() => {
             logger_1.sphinxLogger.info(`=> [ssl] validation server stopped.`);
         });
         return;
@@ -85,7 +84,7 @@ function validateCert(port, data, endpoint, apiKey) {
 }
 function requestValidation(id, apiKey) {
     return __awaiter(this, void 0, void 0, function* () {
-        const res = yield axios({
+        const res = yield (0, axios_1.default)({
             method: 'post',
             url: `${apiUrl}/certificates/${id}/challenges?access_key=${apiKey}`,
             data: qs.stringify({
@@ -105,7 +104,7 @@ function requestValidation(id, apiKey) {
 }
 function getCert(id, apiKey) {
     return __awaiter(this, void 0, void 0, function* () {
-        const res = yield axios({
+        const res = yield (0, axios_1.default)({
             method: 'get',
             url: `${apiUrl}/certificates/${id}?access_key=${apiKey}`,
             headers: {
@@ -117,7 +116,7 @@ function getCert(id, apiKey) {
 }
 function downloadCert(id, apiKey) {
     return __awaiter(this, void 0, void 0, function* () {
-        const res = yield axios({
+        const res = yield (0, axios_1.default)({
             method: 'get',
             url: `${apiUrl}/certificates/${id}/download/return?access_key=${apiKey}`,
             headers: {

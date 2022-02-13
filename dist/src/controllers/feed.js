@@ -63,7 +63,7 @@ const streamFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                     extra_tlv[d.custom_key] = d.custom_value;
                 }
                 const amt = Math.max(Math.round((d.split / 100) * amount), 1);
-                yield anonymousKeysend(owner, d.address, d.route_hint, amt, text, function () { }, function () { }, extra_tlv);
+                yield anonymousKeysend(owner, d.address, d.route_hint, amt, text, void 0, void 0, extra_tlv);
             }
         }));
     }
@@ -102,10 +102,14 @@ function anonymousKeysend(owner, destination_key, route_hint, amount, text, onSu
                     updatedAt: date,
                     tenant,
                 });
-                onSuccess({ destination_key, amount });
+                if (onSuccess) {
+                    onSuccess({ destination_key, amount });
+                }
             },
-            failure: (error) => {
-                onFailure(error);
+            failure: err => {
+                if (onFailure) {
+                    onFailure(err);
+                }
             },
             extra_tlv,
         });
