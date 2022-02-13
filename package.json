@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/app.js",
   "scripts": {
-    "lint": "eslint ./src/**/*.ts --fix",
+    "lint": "npx eslint ./src/**/*.ts --fix",
     "test": "ava",
     "docker-dev": "nodemon ./app.js",
     "build": "tsc",
