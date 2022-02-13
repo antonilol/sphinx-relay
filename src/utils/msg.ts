@@ -2,6 +2,8 @@ import { tokenFromTerms } from './ldat'
 import * as rsa from '../crypto/rsa'
 import constants from '../constants'
 import { Contact } from '../models/ts/contact'
+import { Chat } from '../models/ts/chat'
+import { Message } from '../models/ts/message'
 
 function addInRemoteText(
   full: { [k: string]: any },
@@ -120,7 +122,7 @@ async function finishTermsAndReceipt(
 
 // this is only for tribes
 // DECRYPT EITHER STRING OR FIRST VAL IN OBJ
-async function decryptMessage(full: { [k: string]: any }, chat) {
+async function decryptMessage(full: { [k: string]: any }, chat: Chat) {
   if (!chat.groupPrivateKey) return full
   const m = full && full.message
   if (!m) return full
@@ -151,12 +153,12 @@ async function decryptMessage(full: { [k: string]: any }, chat) {
   return fillmsg(full, obj)
 }
 
-async function personalizeMessage(m, contact: Contact, isTribeOwner: boolean) {
+async function personalizeMessage(msg: Message, contact: Contact, isTribeOwner: boolean) {
   const contactId = contact.id
   const destkey = contact.publicKey
-  const senderPubkey = m.sender.pub_key
+  const senderPubkey = msg.sender.pub_key
 
-  const cloned = JSON.parse(JSON.stringify(m))
+  const cloned = JSON.parse(JSON.stringify(msg))
 
   const chat = cloned && cloned.chat
   const isTribe = chat.type && chat.type === constants.chat_types.tribe
