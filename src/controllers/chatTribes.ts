@@ -11,8 +11,9 @@ import { personalizeMessage, decryptMessage } from '../utils/msg'
 import { Op } from 'sequelize'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
+import { Request, Response } from 'express'
 
-export async function joinTribe(req, res) {
+export async function joinTribe(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -265,7 +266,7 @@ export async function receiveMemberRequest(payload) {
   )
 }
 
-export async function editTribe(req, res) {
+export async function editTribe(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const {
@@ -349,7 +350,7 @@ export async function editTribe(req, res) {
 }
 
 type ChatMemberStatus = 'approved' | 'rejected'
-export async function approveOrRejectMember(req, res) {
+export async function approveOrRejectMember(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 

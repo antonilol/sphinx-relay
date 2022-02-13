@@ -15,8 +15,9 @@ import {
 } from './chatTribes'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
+import { Request, Response } from 'express'
 
-export async function updateChat(req, res) {
+export async function updateChat(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   sphinxLogger.info(`=> updateChat`)
@@ -43,7 +44,7 @@ export async function updateChat(req, res) {
   success(res, jsonUtils.chatToJson(chat))
 }
 
-export async function kickChatMember(req, res) {
+export async function kickChatMember(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -130,7 +131,7 @@ export async function receiveGroupKick(payload) {
   )
 }
 
-export async function getChats(req, res) {
+export async function getChats(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const chats = await models.Chat.findAll({
@@ -141,7 +142,7 @@ export async function getChats(req, res) {
   success(res, c)
 }
 
-export async function mute(req, res) {
+export async function mute(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -165,7 +166,7 @@ export async function mute(req, res) {
 
 // just add self here if tribes
 // or can u add contacts as members?
-export async function createGroupChat(req, res) {
+export async function createGroupChat(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -294,7 +295,7 @@ export async function createGroupChat(req, res) {
 }
 
 // only owner can do for tribe?
-export async function addGroupMembers(req, res) {
+export async function addGroupMembers(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -342,7 +343,7 @@ export async function addGroupMembers(req, res) {
   })
 }
 
-export const deleteChat = async (req, res) => {
+export const deleteChat = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 

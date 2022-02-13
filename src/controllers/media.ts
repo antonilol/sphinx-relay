@@ -17,6 +17,7 @@ import constants from '../constants'
 import { loadConfig } from '../utils/config'
 import { failure } from '../utils/res'
 import { logging, sphinxLogger } from '../utils/logger'
+import { Request, Response } from 'express'
 
 const config = loadConfig()
 
@@ -38,7 +39,7 @@ purchase_accept should update the original attachment message with the terms and
 purchase_deny returns the sats
 */
 
-export const sendAttachmentMessage = async (req, res) => {
+export const sendAttachmentMessage = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   // try {
@@ -183,7 +184,7 @@ export function saveMediaKeys(
   }
 }
 
-export const purchase = async (req, res) => {
+export const purchase = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const { chat_id, contact_id, amount, media_token } = req.body
@@ -573,7 +574,7 @@ export const receiveAttachment = async (payload) => {
   sendConfirmation({ chat, sender: owner, msg_id, receiver: sender })
 }
 
-export async function signer(req, res) {
+export async function signer(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   // const tenant:number = req.owner.id
   if (!req.params.challenge) return resUtils.failure(res, 'no challenge')

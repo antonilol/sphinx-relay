@@ -9,7 +9,7 @@ import { isProxy } from './utils/proxy'
 import * as jwtUtils from './utils/jwt'
 import { allowedJwtRoutes } from './scopes'
 import * as rsa from './crypto/rsa'
-
+import { Request, Response } from 'express'
 import * as fs from 'fs'
 
 const config = loadConfig()
@@ -19,7 +19,7 @@ const config = loadConfig()
 "encrypted_macaroon_path": "/relay/.lnd/admin.macaroon.enc"
 */
 
-export async function unlocker(req, res): Promise<boolean> {
+export async function unlocker(req: Request, res: Response): Promise<boolean> {
   const { password } = req.body
   if (!password) {
     failure(res, 'no password')

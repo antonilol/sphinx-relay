@@ -4,6 +4,7 @@ import { loadConfig } from '../utils/config'
 import * as rsa from '../crypto/rsa'
 import * as tribes from '../utils/tribes'
 import * as fs from 'fs'
+import { Request, Response } from 'express'
 
 const config = loadConfig()
 
@@ -17,7 +18,7 @@ interface MeInfo {
   jwt: string
 }
 
-export async function verifyAuthRequest(req, res) {
+export async function verifyAuthRequest(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   try {
     const sc = [scopes.PERSONAL, scopes.BOTS]
@@ -50,7 +51,7 @@ export async function verifyAuthRequest(req, res) {
   }
 }
 
-export async function requestExternalTokens(req, res) {
+export async function requestExternalTokens(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   try {
     const result: MeInfo = {
@@ -68,7 +69,7 @@ export async function requestExternalTokens(req, res) {
   }
 }
 
-export async function requestTransportToken(req, res) {
+export async function requestTransportToken(req: Request, res: Response) {
   const transportPublicKey = fs.readFileSync(
     config.transportPublicKeyLocation,
     'utf8'

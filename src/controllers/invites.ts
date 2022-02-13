@@ -5,8 +5,9 @@ import { finishInviteInHub, createInviteInHub, payInviteInvoice } from '../hub'
 // import * as proxy from '../utils/proxy'
 import { failure } from '../utils/res'
 import { sphinxLogger } from '../utils/logger'
+import { Request, Response } from 'express'
 
-export const finishInvite = async (req, res) => {
+export const finishInvite = async (req: Request, res: Response) => {
   const { invite_string } = req.body
   const params = {
     invite: {
@@ -28,7 +29,7 @@ export const finishInvite = async (req, res) => {
   finishInviteInHub(params, onSuccess, onFailure)
 }
 
-export const payInvite = async (req, res) => {
+export const payInvite = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -69,7 +70,7 @@ export const payInvite = async (req, res) => {
   payInviteInvoice(dbInvite.invoice, req.owner.publicKey, onSuccess, onFailure)
 }
 
-export const createInvite = async (req, res) => {
+export const createInvite = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const { nickname, welcome_message } = req.body

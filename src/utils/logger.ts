@@ -3,6 +3,7 @@ import * as winston from 'winston'
 import * as moment from 'moment'
 import { loadConfig } from './config'
 import * as blgr from 'blgr'
+import { Request, Response } from 'express'
 
 const config = loadConfig()
 
@@ -22,7 +23,7 @@ const logger = expressWinston.logger({
   // msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
   expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
   colorize: true, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
-  ignoreRoute: function (req, res) {
+  ignoreRoute: function (req: Request, res: Response) {
     if (req.path.startsWith('/json')) return true // debugger
     return false
   }, // optional: allows to skip some log messages based on request and/or response

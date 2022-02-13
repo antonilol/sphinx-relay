@@ -6,6 +6,7 @@ import * as network from '../network'
 import constants from '../constants'
 import { success, failure200, failure } from '../utils/res'
 import { logging, sphinxLogger } from '../utils/logger'
+import { Request, Response } from 'express'
 
 /*
  if in tribe: dont send
@@ -189,7 +190,7 @@ export async function receiveHeartbeat(payload) {
 }
 
 const heartbeats: { [k: string]: boolean } = {}
-export async function healthcheck(req, res) {
+export async function healthcheck(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   // const tenant:number = req.owner.id
 

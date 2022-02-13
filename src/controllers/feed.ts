@@ -3,6 +3,7 @@ import * as helpers from '../helpers'
 import { failure, success } from '../utils/res'
 import constants from '../constants'
 import { sphinxLogger } from '../utils/logger'
+import { Request, Response } from 'express'
 
 export interface ChatMeta {
   itemID: number
@@ -21,7 +22,7 @@ export interface Destination {
   custom_value: string
 }
 
-export const streamFeed = async (req, res) => {
+export const streamFeed = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const {

@@ -6,6 +6,7 @@ import { getTribeOwnersChatByUUID } from '../../utils/tribes'
 import broadcast from './broadcast'
 import pay from './pay'
 import { sphinxLogger } from '../../utils/logger'
+import { Request, Response } from 'express'
 
 /*
 hexdump -n 8 -e '4/4 "%08X" 1 "\n"' /dev/random
@@ -26,7 +27,7 @@ export interface Action {
   recipient_id?: number
 }
 
-export async function processAction(req, res) {
+export async function processAction(req: Request, res: Response) {
   sphinxLogger.info(`=> processAction ${req.body}`)
   let body = req.body
   if (body.data && typeof body.data === 'string' && body.data[1] === "'") {

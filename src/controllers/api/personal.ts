@@ -7,11 +7,12 @@ import * as jsonUtils from '../../utils/json'
 import { success, failure } from '../../utils/res'
 import { loadConfig } from '../../utils/config'
 import { createJWT, scopes } from '../../utils/jwt'
+import { Request, Response } from 'express'
 
 const config = loadConfig()
 // accessed from people.sphinx.chat website
 // U3BoaW54IFZlcmlmaWNhdGlvbg== : "Sphinx Verification"
-export async function createPeopleProfile(req, res) {
+export async function createPeopleProfile(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -62,7 +63,7 @@ export async function createPeopleProfile(req, res) {
 }
 
 // accessed from people.sphinx.chat website
-export async function deletePersonProfile(req, res) {
+export async function deletePersonProfile(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -84,7 +85,7 @@ export async function deletePersonProfile(req, res) {
   }
 }
 
-export async function uploadPublicPic(req, res) {
+export async function uploadPublicPic(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
 
   const { img_base64, img_type } = req.body
@@ -133,7 +134,7 @@ export async function uploadPublicPic(req, res) {
   }
 }
 
-export async function refreshJWT(req, res) {
+export async function refreshJWT(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const sc = [scopes.PERSONAL]
   const jot = createJWT(req.owner.publicKey, sc, 10080) // one week
@@ -142,7 +143,7 @@ export async function refreshJWT(req, res) {
   })
 }
 
-export async function claimOnLiquid(req, res) {
+export async function claimOnLiquid(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 

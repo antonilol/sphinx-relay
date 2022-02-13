@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import { loadConfig } from './config'
 import { sphinxLogger } from '../utils/logger'
 import { Server } from 'http'
+import { Request, Response } from 'express'
 
 const config = loadConfig()
 import * as socketio from 'socket.io'
@@ -19,7 +20,7 @@ export function connect(server: Server) {
   // srvr = new WebSocket.Server({ server, clientTracking:true })
 
   io = socketio(server, {
-    handlePreflightRequest: (req, res) => {
+    handlePreflightRequest: (req: Request, res: Response) => {
       const headers = {
         'Access-Control-Allow-Headers':
           'Content-Type, Accept, x-user-token, X-Requested-With',

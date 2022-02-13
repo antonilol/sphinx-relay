@@ -15,10 +15,11 @@ import * as moment from 'moment'
 import * as rsa from '../crypto/rsa'
 import * as fs from 'fs'
 import { loadConfig } from '../utils/config'
+import { Request, Response } from 'express'
 
 const config = loadConfig()
 
-export const getContacts = async (req, res) => {
+export const getContacts = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -83,7 +84,7 @@ export const getContacts = async (req, res) => {
   })
 }
 
-export const getContactsForChat = async (req, res) => {
+export const getContactsForChat = async (req: Request, res: Response) => {
   const chat_id = parseInt(req.params.chat_id)
   if (!chat_id) return failure(res, 'no chat id')
   if (!req.owner) return failure(res, 'no owner')
@@ -142,7 +143,7 @@ export const getContactsForChat = async (req, res) => {
   success(res, { contacts: finalContacts })
 }
 
-export async function generateOwnerWithExternalSigner(req, res) {
+export async function generateOwnerWithExternalSigner(req: Request, res: Response) {
   if (!isProxy()) {
     return failure(res, 'only proxy')
   }
@@ -169,7 +170,7 @@ export async function generateOwnerWithExternalSigner(req, res) {
   success(res, { id: (created && created.id) || 0 })
 }
 
-export const generateToken = async (req, res) => {
+export const generateToken = async (req: Request, res: Response) => {
   sphinxLogger.info([
     '=> generateToken called',
     {
@@ -240,7 +241,7 @@ export const generateToken = async (req, res) => {
   })
 }
 
-export const updateContact = async (req, res) => {
+export const updateContact = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   sphinxLogger.info(
@@ -299,7 +300,7 @@ export const updateContact = async (req, res) => {
   })
 }
 
-export const exchangeKeys = async (req, res) => {
+export const exchangeKeys = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   sphinxLogger.info(
@@ -328,7 +329,7 @@ export const exchangeKeys = async (req, res) => {
   })
 }
 
-export const createContact = async (req, res) => {
+export const createContact = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   sphinxLogger.info(
@@ -383,7 +384,7 @@ export const createContact = async (req, res) => {
   })
 }
 
-export const deleteContact = async (req, res) => {
+export const deleteContact = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const id = parseInt(req.params.id || '0')
@@ -588,7 +589,7 @@ function extractAttrs(body): { [k: string]: any } {
   return attrs
 }
 
-export const getLatestContacts = async (req, res) => {
+export const getLatestContacts = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -658,12 +659,12 @@ async function switchBlock(
   success(res, jsonUtils.contactToJson(updated))
 }
 
-export const blockContact = async (req, res) => {
+export const blockContact = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   switchBlock(res, req.owner.id, req.params.contact_id, true)
 }
 
-export const unblockContact = async (req, res) => {
+export const unblockContact = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   switchBlock(res, req.owner.id, req.params.contact_id, false)
 }

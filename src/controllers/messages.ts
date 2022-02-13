@@ -12,9 +12,10 @@ import * as network from '../network'
 import * as short from 'short-uuid'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
+import { Request, Response } from 'express'
 
 // deprecated
-export const getMessages = async (req, res) => {
+export const getMessages = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -102,7 +103,7 @@ export const getMessages = async (req, res) => {
   res.end()
 }
 
-export const getAllMessages = async (req, res) => {
+export const getAllMessages = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -159,7 +160,7 @@ export const getAllMessages = async (req, res) => {
   })
 }
 
-export const getMsgs = async (req, res) => {
+export const getMsgs = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -218,7 +219,7 @@ export const getMsgs = async (req, res) => {
   })
 }
 
-export async function deleteMessage(req, res) {
+export async function deleteMessage(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -254,7 +255,7 @@ export async function deleteMessage(req, res) {
   })
 }
 
-export const sendMessage = async (req, res) => {
+export const sendMessage = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   // try {
@@ -577,7 +578,7 @@ export const receiveDeleteMessage = async (payload) => {
   )
 }
 
-export const readMessages = async (req, res) => {
+export const readMessages = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
 
   const chat_id = req.params.chat_id
@@ -615,7 +616,7 @@ export const readMessages = async (req, res) => {
   }
 }
 
-export const clearMessages = (req, res) => {
+export const clearMessages = (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 

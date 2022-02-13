@@ -8,15 +8,16 @@ import { loadConfig } from '../utils/config'
 import { getAppVersionsFromHub } from '../hub'
 import { Op } from 'sequelize'
 import { sphinxLogger } from '../utils/logger'
+import { Request, Response } from 'express'
 
 const config = loadConfig()
 
 const VERSION = 2
-export async function getRelayVersion(req, res) {
+export async function getRelayVersion(req: Request, res: Response) {
   success(res, { version: VERSION })
 }
 
-export async function getAppVersions(req, res) {
+export async function getAppVersions(req: Request, res: Response) {
   const vs = await getAppVersionsFromHub()
   if (vs) {
     success(res, vs)
@@ -25,7 +26,7 @@ export async function getAppVersions(req, res) {
   }
 }
 
-export const checkRoute = async (req, res) => {
+export const checkRoute = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
 
   const { pubkey, amount, route_hint } = req.query
@@ -46,7 +47,7 @@ export const checkRoute = async (req, res) => {
   }
 }
 
-export const checkRouteByContactOrChat = async (req, res) => {
+export const checkRouteByContactOrChat = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
 
   const chatID = req.query.chat_id
@@ -97,7 +98,7 @@ const defaultLogFiles = [
   '/home/lnd/.pm2/logs/app-error.log',
   '/var/log/syslog',
 ]
-export async function getLogsSince(req, res) {
+export async function getLogsSince(req: Request, res: Response) {
   const logFiles = config.log_file ? [config.log_file] : defaultLogFiles
   let txt
   let err
@@ -119,7 +120,7 @@ export async function getLogsSince(req, res) {
   else failure(res, err)
 }
 
-export const getLightningInfo = async (req, res) => {
+export const getLightningInfo = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   res.status(200)
   try {
@@ -131,7 +132,7 @@ export const getLightningInfo = async (req, res) => {
   res.end()
 }
 
-export const getChannels = async (req, res) => {
+export const getChannels = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
 
   res.status(200)
@@ -144,7 +145,7 @@ export const getChannels = async (req, res) => {
   res.end()
 }
 
-export const getBalance = async (req, res) => {
+export const getBalance = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -167,7 +168,7 @@ export const getBalance = async (req, res) => {
   res.end()
 }
 
-export const getLocalRemoteBalance = async (req, res) => {
+export const getLocalRemoteBalance = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   res.status(200)
   try {
@@ -195,7 +196,7 @@ export const getLocalRemoteBalance = async (req, res) => {
   res.end()
 }
 
-export const getNodeInfo = async (req, res) => {
+export const getNodeInfo = async (req: Request, res: Response) => {
   const ipOfSource = req.connection.remoteAddress
   if (!(ipOfSource.includes('127.0.0.1') || ipOfSource.includes('localhost'))) {
     res.status(401)
@@ -214,7 +215,7 @@ async function asyncForEach(array, callback) {
   }
 }
 
-export async function clearForTesting(req, res) {
+export async function clearForTesting(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 

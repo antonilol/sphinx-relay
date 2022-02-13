@@ -11,8 +11,9 @@ import constants from '../constants'
 import { Op } from 'sequelize'
 import { anonymousKeysend } from './feed'
 import { sphinxLogger } from '../utils/logger'
+import { Request, Response } from 'express'
 
-export const sendPayment = async (req, res) => {
+export const sendPayment = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const {
@@ -203,7 +204,7 @@ export const receivePayment = async (payload) => {
   sendNotification(chat, msg.senderAlias || sender.alias, 'message', owner)
 }
 
-export const listPayments = async (req, res) => {
+export const listPayments = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const limit = (req.query.limit && parseInt(req.query.limit)) || 100

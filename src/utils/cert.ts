@@ -47,7 +47,7 @@ async function validateCert(port, data, endpoint, apiKey) {
   const validationObject = data.validation.other_methods[endpoint]
   const replacement = new RegExp(`http://${endpoint}`, 'g')
   const path = validationObject.file_validation_url_http.replace(replacement, '')
-  app.get(path, (req, res) => {
+  app.get(path, (req: Request, res: Response) => {
     res.set('Content-Type', 'text/plain')
     res.send(validationObject.file_validation_content.join('\n'))
   })
