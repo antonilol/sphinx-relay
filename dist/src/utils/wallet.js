@@ -16,7 +16,7 @@ const config_1 = require("./config");
 const config = (0, config_1.loadConfig)();
 const LND_IP = config.lnd_ip || 'localhost';
 let walletClient;
-const loadWalletKit = () => {
+function loadWalletKit() {
     if (walletClient) {
         return walletClient;
     }
@@ -27,26 +27,19 @@ const loadWalletKit = () => {
         walletClient = new walletkit.WalletKit(LND_IP + ':' + config.lnd_port, credentials);
         return walletClient;
     }
-};
+}
 exports.loadWalletKit = loadWalletKit;
 function listUnspent() {
     return __awaiter(this, void 0, void 0, function* () {
-        const walletkit = yield (0, exports.loadWalletKit)();
         return new Promise((resolve, reject) => {
-            try {
-                const opts = { min_confs: 0, max_confs: 10000 };
-                walletkit.listUnspent(opts, function (err, res) {
-                    if (err || !(res && res.utxos)) {
-                        reject(err);
-                    }
-                    else {
-                        resolve(res.utxos);
-                    }
-                });
-            }
-            catch (e) {
-                reject(e);
-            }
+            loadWalletKit().listUnspent({ min_confs: 0, max_confs: 10000 }, function (err, res) {
+                if (err || !(res && res.utxos)) {
+                    reject(err);
+                }
+                else {
+                    resolve(res.utxos);
+                }
+            });
         });
     });
 }
