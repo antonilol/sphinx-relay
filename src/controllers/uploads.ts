@@ -2,12 +2,13 @@ import { models } from '../models'
 import * as path from 'path'
 import { loadConfig } from '../utils/config'
 import * as multer from 'multer'
+import { Request, Response } from 'express'
 
 const config = loadConfig()
 
 // setup disk storage
 const avatarStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
+  destination: (req: Request, file, cb) => {
     const dir = __dirname.includes('/dist/')
       ? path.join(__dirname, '..')
       : __dirname
@@ -32,7 +33,7 @@ function hasProtocol(ip) {
   return false
 }
 
-export const uploadFile = async (req, res) => {
+export const uploadFile = async (req: Request, res: Response) => {
   const { contact_id, chat_id } = req.body
   const { file } = req
 
