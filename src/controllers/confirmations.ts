@@ -194,11 +194,11 @@ export async function healthcheck(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')
   // const tenant:number = req.owner.id
 
-  const pubkey: string = req.query.pubkey
+  const pubkey: string = (req.query.pubkey || '').toString()
   if (!(pubkey && pubkey.length === 66)) {
     return failure200(res, 'missing pubkey')
   }
-  const routeHint: string = req.query.route_hint
+  const routeHint: string = (req.query.route_hint || '').toString()
 
   const owner = req.owner
 

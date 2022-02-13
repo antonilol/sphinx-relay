@@ -48,7 +48,7 @@ const checkRoute = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         return (0, res_1.failure)(res, 'wrong pubkey');
     const owner = req.owner;
     try {
-        const amt = parseInt(amount) || constants_1.default.min_sat_amount;
+        const amt = parseInt((amount || '').toString()) || constants_1.default.min_sat_amount;
         const r = yield Lightning.queryRoute(pubkey, amt, route_hint || '', owner.publicKey);
         (0, res_1.success)(res, r);
     }

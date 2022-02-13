@@ -186,11 +186,11 @@ function healthcheck(req, res) {
         if (!req.owner)
             return (0, res_1.failure)(res, 'no owner');
         // const tenant:number = req.owner.id
-        const pubkey = req.query.pubkey;
+        const pubkey = (req.query.pubkey || '').toString();
         if (!(pubkey && pubkey.length === 66)) {
             return (0, res_1.failure200)(res, 'missing pubkey');
         }
-        const routeHint = req.query.route_hint;
+        const routeHint = (req.query.route_hint || '').toString();
         const owner = req.owner;
         const amt = 10;
         const opts = {
