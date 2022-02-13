@@ -25,7 +25,7 @@ const nodes_1 = require("../nodes");
 function latestTest(t, node1, node2, node3 = null) {
     return __awaiter(this, void 0, void 0, function* () {
         //TWO NODES SEND TEXT MESSAGES TO EACH OTHER ===>
-        var aliases = `${node1.alias} and ${node2.alias}`;
+        let aliases = `${node1.alias} and ${node2.alias}`;
         if (node3)
             aliases = aliases + ` and ${node3 === null || node3 === void 0 ? void 0 : node3.alias}`;
         console.log(aliases);
@@ -34,27 +34,27 @@ function latestTest(t, node1, node2, node3 = null) {
         t.truthy(dateq1, 'timestamp should exist');
         yield (0, helpers_1.sleep)(1000);
         //NODE1 GETS LATEST
-        let latest = yield (0, get_1.getLatest)(t, node1, dateq1);
+        const latest = yield (0, get_1.getLatest)(t, node1, dateq1);
         t.true(latest.success, 'node1 should get latest');
         t.true(latest.response.contacts.length === 0, 'there should be no contacts');
         t.true(latest.response.chats.length === 0, 'there should be no chats');
         //NODE1 ADDS NODE2 AS A CONTACT
-        let added = yield (0, save_1.addContact)(t, node1, node2);
+        const added = yield (0, save_1.addContact)(t, node1, node2);
         t.true(added, 'node1 should add node2 as contact');
         //NODE1 GETS LATEST
-        let latest2 = yield (0, get_1.getLatest)(t, node1, dateq1);
+        const latest2 = yield (0, get_1.getLatest)(t, node1, dateq1);
         t.true(latest2.success, 'node1 should get latest');
         t.true(latest2.response.contacts.length >= 1, 'there should be one contacts');
         t.true(latest2.response.contacts[0].public_key === node2.pubkey, 'node2 should be the latest contact');
         //NODE1 SENDS A TEXT MESSAGE TO NODE2
         const text = (0, helpers_1.randomText)();
-        let messageSent = yield (0, msg_1.sendMessageAndCheckDecryption)(t, node1, node2, text);
+        const messageSent = yield (0, msg_1.sendMessageAndCheckDecryption)(t, node1, node2, text);
         //CHECK THAT NODE1'S DECRYPTED MESSAGE IS SAME AS INPUT
         const check = yield (0, msg_1.checkMessageDecryption)(t, node2, messageSent.uuid, text);
         t.true(check, 'node2 should have read and decrypted node1 message');
         yield (0, helpers_1.sleep)(1000);
         //NODE1 GETS LATEST
-        let latest3 = yield (0, get_1.getLatest)(t, node2, dateq1);
+        const latest3 = yield (0, get_1.getLatest)(t, node2, dateq1);
         t.true(latest3.success, 'node2 should get latest');
         t.true(latest3.response.contacts.length === 1, 'there should be no contacts');
         t.true(latest3.response.chats.length === 1, 'there should be no chats');

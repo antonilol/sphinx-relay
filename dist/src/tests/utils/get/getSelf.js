@@ -15,7 +15,7 @@ const helpers_1 = require("../helpers");
 const getSelf = (t, node) => __awaiter(void 0, void 0, void 0, function* () {
     const r = yield http.get(node.external_ip + '/contacts', (0, helpers_1.makeArgs)(node));
     t.true(r.success, 'should get node contacts');
-    let nodeContact = r.response.contacts.find((contact) => contact.public_key === node.pubkey);
+    const nodeContact = r.response.contacts.find((contact) => contact.public_key === node.pubkey);
     t.true(typeof nodeContact === 'object', 'node should be its own first contact');
     return nodeContact;
 });

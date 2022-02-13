@@ -13,7 +13,7 @@ exports.getCheckNewPaidMsgs = void 0;
 const http = require("ava-http");
 const helpers_1 = require("../helpers");
 function getCheckNewPaidMsgs(t, node, imgMsg) {
-    var msgToken = imgMsg.media_token.split('.')[1];
+    const msgToken = imgMsg.media_token.split('.')[1];
     return new Promise((resolve, reject) => {
         let i = 0;
         const interval = setInterval(() => __awaiter(this, void 0, void 0, function* () {

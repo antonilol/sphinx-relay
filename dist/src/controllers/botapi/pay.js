@@ -36,7 +36,7 @@ function pay(a) {
         const tenant = owner.id;
         const alias = bot_name || owner.alias;
         const botContactId = -1;
-        var date = new Date();
+        const date = new Date();
         date.setMilliseconds(0);
         const msg = {
             chatId: theChat.id,

@@ -22,10 +22,10 @@ function sendEscrowMsg(t, node, admin, tribe, text) {
         t.true(escrowAmount != 0, 'escrow amount should not be zero');
         const escrowMillis = tribe.escrow_millis;
         t.true(escrowMillis != 0, 'escrow time should not be zero');
-        var pricePerMessage = 0;
+        let pricePerMessage = 0;
         if (tribe.price_per_message)
             pricePerMessage = tribe.price_per_message;
-        let nodeContact = yield (0, get_1.getSelf)(t, node);
+        const nodeContact = yield (0, get_1.getSelf)(t, node);
         //encrypt random string with node contact_key
         const encryptedText = (0, rsa_1.encrypt)(nodeContact.contact_key, text);
         //encrypt random string with test tribe group_key from node1

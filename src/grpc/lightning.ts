@@ -72,7 +72,7 @@ export async function loadLightning(
   }
 
   if (IS_GREENLIGHT) {
-    var credentials = loadGreenlightCredentials()
+    const credentials = loadGreenlightCredentials()
     const descriptor = grpc.load('proto/greenlight.proto')
     const greenlight: any = descriptor.greenlight
     const options = {
@@ -84,19 +84,15 @@ export async function loadLightning(
     return lightningClient
   }
 
-  try {
-    // LND
-    var credentials = loadCredentials()
-    const lnrpcDescriptor = grpc.load('proto/rpc.proto')
-    const lnrpc: any = lnrpcDescriptor.lnrpc
-    lightningClient = new lnrpc.Lightning(
-      LND_IP + ':' + config.lnd_port,
-      credentials
-    )
-    return lightningClient
-  } catch (e) {
-    throw e
-  }
+  // LND
+  const credentials = loadCredentials()
+  const lnrpcDescriptor = grpc.load('proto/rpc.proto')
+  const lnrpc: any = lnrpcDescriptor.lnrpc
+  lightningClient = new lnrpc.Lightning(
+    LND_IP + ':' + config.lnd_port,
+    credentials
+  )
+  return lightningClient
 }
 
 export const loadWalletUnlocker = () => {
@@ -119,8 +115,8 @@ export const loadWalletUnlocker = () => {
 }
 
 export const unlockWallet = async (pwd: string) => {
-  return new Promise(async function (resolve, reject) {
-    const wu = await loadWalletUnlocker()
+  const wu = await loadWalletUnlocker()
+  return new Promise((resolve, reject) => {
     wu.unlockWallet(
       { wallet_password: ByteBuffer.fromUTF8(pwd) },
       (err, response) => {
@@ -172,8 +168,8 @@ export async function queryRoute(
       routes: [],
     }
   }
-  return new Promise(async function (resolve, reject) {
-    const lightning = await loadLightning(true, ownerPubkey) // try proxy
+  const lightning = await loadLightning(true, ownerPubkey) // try proxy
+  return new Promise((resolve, reject) => {
     const options: { [k: string]: any } = { pub_key, amt }
     if (route_hint && route_hint.includes(':')) {
       const arr = route_hint.split(':')
@@ -203,8 +199,8 @@ export type NewAddressType = 0 | 1 | 2 | 3
 export async function newAddress(
   type: NewAddressType = NESTED_PUBKEY_HASH
 ): Promise<string> {
-  return new Promise(async function (resolve, reject) {
-    const lightning = await loadLightning()
+  const lightning = await loadLightning()
+  return new Promise((resolve, reject) => {
     lightning.newAddress({ type }, (err, response) => {
       if (err) {
         reject(err)
@@ -219,14 +215,14 @@ export async function newAddress(
   })
 }
 
-// for payingn invoice and invite invoice
+// for paying invoice and invite invoice
 export async function sendPayment(
   payment_request: string,
   ownerPubkey?: string
 ): Promise<interfaces.SendPaymentResponse> {
   sphinxLogger.info('sendPayment', logging.Lightning)
-  return new Promise(async (resolve, reject) => {
-    const lightning = await loadLightning(true, ownerPubkey) // try proxy
+  const lightning = await loadLightning(true, ownerPubkey) // try proxy
+  return new Promise((resolve, reject) => {
     if (isProxy()) {
       const opts = {
         payment_request,
@@ -386,18 +382,14 @@ export const loadRouter = () => {
   if (routerClient) {
     return routerClient
   } else {
-    try {
-      const credentials = loadCredentials('router.macaroon')
-      const descriptor = grpc.load('proto/router.proto')
-      const router: any = descriptor.routerrpc
-      routerClient = new router.Router(
-        LND_IP + ':' + config.lnd_port,
-        credentials
-      )
-      return routerClient
-    } catch (e) {
-      throw e
-    }
+    const credentials = loadCredentials('router.macaroon')
+    const descriptor = grpc.load('proto/router.proto')
+    const router: any = descriptor.routerrpc
+    routerClient = new router.Router(
+      LND_IP + ':' + config.lnd_port,
+      credentials
+    )
+    return routerClient
   }
 }
 
@@ -461,12 +453,8 @@ async function asyncForEach(array, callback) {
 }
 
 export async function signAscii(ascii: string, ownerPubkey?: string) {
-  try {
-    const sig = await signMessage(ascii_to_hexa(ascii), ownerPubkey)
-    return sig
-  } catch (e) {
-    throw e
-  }
+  const sig = await signMessage(ascii_to_hexa(ascii), ownerPubkey)
+  return sig
 }
 
 export function listInvoices() {
@@ -576,12 +564,8 @@ export function listAllPaymentsFull() {
 // msg is hex
 export async function signMessage(msg: string, ownerPubkey?: string) {
   // log('signMessage')
-  try {
-    const r = await signBuffer(Buffer.from(msg, 'hex'), ownerPubkey)
-    return r
-  } catch (e) {
-    throw e
-  }
+  const r = await signBuffer(Buffer.from(msg, 'hex'), ownerPubkey)
+  return r
 }
 
 export function signBuffer(msg: Buffer, ownerPubkey?: string): Promise<string> {
@@ -618,12 +602,8 @@ export function signBuffer(msg: Buffer, ownerPubkey?: string): Promise<string> {
 }
 
 export async function verifyBytes(msg: Buffer, sig): Promise<VerifyResponse> {
-  try {
-    const r = await verifyMessage(msg.toString('hex'), sig)
-    return r
-  } catch (e) {
-    throw e
-  }
+  const r = await verifyMessage(msg.toString('hex'), sig)
+  return r
 }
 
 interface VerifyResponse {
@@ -695,12 +675,8 @@ export async function verifyAscii(
   sig: string,
   ownerPubkey?: string
 ): Promise<VerifyResponse> {
-  try {
-    const r = await verifyMessage(ascii_to_hexa(ascii), sig, ownerPubkey)
-    return r
-  } catch (e) {
-    throw e
-  }
+  const r = await verifyMessage(ascii_to_hexa(ascii), sig, ownerPubkey)
+  return r
 }
 
 export async function getInfo(

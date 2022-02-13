@@ -66,7 +66,7 @@ function sphinxPeople(t, node1) {
         //GET PERSON FROM RELAY
         const res = yield http.get(node1.external_ip + '/contacts', (0, helpers_1.makeArgs)(node1));
         //create node contact object from node perspective
-        let self = res.response.contacts.find((contact) => contact.public_key === node1.pubkey);
+        const self = res.response.contacts.find((contact) => contact.public_key === node1.pubkey);
         //CHECK THAT PRICE TO MEET FROM TRIBES IS SAME AS PRICE TO MEET FROM RELAY
         t.true(person.price_to_meet === priceToMeet, 'tribe server profile should have price to meet');
         t.true(person.price_to_meet === self.price_to_meet, 'relay server should have price to meet');
@@ -89,7 +89,7 @@ function sphinxPeople(t, node1) {
         //GET PERSON FROM RELAY
         const res2 = yield http.get(node1.external_ip + '/contacts', (0, helpers_1.makeArgs)(node1));
         //create node contact object from node perspective
-        let self2 = res2.response.contacts.find((contact) => contact.public_key === node1.pubkey);
+        const self2 = res2.response.contacts.find((contact) => contact.public_key === node1.pubkey);
         //CHECK THAT PRICE TO MEET FROM TRIBES IS SAME AS PRICE TO MEET FROM RELAY
         t.true(person2.price_to_meet === newPriceToMeet, 'tribes server should reset price to meet to newPriceToMeet');
         t.true(person2.price_to_meet === self2.price_to_meet, 'Relay server should reset price to meet to newPriceToMeet');

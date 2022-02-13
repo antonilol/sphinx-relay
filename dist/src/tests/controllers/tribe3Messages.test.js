@@ -28,21 +28,21 @@ function tribe3Msgs(t, node1, node2, node3) {
         t.truthy(node3, 'this test requires three nodes');
         console.log(`${node1.alias} and ${node2.alias} and ${node3.alias}`);
         //NODE1 CREATES A TRIBE
-        let tribe = yield (0, save_1.createTribe)(t, node1);
+        const tribe = yield (0, save_1.createTribe)(t, node1);
         t.truthy(tribe, 'tribe should have been created by node1');
         //NODE2 JOINS TRIBE CREATED BY NODE1
         if (node1.routeHint)
             tribe.owner_route_hint = node1.routeHint;
-        let join = yield (0, save_1.joinTribe)(t, node2, tribe);
+        const join = yield (0, save_1.joinTribe)(t, node2, tribe);
         t.true(join, 'node2 should join tribe');
         //NODE3 JOINS TRIBE CREATED BY NODE1
         if (node1.routeHint)
             tribe.owner_route_hint = node1.routeHint;
-        let join2 = yield (0, save_1.joinTribe)(t, node3, tribe);
+        const join2 = yield (0, save_1.joinTribe)(t, node3, tribe);
         t.true(join2, 'node3 should join tribe');
         //NODE1 SENDS A TEXT MESSAGE IN TRIBE
         const text = (0, helpers_1.randomText)();
-        let tribeMessage = yield (0, msg_1.sendTribeMessage)(t, node1, tribe, text);
+        const tribeMessage = yield (0, msg_1.sendTribeMessage)(t, node1, tribe, text);
         //CHECK THAT NODE1'S DECRYPTED MESSAGE IS SAME AS INPUT
         const n2check = yield (0, msg_1.checkMessageDecryption)(t, node2, tribeMessage.uuid, text);
         t.true(n2check, 'node2 should have read and decrypted node1 message');
@@ -51,7 +51,7 @@ function tribe3Msgs(t, node1, node2, node3) {
         t.true(n3check, 'node3 should have read and decrypted node1 message');
         //NODE2 SENDS A TEXT MESSAGE IN TRIBE
         const text2 = (0, helpers_1.randomText)();
-        let tribeMessage2 = yield (0, msg_1.sendTribeMessage)(t, node2, tribe, text2);
+        const tribeMessage2 = yield (0, msg_1.sendTribeMessage)(t, node2, tribe, text2);
         //CHECK THAT NODE2'S DECRYPTED MESSAGE IS SAME AS INPUT
         const n1check = yield (0, msg_1.checkMessageDecryption)(t, node1, tribeMessage2.uuid, text2);
         t.true(n1check, 'node1 should have read and decrypted node2 message');
@@ -60,7 +60,7 @@ function tribe3Msgs(t, node1, node2, node3) {
         t.true(n3check2, 'node3 should have read and decrypted node2 message');
         //NODE3 SENDS A TEXT MESSAGE IN TRIBE
         const text3 = (0, helpers_1.randomText)();
-        let tribeMessage3 = yield (0, msg_1.sendTribeMessage)(t, node3, tribe, text3);
+        const tribeMessage3 = yield (0, msg_1.sendTribeMessage)(t, node3, tribe, text3);
         //CHECK THAT NODE3'S DECRYPTED MESSAGE IS SAME AS INPUT
         const n1check2 = yield (0, msg_1.checkMessageDecryption)(t, node1, tribeMessage3.uuid, text3);
         t.true(n1check2, 'node1 should have read and decrypted node3 message');
@@ -68,13 +68,13 @@ function tribe3Msgs(t, node1, node2, node3) {
         const n2check2 = yield (0, msg_1.checkMessageDecryption)(t, node2, tribeMessage3.uuid, text3);
         t.true(n2check2, 'node2 should have read and decrypted node3 message');
         //NODE2 LEAVES THE TRIBE
-        let n2left = yield (0, del_1.leaveTribe)(t, node2, tribe);
+        const n2left = yield (0, del_1.leaveTribe)(t, node2, tribe);
         t.true(n2left, 'node2 should leave tribe');
         //NODE3 LEAVES THE TRIBE
-        let n3left = yield (0, del_1.leaveTribe)(t, node3, tribe);
+        const n3left = yield (0, del_1.leaveTribe)(t, node3, tribe);
         t.true(n3left, 'node3 should leave tribe');
         //NODE1 DELETES THE TRIBE
-        let delTribe = yield (0, del_1.deleteTribe)(t, node1, tribe);
+        const delTribe = yield (0, del_1.deleteTribe)(t, node1, tribe);
         t.true(delTribe, 'node1 should delete tribe');
     });
 }

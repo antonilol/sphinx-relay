@@ -19,11 +19,11 @@ function sendPayment(t, node1, node2, amount, text) {
     return __awaiter(this, void 0, void 0, function* () {
         //SEND PAYMENT FROM NODE1 TO NODE2 ===>
         //get node1 balance before payment
-        var node1bal = yield http.get(node1.external_ip + '/balance', (0, helpers_1.makeArgs)(node1));
+        let node1bal = yield http.get(node1.external_ip + '/balance', (0, helpers_1.makeArgs)(node1));
         t.true(node1bal.success, 'should get node1 balance');
         const node1beforeBalance = node1bal.response.balance;
         //get node2 balance before payment
-        var node2bal = yield http.get(node2.external_ip + '/balance', (0, helpers_1.makeArgs)(node2));
+        let node2bal = yield http.get(node2.external_ip + '/balance', (0, helpers_1.makeArgs)(node2));
         t.true(node2bal.success, 'should get node2 balance');
         const node2beforeBalance = node2bal.response.balance;
         //get contacts from node1 perspective

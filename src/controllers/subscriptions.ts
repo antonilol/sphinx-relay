@@ -260,12 +260,8 @@ export async function restartSubscription(req, res) {
 
 async function getRawSubs(opts = {}) {
   const options: { [k: string]: any } = { order: [['id', 'asc']], ...opts }
-  try {
-    const subs = await models.Subscription.findAll(options)
-    return subs
-  } catch (e) {
-    throw e
-  }
+  const subs = await models.Subscription.findAll(options)
+  return subs
 }
 
 // all subs

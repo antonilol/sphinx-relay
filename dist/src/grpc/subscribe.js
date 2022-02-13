@@ -22,73 +22,75 @@ const ERR_CODE_UNAVAILABLE = 14;
 const ERR_CODE_STREAM_REMOVED = 2;
 const ERR_CODE_UNIMPLEMENTED = 12; // locked
 function subscribeInvoices(parseKeysendInvoice) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-        let ownerPubkey = '';
-        if ((0, proxy_1.isProxy)()) {
-            ownerPubkey = yield (0, proxy_1.getProxyRootPubkey)();
-        }
-        const lightning = yield (0, lightning_1.loadLightning)(true, ownerPubkey); // try proxy
-        const cmd = interfaces.subscribeCommand();
-        const call = lightning[cmd]();
-        call.on('data', function (response) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // console.log("=> INVOICE RAW", response)
-                const inv = interfaces.subscribeResponse(response);
-                // console.log("INVOICE RECEIVED", inv)
-                // loginvoice(inv)
-                if (inv.state !== interfaces.InvoiceState.SETTLED) {
-                    return;
-                }
-                // console.log("IS KEYSEND", inv.is_keysend)
-                if (inv.is_keysend) {
-                    parseKeysendInvoice(inv);
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+            let ownerPubkey = '';
+            if ((0, proxy_1.isProxy)()) {
+                ownerPubkey = yield (0, proxy_1.getProxyRootPubkey)();
+            }
+            const lightning = yield (0, lightning_1.loadLightning)(true, ownerPubkey); // try proxy
+            const cmd = interfaces.subscribeCommand();
+            const call = lightning[cmd]();
+            call.on('data', function (response) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    // console.log("=> INVOICE RAW", response)
+                    const inv = interfaces.subscribeResponse(response);
+                    // console.log("INVOICE RECEIVED", inv)
+                    // loginvoice(inv)
+                    if (inv.state !== interfaces.InvoiceState.SETTLED) {
+                        return;
+                    }
+                    // console.log("IS KEYSEND", inv.is_keysend)
+                    if (inv.is_keysend) {
+                        parseKeysendInvoice(inv);
+                    }
+                    else {
+                        (0, regular_1.receiveNonKeysend)(inv);
+                    }
+                });
+            });
+            call.on('status', function (status) {
+                logger_1.sphinxLogger.info(`[lightning] Status ${status.code} ${status}`);
+                // The server is unavailable, trying to reconnect.
+                if (status.code == ERR_CODE_UNAVAILABLE ||
+                    status.code == ERR_CODE_STREAM_REMOVED) {
+                    i = 0;
+                    waitAndReconnect();
                 }
                 else {
-                    (0, regular_1.receiveNonKeysend)(inv);
+                    resolve(status);
                 }
             });
-        });
-        call.on('status', function (status) {
-            logger_1.sphinxLogger.info(`[lightning] Status ${status.code} ${status}`);
-            // The server is unavailable, trying to reconnect.
-            if (status.code == ERR_CODE_UNAVAILABLE ||
-                status.code == ERR_CODE_STREAM_REMOVED) {
+            call.on('error', function (err) {
+                const now = moment().format('YYYY-MM-DD HH:mm:ss').trim();
+                logger_1.sphinxLogger.error(`[lightning] Error ${now} ${err.code}`);
+                if (err.code == ERR_CODE_UNAVAILABLE ||
+                    err.code == ERR_CODE_STREAM_REMOVED) {
+                    i = 0;
+                    waitAndReconnect();
+                }
+                else {
+                    reject(err);
+                }
+            });
+            call.on('end', function () {
+                const now = moment().format('YYYY-MM-DD HH:mm:ss').trim();
+                logger_1.sphinxLogger.info(`[lightning] Closed stream ${now}`);
+                // The server has closed the stream.
                 i = 0;
                 waitAndReconnect();
-            }
-            else {
-                resolve(status);
-            }
-        });
-        call.on('error', function (err) {
-            const now = moment().format('YYYY-MM-DD HH:mm:ss').trim();
-            logger_1.sphinxLogger.error(`[lightning] Error ${now} ${err.code}`);
-            if (err.code == ERR_CODE_UNAVAILABLE ||
-                err.code == ERR_CODE_STREAM_REMOVED) {
-                i = 0;
-                waitAndReconnect();
-            }
-            else {
-                reject(err);
-            }
-        });
-        call.on('end', function () {
-            const now = moment().format('YYYY-MM-DD HH:mm:ss').trim();
-            logger_1.sphinxLogger.info(`[lightning] Closed stream ${now}`);
-            // The server has closed the stream.
-            i = 0;
-            waitAndReconnect();
-        });
-        setTimeout(() => {
-            resolve(null);
-        }, 100);
-    }));
+            });
+            setTimeout(() => {
+                resolve(null);
+            }, 100);
+        }));
+    });
 }
 exports.subscribeInvoices = subscribeInvoices;
 function waitAndReconnect() {
     setTimeout(() => reconnectToLightning(Math.random(), null, true), 2000);
 }
-var i = 0;
+let i = 0;
 let ctx = 0;
 function reconnectToLightning(innerCtx, callback, noCache) {
     return __awaiter(this, void 0, void 0, function* () {

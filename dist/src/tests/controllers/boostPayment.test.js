@@ -25,35 +25,35 @@ npx ava src/tests/controllers/boostPayment.test.ts --verbose --serial --timeout=
 function boostPayment(t, index1, index2, index3) {
     return __awaiter(this, void 0, void 0, function* () {
         //TWO NODES SEND IMAGES WITHIN A TRIBE ===>
-        let node1 = nodes_1.default[index1];
-        let node2 = nodes_1.default[index2];
-        let node3 = nodes_1.default[index3];
+        const node1 = nodes_1.default[index1];
+        const node2 = nodes_1.default[index2];
+        const node3 = nodes_1.default[index3];
         t.truthy(node3, 'this test requires three nodes');
         console.log(`Checking boost messages in tribe for ${node1.alias} and ${node2.alias} and ${node3.alias}`);
         //NODE1 CREATES A TRIBE
-        let tribe = yield (0, save_1.createTribe)(t, node1);
+        const tribe = yield (0, save_1.createTribe)(t, node1);
         t.truthy(tribe, 'tribe should have been created by node1');
         //NODE2 JOINS TRIBE CREATED BY NODE1
         if (node1.routeHint)
             tribe.owner_route_hint = node1.routeHint;
-        let join = yield (0, save_1.joinTribe)(t, node2, tribe);
+        const join = yield (0, save_1.joinTribe)(t, node2, tribe);
         t.true(join, 'node2 should join tribe');
         //NODE3 JOINS TRIBE CREATED BY NODE1
         if (node1.routeHint)
             tribe.owner_route_hint = node1.routeHint;
-        let join2 = yield (0, save_1.joinTribe)(t, node3, tribe);
+        const join2 = yield (0, save_1.joinTribe)(t, node3, tribe);
         t.true(join2, 'node3 should join tribe');
         //NODE1 SENDS A MESSAGE IN THE TRIBE AND NODE2 CHECKS TO SEE IF THEY RECEIVED THE MESSAGE
         const text = (0, helpers_1.randomText)();
-        let tribeMessage1 = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node1, node2, text, tribe);
+        const tribeMessage1 = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node1, node2, text, tribe);
         t.truthy(tribeMessage1, 'node1 should send message to tribe');
         //NODE2 SENDS A MESSAGE IN THE TRIBE AND NODE3 CHECKS TO SEE IF THEY RECEIVED THE MESSAGE
         const text2 = (0, helpers_1.randomText)();
-        let tribeMessage2 = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node2, node3, text2, tribe);
+        const tribeMessage2 = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node2, node3, text2, tribe);
         t.truthy(tribeMessage2, 'node2 should send message to tribe');
         //NODE3 SENDS A MESSAGE IN THE TRIBE AND NODE1 CHECKS TO SEE IF THEY RECEIVED THE MESSAGE
         const text3 = (0, helpers_1.randomText)();
-        let tribeMessage3 = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node3, node1, text3, tribe);
+        const tribeMessage3 = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node3, node1, text3, tribe);
         t.truthy(tribeMessage3, 'node3 should send message to tribe');
         //NODE1 SENDS A BOOST ON NODE2'S MESSAGE
         const boost = yield (0, msg_1.sendBoost)(t, node1, node2, tribeMessage2, 11, tribe);
@@ -65,13 +65,13 @@ function boostPayment(t, index1, index2, index3) {
         const boost3 = yield (0, msg_1.sendBoost)(t, node3, node1, tribeMessage1, 13, tribe);
         t.true(boost3.success);
         //NODE2 LEAVES TRIBE
-        let left2 = yield (0, del_1.leaveTribe)(t, node2, tribe);
+        const left2 = yield (0, del_1.leaveTribe)(t, node2, tribe);
         t.true(left2, 'node2 should leave tribe');
         //NODE3 LEAVES TRIBE
-        let left3 = yield (0, del_1.leaveTribe)(t, node3, tribe);
+        const left3 = yield (0, del_1.leaveTribe)(t, node3, tribe);
         t.true(left3, 'node3 should leave tribe');
         //NODE1 DELETES TRIBE
-        let delTribe2 = yield (0, del_1.deleteTribe)(t, node1, tribe);
+        const delTribe2 = yield (0, del_1.deleteTribe)(t, node1, tribe);
         t.true(delTribe2, 'node1 should delete tribe');
     });
 }

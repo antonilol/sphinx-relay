@@ -125,7 +125,7 @@ function finalNotification(ownerID, params, isTribeOwner) {
         // if (!isTribeOwner) {
         //   where.type = { [Op.notIn]: typesToNotNotify };
         // }
-        let unseenMessages = yield models_1.models.Message.count({
+        const unseenMessages = yield models_1.models.Message.count({
             where,
         });
         // if(!unseenMessages) return

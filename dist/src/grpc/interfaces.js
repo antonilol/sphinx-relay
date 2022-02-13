@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.greenlightSignMessagePayload = exports.connectPeerResponse = exports.connectPeerRequest = exports.subscribeResponse = exports.InvoiceState = exports.subscribeCommand = exports.keysendResponse = exports.keysendRequest = exports.listPeersResponse = exports.listPeersRequest = exports.listChannelsRequest = exports.listChannelsCommand = exports.listChannelsResponse = exports.addInvoiceResponse = exports.addInvoiceCommand = exports.addInvoiceRequest = exports.getInfoResponse = void 0;
+exports.greenlightSignMessagePayload = exports.connectPeerRequest = exports.subscribeResponse = exports.InvoiceState = exports.subscribeCommand = exports.keysendResponse = exports.keysendRequest = exports.listPeersResponse = exports.listPeersRequest = exports.listChannelsRequest = exports.listChannelsCommand = exports.listChannelsResponse = exports.addInvoiceResponse = exports.addInvoiceCommand = exports.addInvoiceRequest = exports.getInfoResponse = void 0;
 const config_1 = require("../utils/config");
 const ByteBuffer = require("bytebuffer");
 const crypto = require("crypto");
@@ -286,15 +286,6 @@ function connectPeerRequest(req) {
     return {};
 }
 exports.connectPeerRequest = connectPeerRequest;
-function connectPeerResponse(res) {
-    if (IS_LND)
-        return res;
-    if (IS_GREENLIGHT) {
-        return {};
-    }
-    return {};
-}
-exports.connectPeerResponse = connectPeerResponse;
 function greenlightAmoutToAmounts(a) {
     let satoshi = '';
     let millisatoshi = '';

@@ -26,7 +26,7 @@ function addContact(t, node1, node2) {
         const add = yield http.post(node1.external_ip + '/contacts', (0, helpers_1.makeArgs)(node1, body));
         t.true(typeof add.response === 'object', 'add contact should return object');
         //create node2 id based on the post response
-        var node2id = add && add.response && add.response.id;
+        const node2id = add && add.response && add.response.id;
         //check that node2id is a number and therefore exists (contact was posted)
         t.true(typeof node2id === 'number', 'node1id should be a number');
         //await contact_key

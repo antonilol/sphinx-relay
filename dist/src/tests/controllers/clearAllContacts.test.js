@@ -27,8 +27,8 @@ function clearAllContacts(t) {
             if (!node)
                 return;
             //get all contacts from node
-            var res = yield http.get(node.external_ip + '/contacts?unmet=include', (0, helpers_1.makeArgs)(node));
-            var contacts = res.response.contacts;
+            const res = yield http.get(node.external_ip + '/contacts?unmet=include', (0, helpers_1.makeArgs)(node));
+            const contacts = res.response.contacts;
             t.truthy(contacts, 'should have at least one contact');
             if (contacts.length === 1) {
                 console.log(`${node.alias} had no contacts`);
@@ -37,7 +37,7 @@ function clearAllContacts(t) {
             //delete any contact basides itself
             yield (0, helpers_1.asyncForEach)(contacts, (c) => __awaiter(this, void 0, void 0, function* () {
                 if (c.public_key !== node.pubkey) {
-                    let deletion = yield http.del(node.external_ip + '/contacts/' + c.id, (0, helpers_1.makeArgs)(node));
+                    const deletion = yield http.del(node.external_ip + '/contacts/' + c.id, (0, helpers_1.makeArgs)(node));
                     t.true(deletion.success, 'node should delete the contact');
                 }
             }));

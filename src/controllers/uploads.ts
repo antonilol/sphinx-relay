@@ -1,11 +1,11 @@
 import { models } from '../models'
 import * as path from 'path'
 import { loadConfig } from '../utils/config'
+import * as multer from 'multer'
 
 const config = loadConfig()
 
 // setup disk storage
-const multer = require('multer')
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = __dirname.includes('/dist/')
@@ -24,7 +24,7 @@ const avatarStorage = multer.diskStorage({
     }
   },
 })
-export var avatarUpload = multer({ storage: avatarStorage })
+export const avatarUpload = multer({ storage: avatarStorage })
 
 function hasProtocol(ip) {
   if (ip.startsWith('https://')) return true

@@ -30,12 +30,12 @@ function tribeImages(t, node1, node2) {
         //TWO NODES SEND IMAGES WITHIN A TRIBE ===>
         console.log(`Sending Tribe images from ${node1.alias} and ${node2.alias}`);
         //NODE1 CREATES A TRIBE
-        let tribe = yield (0, save_1.createTribe)(t, node1);
+        const tribe = yield (0, save_1.createTribe)(t, node1);
         t.truthy(tribe, 'tribe should have been created by node1');
         //NODE2 JOINS TRIBE CREATED BY NODE1
         if (node1.routeHint)
             tribe.owner_route_hint = node1.routeHint;
-        let join = yield (0, save_1.joinTribe)(t, node2, tribe);
+        const join = yield (0, save_1.joinTribe)(t, node2, tribe);
         t.true(join, 'node2 should join tribe');
         //NODE1 SEND IMAGE TO NODE2
         const image = base64images_1.greenSquare;
@@ -46,10 +46,10 @@ function tribeImages(t, node1, node2) {
         const imageSent2 = yield (0, msg_1.sendImage)(t, node2, node1, image2, tribe);
         t.true(imageSent2, 'message should have been sent');
         //NODE2 LEAVES TRIBE
-        let left2 = yield (0, del_1.leaveTribe)(t, node2, tribe);
+        const left2 = yield (0, del_1.leaveTribe)(t, node2, tribe);
         t.true(left2, 'node2 should leave tribe');
         //NODE1 DELETES TRIBE
-        let delTribe2 = yield (0, del_1.deleteTribe)(t, node1, tribe);
+        const delTribe2 = yield (0, del_1.deleteTribe)(t, node1, tribe);
         t.true(delTribe2, 'node1 should delete tribe');
     });
 }

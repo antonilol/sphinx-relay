@@ -36,7 +36,7 @@ function paidMeet(t, node1, node2) {
         const self = yield (0, get_1.getSelf)(t, node1);
         t.true(self.price_to_meet === 13, 'node1 should have updated price_to_meet');
         //NODE2 ADDS NODE1 AS A CONTACT
-        let added = yield (0, save_1.addContact)(t, node2, node1);
+        const added = yield (0, save_1.addContact)(t, node2, node1);
         t.true(added, 'node2 should add node1 as contact');
         //NODE2 SENDS A TEXT MESSAGE TO NODE1
         const text = (0, helpers_1.randomText)();
@@ -61,7 +61,7 @@ function paidMeet(t, node1, node2) {
         const clear = yield (0, clearAllContacts_test_1.clearAllContacts)(t);
         t.truthy(clear, 'all contacts should be cleared');
         //NODE2 ADDS NODE1 AS A CONTACT WITH CORRECT PRICE TO MEET
-        let added3 = yield (0, save_1.addContact)(t, node2, node1);
+        const added3 = yield (0, save_1.addContact)(t, node2, node1);
         t.true(added3, 'node2 should add node1 as contact again');
         //NODE2 SENDS A TEXT MESSAGE TO NODE1
         const text3 = (0, helpers_1.randomText)();

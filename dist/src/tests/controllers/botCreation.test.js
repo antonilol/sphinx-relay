@@ -29,18 +29,18 @@ function botCreation(t, node1, node2, node3) {
         //CHECK BOT CREATION WITHIN A TRIBE ===>
         console.log(`${node1.alias} and ${node2.alias} and ${node3.alias}`);
         //NODE1 CREATES A TRIBE
-        let tribe = yield (0, save_1.createTribe)(t, node1);
+        const tribe = yield (0, save_1.createTribe)(t, node1);
         t.truthy(tribe, 'tribe should have been created by node1');
         //NODE2 JOINS TRIBE CREATED BY NODE1
         if (node1.routeHint)
             tribe.owner_route_hint = node1.routeHint;
-        let join = yield (0, save_1.joinTribe)(t, node2, tribe);
+        const join = yield (0, save_1.joinTribe)(t, node2, tribe);
         t.true(join, 'node2 should join tribe');
         //NODE1 SENDS A BOT HELP MESSAGE IN TRIBE
         const text = '/bot help';
         yield (0, msg_1.sendTribeMessage)(t, node1, tribe, text);
         //NODE1 AWAIT REPLY FROM BOT
-        var botAlias = 'MotherBot';
+        let botAlias = 'MotherBot';
         const botReply = yield (0, get_1.getCheckBotMsg)(t, node1, botAlias);
         t.truthy(botReply, 'MotherBot should reply');
         // console.log("BOTREPLY === ", JSON.stringify(botReply))
@@ -65,7 +65,7 @@ function botCreation(t, node1, node2, node3) {
         //NODE3 JOINS TRIBE CREATED BY NODE1
         if (node1.routeHint)
             tribe.owner_route_hint = node1.routeHint;
-        let join2 = yield (0, save_1.joinTribe)(t, node3, tribe);
+        const join2 = yield (0, save_1.joinTribe)(t, node3, tribe);
         t.true(join2, 'node3 should join tribe');
         //NODE3 AWAIT REPLY FROM BOT
         botAlias = 'WelcomeBot';
@@ -105,13 +105,13 @@ function botCreation(t, node1, node2, node3) {
         // await h.sleep(5000)
         // return
         //NODE2 LEAVES THE TRIBE
-        let left = yield (0, del_1.leaveTribe)(t, node2, tribe);
+        const left = yield (0, del_1.leaveTribe)(t, node2, tribe);
         t.true(left, 'node2 should leave tribe');
         //NODE3 LEAVES THE TRIBE
-        let left2 = yield (0, del_1.leaveTribe)(t, node3, tribe);
+        const left2 = yield (0, del_1.leaveTribe)(t, node3, tribe);
         t.true(left2, 'node3 should leave tribe');
         //NODE1 DELETES THE TRIBE
-        let delTribe = yield (0, del_1.deleteTribe)(t, node1, tribe);
+        const delTribe = yield (0, del_1.deleteTribe)(t, node1, tribe);
         t.true(delTribe, 'node1 should delete tribe');
     });
 }

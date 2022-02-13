@@ -141,7 +141,7 @@ async function finalNotification(
   // if (!isTribeOwner) {
   //   where.type = { [Op.notIn]: typesToNotNotify };
   // }
-  let unseenMessages = await models.Message.count({
+  const unseenMessages = await models.Message.count({
     where,
   })
   // if(!unseenMessages) return

@@ -20,7 +20,7 @@ function payStream(t, node1, node2, node3, amount) {
         //check and record balances for all nodes
         const beforeBal = yield (0, get_1.getBalance)(t, node1);
         const beforeBal2 = yield (0, get_1.getBalance)(t, node2);
-        var beforeBal3 = 0;
+        let beforeBal3 = 0;
         if (node3)
             beforeBal3 = yield (0, get_1.getBalance)(t, node3);
         //create destinations array for node2 with 100% of payment
@@ -62,7 +62,7 @@ function payStream(t, node1, node2, node3, amount) {
             update_meta,
         };
         //node1 sends a stream/feed payment
-        var stream = yield http.post(node1.external_ip + '/stream', (0, helpers_1.makeArgs)(node1, v));
+        const stream = yield http.post(node1.external_ip + '/stream', (0, helpers_1.makeArgs)(node1, v));
         t.truthy(stream);
         //check that node2 has received stream payment message
         const streamCheck = yield (0, get_1.getCheckNewStream)(t, node2, string);
@@ -80,7 +80,7 @@ function payStream(t, node1, node2, node3, amount) {
         //get and record balances after payment
         const afterBal = yield (0, get_1.getBalance)(t, node1);
         const afterBal2 = yield (0, get_1.getBalance)(t, node2);
-        var afterBal3 = 0;
+        let afterBal3 = 0;
         if (node3)
             afterBal3 = yield (0, get_1.getBalance)(t, node3);
         //check that balances have moved within range of Allowed Fee

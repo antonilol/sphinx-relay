@@ -106,7 +106,7 @@ function startGreenlightInit() {
 exports.startGreenlightInit = startGreenlightInit;
 function schedule(pubkey) {
     logger_1.sphinxLogger.info('=> Greenlight schedule');
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
         try {
             const s = loadScheduler();
             s.schedule({
@@ -125,7 +125,7 @@ function schedule(pubkey) {
         catch (e) {
             logger_1.sphinxLogger.error(e);
         }
-    }));
+    });
 }
 exports.schedule = schedule;
 function recoverGreenlight(gid) {
@@ -175,7 +175,7 @@ function registerGreenlight(gid, rootkey, secretPath) {
     });
 }
 function get_challenge(node_id) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
         try {
             const s = loadScheduler();
             s.getChallenge({
@@ -193,7 +193,7 @@ function get_challenge(node_id) {
         catch (e) {
             reject(e);
         }
-    }));
+    });
 }
 exports.get_challenge = get_challenge;
 function sign_challenge(challenge) {
@@ -205,7 +205,7 @@ function sign_challenge(challenge) {
 }
 exports.sign_challenge = sign_challenge;
 function register(pubkey, bip32_key, challenge, signature) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
         try {
             const s = loadScheduler();
             s.register({
@@ -227,11 +227,11 @@ function register(pubkey, bip32_key, challenge, signature) {
         catch (e) {
             reject(e);
         }
-    }));
+    });
 }
 exports.register = register;
 function recover(pubkey, challenge, signature) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
         try {
             const s = loadScheduler();
             s.recover({
@@ -251,7 +251,7 @@ function recover(pubkey, challenge, signature) {
         catch (e) {
             reject(e);
         }
-    }));
+    });
 }
 exports.recover = recover;
 function streamHsmRequests() {

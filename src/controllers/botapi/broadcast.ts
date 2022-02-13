@@ -26,7 +26,7 @@ export default async function broadcast(a: any) {
   const encryptedForMeText = rsa.encrypt(owner.contactKey, content)
   const encryptedText = rsa.encrypt(theChat.groupKey, content)
   const textMap = { chat: encryptedText }
-  var date = new Date()
+  const date = new Date()
   date.setMilliseconds(0)
   const alias = bot_name || 'Bot'
   const botContactId = -1

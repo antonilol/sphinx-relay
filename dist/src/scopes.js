@@ -24,7 +24,7 @@ function allowedJwtRoutes(jwt, path) {
     scopes.forEach((sc) => {
         if (exports.routes[sc]) {
             // convert to regex with wildcards
-            let rs = exports.routes[sc].map((r) => wildcardToRegExp(r));
+            const rs = exports.routes[sc].map((r) => wildcardToRegExp(r));
             rs.forEach((r) => {
                 if (path.match(r))
                     ok = true;

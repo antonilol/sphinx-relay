@@ -19,7 +19,7 @@ ava_1.default.serial('checkSelf', (t) => __awaiter(void 0, void 0, void 0, funct
         if (!node)
             return;
         //get list of contacts as node
-        var me = yield (0, get_1.getSelf)(t, node);
+        const me = yield (0, get_1.getSelf)(t, node);
         //check that the structure object
         t.true(typeof me === 'object'); // json object by default
         //check that first contact public_key === node pubkey

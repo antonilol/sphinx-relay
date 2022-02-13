@@ -24,26 +24,26 @@ ava_1.default.serial('tribe', (t) => __awaiter(void 0, void 0, void 0, function*
 function tribeTest(t, node1, node2) {
     return __awaiter(this, void 0, void 0, function* () {
         //NODE1 CREATES A TRIBE
-        let tribe = yield (0, save_1.createTribe)(t, node1);
+        const tribe = yield (0, save_1.createTribe)(t, node1);
         t.truthy(tribe, 'tribe should have been created by node1');
         //NODE2 JOINS TRIBE CREATED BY NODE1
         if (node1.routeHint)
             tribe.owner_route_hint = node1.routeHint;
-        let join = yield (0, save_1.joinTribe)(t, node2, tribe);
+        const join = yield (0, save_1.joinTribe)(t, node2, tribe);
         t.true(join, 'node2 should join tribe');
         //NODE1 SENDS A TEXT MESSAGE IN TRIBE
         const text = (0, helpers_1.randomText)();
-        let tribeMessage = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node1, node2, text, tribe);
+        const tribeMessage = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node1, node2, text, tribe);
         t.true(!!tribeMessage, 'node1 should send message to tribe');
         //NODE2 SENDS A TEXT MESSAGE IN TRIBE
         const text2 = (0, helpers_1.randomText)();
-        let tribeMessage2 = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node2, node1, text2, tribe);
+        const tribeMessage2 = yield (0, msg_1.sendTribeMessageAndCheckDecryption)(t, node2, node1, text2, tribe);
         t.true(!!tribeMessage2, 'node1 should send message to tribe');
         //NODE2 LEAVES THE TRIBE
-        let left = yield (0, del_1.leaveTribe)(t, node2, tribe);
+        const left = yield (0, del_1.leaveTribe)(t, node2, tribe);
         t.true(left, 'node2 should leave tribe');
         //NODE2 LEAVES THE TRIBE
-        let delTribe = yield (0, del_1.deleteTribe)(t, node1, tribe);
+        const delTribe = yield (0, del_1.deleteTribe)(t, node1, tribe);
         t.true(delTribe, 'node1 should delete tribe');
     });
 }

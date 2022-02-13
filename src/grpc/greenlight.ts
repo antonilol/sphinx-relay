@@ -109,7 +109,7 @@ interface ScheduleResponse {
 }
 export function schedule(pubkey: string): Promise<ScheduleResponse> {
   sphinxLogger.info('=> Greenlight schedule')
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const s = loadScheduler()
       s.schedule(
@@ -185,7 +185,7 @@ async function registerGreenlight(
 }
 
 export function get_challenge(node_id: string): Promise<string> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const s = loadScheduler()
       s.getChallenge(
@@ -227,7 +227,7 @@ export function register(
   challenge: string,
   signature: string
 ): Promise<RegisterResponse> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const s = loadScheduler()
       s.register(
@@ -258,7 +258,7 @@ export function recover(
   challenge: string,
   signature: string
 ): Promise<RegisterResponse> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const s = loadScheduler()
       s.recover(

@@ -19,7 +19,7 @@ const findOrCreateChat = (params) => __awaiter(void 0, void 0, void 0, function*
     const { chat_id, owner_id, recipient_id } = params;
     // console.log("chat_id, owner_id, recipient_id", chat_id, owner_id, recipient_id)
     let chat;
-    let date = new Date();
+    const date = new Date();
     date.setMilliseconds(0);
     // console.log("findOrCreateChat", chat_id, typeof chat_id, owner_id, typeof owner_id)
     if (chat_id) {
@@ -77,16 +77,15 @@ const sendContactKeys = ({ type, contactIds, sender, success, failure, dontActua
     }
     let yes = null;
     let no = null;
-    let cids = contactIds || [];
+    const cids = contactIds || [];
     yield asyncForEach(cids, (contactId) => __awaiter(void 0, void 0, void 0, function* () {
-        let destination_key;
         if (contactId == sender.id) {
             return;
         }
         const contact = yield models_1.models.Contact.findOne({ where: { id: contactId } });
         if (!(contact && contact.publicKey))
             return;
-        destination_key = contact.publicKey;
+        const destination_key = contact.publicKey;
         const route_hint = contact.routeHint;
         // console.log("=> KEY EXCHANGE", msg)
         // console.log("=> TO", destination_key, route_hint)
@@ -177,7 +176,7 @@ function findOrCreateChatByUUID(chat_uuid, contactIds, tenant) {
             where: { uuid: chat_uuid, tenant, deleted: false },
         });
         if (!chat) {
-            var date = new Date();
+            const date = new Date();
             date.setMilliseconds(0);
             chat = yield models_1.models.Chat.create({
                 uuid: chat_uuid,

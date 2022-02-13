@@ -24,7 +24,7 @@ export default async function pay(a) {
   const alias = bot_name || owner.alias
   const botContactId = -1
 
-  var date = new Date()
+  const date = new Date()
   date.setMilliseconds(0)
   const msg: { [k: string]: any } = {
     chatId: theChat.id,

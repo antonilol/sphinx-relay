@@ -11,7 +11,7 @@ const ERR_CODE_UNAVAILABLE = 14
 const ERR_CODE_STREAM_REMOVED = 2
 const ERR_CODE_UNIMPLEMENTED = 12 // locked
 
-export function subscribeInvoices(parseKeysendInvoice) {
+export async function subscribeInvoices(parseKeysendInvoice) {
   return new Promise(async (resolve, reject) => {
     let ownerPubkey = ''
     if (isProxy()) {
@@ -79,7 +79,7 @@ function waitAndReconnect() {
   setTimeout(() => reconnectToLightning(Math.random(), null, true), 2000)
 }
 
-var i = 0
+let i = 0
 let ctx = 0
 export async function reconnectToLightning(
   innerCtx: number,

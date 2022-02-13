@@ -267,13 +267,8 @@ exports.restartSubscription = restartSubscription;
 function getRawSubs(opts = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = Object.assign({ order: [['id', 'asc']] }, opts);
-        try {
-            const subs = yield models_1.models.Subscription.findAll(options);
-            return subs;
-        }
-        catch (e) {
-            throw e;
-        }
+        const subs = yield models_1.models.Subscription.findAll(options);
+        return subs;
     });
 }
 // all subs

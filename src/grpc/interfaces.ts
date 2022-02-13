@@ -179,9 +179,10 @@ interface ChannelConstraints {
   min_htlc_msat: number
   max_accepted_htlcs: number
 }
-interface HTLC {
-  // ...
-}
+// empty and thus useless interface
+//interface HTLC {
+// ...
+//}
 interface Channel {
   active: boolean
   remote_pubkey: string
@@ -197,7 +198,8 @@ interface Channel {
   total_satoshis_sent: number
   total_satoshis_received: number
   num_updates: number
-  pending_htlcs: HTLC[]
+  // pending_htlcs: HTLC[]
+  pending_htlcs: Record<string, unknown>[] // <== is this used?
   csv_delay: number
   private: boolean
   initiator: boolean
@@ -596,20 +598,28 @@ export function connectPeerRequest(
   }
   return <ConnectPeerArgs>{}
 }
-interface ConnectPeerResponse {}
-interface GreenlightConnectPeerResponse {
-  node_id: string
-  features: string
-}
+// empty and thus useless interface
+// interface ConnectPeerResponse {}
+// unused interface
+//interface GreenlightConnectPeerResponse {
+//  node_id: string
+//  features: string
+//}
+/* Unused function
 export function connectPeerResponse(
-  res: ConnectPeerResponse | GreenlightConnectPeerResponse
-): ConnectPeerResponse {
-  if (IS_LND) return res as ConnectPeerResponse
+//  res: ConnectPeerResponse | GreenlightConnectPeerResponse
+  res: {} | GreenlightConnectPeerResponse
+//): ConnectPeerResponse {
+): {} {
+//  if (IS_LND) return res as ConnectPeerResponse
+  if (IS_LND) return res as {}
   if (IS_GREENLIGHT) {
     return <GreenlightConnectPeerResponse>{}
   }
-  return <ConnectPeerResponse>{}
+//  return <ConnectPeerResponse>{}
+  return <{}>{}
 }
+*/
 
 interface AmountsRes {
   satoshi: string

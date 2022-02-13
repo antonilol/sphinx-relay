@@ -320,7 +320,7 @@ export const receiveQuery = async (payload) => {
   sphinxLogger.info(`=> query received ${q}`)
   let result = ''
   switch (q.type) {
-    case 'onchain_address':
+    case 'onchain_address': {
       const addy = await lightning.newAddress(lightning.NESTED_PUBKEY_HASH)
       const acc = {
         date: new Date(),
@@ -334,6 +334,7 @@ export const receiveQuery = async (payload) => {
       }
       await models.Accounting.create(acc)
       result = addy
+    }
   }
   const ret: Query = {
     type: q.type,

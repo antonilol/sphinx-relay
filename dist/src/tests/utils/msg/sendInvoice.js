@@ -17,14 +17,14 @@ const get_1 = require("../get");
 function sendInvoice(t, node1, node2, amount, text) {
     return __awaiter(this, void 0, void 0, function* () {
         //SEND INVOICE FROM NODE1 TO NODE2 ===>
-        let [node1contact, node2contact] = yield (0, get_1.getCheckContacts)(t, node1, node2);
+        const [node1contact, node2contact] = yield (0, get_1.getCheckContacts)(t, node1, node2);
         //encrypt random string with node1 contact_key
         const encryptedText = (0, rsa_1.encrypt)(node1contact.contact_key, text);
         //encrypt random string with node2 contact_key
         const remoteText = (0, rsa_1.encrypt)(node2contact.contact_key, text);
         //create node2 contact id
-        let contact_id = node2contact.id;
-        let destination_key = '';
+        const contact_id = node2contact.id;
+        const destination_key = '';
         //create payment object
         const v = {
             contact_id: contact_id || null,

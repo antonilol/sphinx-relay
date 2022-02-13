@@ -27,13 +27,13 @@ function tribeEdit(t, node1, node2) {
         console.log(`${node1.alias} and ${node2.alias}`);
         //NODE1 CREATES A TRIBE
         console.log('create tribe');
-        let tribe = yield (0, save_1.createTribe)(t, node1);
+        const tribe = yield (0, save_1.createTribe)(t, node1);
         t.truthy(tribe, 'tribe should have been created by node1');
         //NODE2 JOINS TRIBE CREATED BY NODE1
         console.log('join tribe');
         if (node1.routeHint)
             tribe.owner_route_hint = node1.routeHint;
-        let join = yield (0, save_1.joinTribe)(t, node2, tribe);
+        const join = yield (0, save_1.joinTribe)(t, node2, tribe);
         t.true(join, 'node2 should join tribe');
         //GET TRIBE ID FROM NODE1 PERSPECTIVE
         console.log('get id');
@@ -74,11 +74,11 @@ function tribeEdit(t, node1, node2) {
         t.true(tribeFetch.description === newDescription, 'tribe server should show new description');
         //NODE2 LEAVES THE TRIBE
         console.log('leave tribe');
-        let left = yield (0, del_1.leaveTribe)(t, node2, tribe);
+        const left = yield (0, del_1.leaveTribe)(t, node2, tribe);
         t.true(left, 'node2 should leave tribe');
         //NODE1 DELETES THE TRIBE
         console.log('delete tribe');
-        let delTribe = yield (0, del_1.deleteTribe)(t, node1, tribe);
+        const delTribe = yield (0, del_1.deleteTribe)(t, node1, tribe);
         t.true(delTribe, 'node1 should delete tribe');
     });
 }

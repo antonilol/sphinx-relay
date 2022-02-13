@@ -18,7 +18,7 @@ const FormData = require("form-data");
 function uploadMeme(fileBase64, typ, host, token, filename, isPublic) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let imgBuf = dataURLtoBuf(fileBase64);
+            const imgBuf = dataURLtoBuf(fileBase64);
             let finalImgBuffer;
             let newKey = '';
             if (isPublic) {
@@ -44,7 +44,7 @@ function uploadMeme(fileBase64, typ, host, token, filename, isPublic) {
                 headers: Object.assign(Object.assign({}, formHeaders), { Authorization: `Bearer ${token}` }),
                 body: form,
             });
-            let json = yield resp.json();
+            const json = yield resp.json();
             if (!json.muid)
                 throw new Error('no muid');
             return {

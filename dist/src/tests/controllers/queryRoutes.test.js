@@ -27,7 +27,7 @@ function queryRoutes(t, node1, node2) {
         if (node2.routeHint) {
             q += `&route_hint=${node2.routeHint}`;
         }
-        var route = yield http.get(node1.external_ip + `/route?${q}`, (0, helpers_2.makeArgs)(node1));
+        const route = yield http.get(node1.external_ip + `/route?${q}`, (0, helpers_2.makeArgs)(node1));
         t.truthy(route.response.success_prob, 'route response success prob should exist');
         t.true(typeof route.response.success_prob === 'number', 'route response success prob should be a number');
         t.true(route.response.success_prob > 0, 'route response should be greater than 0');
