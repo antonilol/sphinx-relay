@@ -22,11 +22,11 @@ const clients: { [k: string]: { [k: string]: mqtt.Client } } = {}
 const optz: IClientSubscribeOptions = { qos: 0 }
 
 // this runs at relay startup
-export async function connect(onMessage: (topic: string, message: Buffer) => void) {
+export async function connect(onMessage: (topic: string, message: Buffer) => void): Promise<void> {
   initAndSubscribeTopics(onMessage)
 }
 
-export async function getTribeOwnersChatByUUID(uuid: string) {
+export async function getTribeOwnersChatByUUID(uuid: string): Promise<any> {
   const isOwner = isProxy() ? "'t'" : '1'
   try {
     const r = await sequelize.query(
@@ -187,7 +187,7 @@ async function subExtraHostsForTenant(
   })
 }
 
-export function printTribesClients() {
+export function printTribesClients(): string {
   const ret = {}
   Object.entries(clients).forEach((entry) => {
     const pk = entry[0]
@@ -204,7 +204,7 @@ export async function addExtraHost(
   pubkey: string,
   host: string,
   onMessage: (topic: string, message: Buffer) => void
-) {
+): Promise<void> {
   // console.log("ADD EXTRA HOST", printTribesClients(), host);
   if (getHost() === host) return // not for default host
   if (clients[pubkey] && clients[pubkey][host]) return // already exists
@@ -261,7 +261,7 @@ async function updateTribeStats(myPubkey) {
   }
 }
 
-export async function subscribe(topic: string, onMessage: (topic: string, message: Buffer) => void) {
+export async function subscribe(topic: string, onMessage: (topic: string, message: Buffer) => void): Promise<void> {
   const pubkey = topic.split('/')[0]
   if (pubkey.length !== 66) return
   const host = getHost()
@@ -272,7 +272,7 @@ export async function subscribe(topic: string, onMessage: (topic: string, messag
     })
 }
 
-export async function publish(topic, msg, ownerPubkey, cb) {
+export async function publish(topic: string, msg: string, ownerPubkey: string, cb: () => void): Promise<void> {
   if (ownerPubkey.length !== 66) return
   const host = getHost()
   const client = await lazyClient(ownerPubkey, host)
@@ -304,7 +304,7 @@ export async function declare({
   feed_type,
   owner_route_hint,
   pin,
-}) {
+}): Promise<void> {
   try {
     let protocol = 'https'
     if (config.tribes_insecure) protocol = 'http'
@@ -364,7 +364,7 @@ export async function edit({
   owner_route_hint,
   owner_pubkey,
   pin,
-}) {
+}): Promise<void> {
   try {
     const token = await genSignedTimestamp(owner_pubkey)
     let protocol = 'https'
@@ -403,7 +403,7 @@ export async function edit({
   }
 }
 
-export async function delete_tribe(uuid, owner_pubkey) {
+export async function delete_tribe(uuid: string, owner_pubkey: string): Promise<void> {
   const host = getHost()
   try {
     const token = await genSignedTimestamp(owner_pubkey)
@@ -429,7 +429,7 @@ export async function putActivity(
   uuid: string,
   host: string,
   owner_pubkey: string
-) {
+): Promise<void> {
   try {
     const token = await genSignedTimestamp(owner_pubkey)
     let protocol = 'https'
@@ -450,7 +450,7 @@ export async function putstats({
   member_count,
   chatId,
   owner_pubkey,
-}) {
+}): Promise<void> {
   if (!uuid) return
   const bots = await makeBotsJSON(chatId)
   try {
@@ -472,7 +472,7 @@ export async function putstats({
   }
 }
 
-export async function genSignedTimestamp(ownerPubkey: string) {
+export async function genSignedTimestamp(ownerPubkey: string): Promise<string> {
   // console.log('genSignedTimestamp')
   const now = moment().unix()
   const tsBytes = Buffer.from(now.toString(16), 'hex')
@@ -483,23 +483,21 @@ export async function genSignedTimestamp(ownerPubkey: string) {
   return urlBase64(buf)
 }
 
-export async function verifySignedTimestamp(stsBase64) {
+export async function verifySignedTimestamp(stsBase64: string): Promise<string | undefined> {
   const stsBuf = Buffer.from(stsBase64, 'base64')
   const sig = stsBuf.subarray(4, 92)
   const sigZbase32 = zbase32.encode(sig)
   const r = await LND.verifyBytes(stsBuf.subarray(0, 4), sigZbase32) // sig needs to be zbase32 :(
   if (r.valid) {
     return r.pubkey
-  } else {
-    return false
   }
 }
 
-export function getHost() {
+export function getHost(): string {
   return config.tribes_host || ''
 }
 
-function urlBase64(buf) {
+function urlBase64(buf: Buffer): string {
   return buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
 }
 

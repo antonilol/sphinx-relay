@@ -7,7 +7,7 @@ import { sphinxLogger } from './logger'
 
 const config = loadConfig()
 
-export async function delete_bot({ uuid, owner_pubkey }) {
+export async function delete_bot({ uuid, owner_pubkey }): Promise<boolean> {
   const host = getHost()
   const token = await genSignedTimestamp(owner_pubkey)
   try {
@@ -38,7 +38,7 @@ export async function declare_bot({
   deleted,
   owner_route_hint,
   owner_alias,
-}) {
+}): Promise<void> {
   const host = getHost()
   try {
     let protocol = 'https'

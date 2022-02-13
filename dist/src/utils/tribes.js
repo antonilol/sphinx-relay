@@ -478,9 +478,6 @@ function verifySignedTimestamp(stsBase64) {
         if (r.valid) {
             return r.pubkey;
         }
-        else {
-            return false;
-        }
     });
 }
 exports.verifySignedTimestamp = verifySignedTimestamp;
