@@ -30,8 +30,8 @@ Base64 strings separated by dots:
 function tokenFromTerms({ host, muid, ttl, pubkey, meta, ownerPubkey }) {
     return __awaiter(this, void 0, void 0, function* () {
         const theHost = host || config.media_host || '';
-        const pubkeyBytes = Buffer.from(pubkey, 'hex');
-        const pubkey64 = urlBase64FromBytes(pubkeyBytes);
+        const pubkeyBuffer = Buffer.from(pubkey, 'hex');
+        const pubkey64 = urlBase64(pubkeyBuffer);
         const now = Math.floor(Date.now() / 1000);
         const exp = ttl ? now + 60 * 60 * 24 * 365 : 0;
         const ldat = startLDAT(theHost, muid, pubkey64, exp, meta);
@@ -162,8 +162,8 @@ function urlBase64(buf) {
     return buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-');
 }
 exports.urlBase64 = urlBase64;
-function urlBase64FromBytes(buf) {
-    return Buffer.from(buf)
+function urlBase64FromBytes(bytes) {
+    return Buffer.from(bytes)
         .toString('base64')
         .replace(/\//g, '_')
         .replace(/\+/g, '-');
@@ -176,8 +176,8 @@ function urlBase64FromAscii(ascii) {
         .replace(/\+/g, '-');
 }
 exports.urlBase64FromAscii = urlBase64FromAscii;
-function urlBase64FromHex(ascii) {
-    return Buffer.from(ascii, 'hex')
+function urlBase64FromHex(hex) {
+    return Buffer.from(hex, 'hex')
         .toString('base64')
         .replace(/\//g, '_')
         .replace(/\+/g, '-');

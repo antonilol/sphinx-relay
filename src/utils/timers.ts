@@ -2,25 +2,32 @@ import { models } from '../models'
 import * as network from '../network'
 import constants from '../constants'
 
-const timerz = {}
-function clearTimer(t) {
+// TODO proper interface
+type Timer = { [k: string]: any };
+
+const timerz: { [k: string]: NodeJS.Timeout } = {}
+
+function clearTimer(t: Timer) {
   const name = makeName(t)
   if (name) clearTimeout(timerz[name])
 }
-export async function removeTimerByMsgId(msgId) {
+
+export async function removeTimerByMsgId(msgId: number) {
   const t = await models.Timer.findOne({ where: { msgId } })
   clearTimer(t)
   models.Timer.destroy({ where: { msgId } })
 }
-export async function removeTimersByContactId(contactId, tenant) {
-  const ts = await models.Timer.findAll({
+
+export async function removeTimersByContactId(contactId: number, tenant: number) {
+  const ts: Timer[] = await models.Timer.findAll({
     where: { receiver: contactId, tenant },
   })
   ts.forEach((t) => clearTimer(t))
   models.Timer.destroy({ where: { receiver: contactId, tenant } })
 }
-export async function removeTimersByContactIdChatId(contactId, chatId, tenant) {
-  const ts = await models.Timer.findAll({
+
+export async function removeTimersByContactIdChatId(contactId: number, chatId: number, tenant: number) {
+  const ts: Timer[] = await models.Timer.findAll({
     where: { receiver: contactId, chatId, tenant },
   })
   ts.forEach((t) => clearTimer(t))
@@ -49,7 +56,7 @@ export async function addTimer({
     payBack(t)
   })
 }
-export function setTimer(name: string, when: number, cb) {
+export function setTimer(name: string, when: number, cb: () => void) {
   const now = new Date().valueOf()
   const ms = when - now
   if (ms < 0) {
@@ -58,13 +65,13 @@ export function setTimer(name: string, when: number, cb) {
     timerz[name] = setTimeout(cb, ms)
   }
 }
-function makeName(t) {
+function makeName(t: Timer) {
   if (!t) return ''
   return `${t.chatId}_${t.receiver}_${t.msgId}`
 }
 
 export async function reloadTimers() {
-  const timers = await models.Timer.findAll()
+  const timers: Timer[] = await models.Timer.findAll()
   timers &&
     timers.forEach((t, i) => {
       const name = makeName(t)
@@ -75,7 +82,7 @@ export async function reloadTimers() {
       })
     })
 }
-export async function payBack(t) {
+export async function payBack(t: Timer) {
   const chat = await models.Chat.findOne({
     where: { id: t.chatId, tenant: t.tenant },
   })

@@ -2,10 +2,10 @@ import { models } from '../models'
 import * as crypto from 'crypto'
 import * as fs from 'fs'
 import { loadConfig } from './config'
-import { sphinxLogger} from '../utils/logger'
+import { sphinxLogger } from '../utils/logger'
+import { Server } from 'http'
 
 const config = loadConfig()
-// import * as WebSocket from 'ws'
 import * as socketio from 'socket.io'
 
 type ClientMap = Record<number, any[]>
@@ -15,7 +15,7 @@ const CLIENTS: ClientMap = {}
 let io: any
 // let srvr: any
 
-export function connect(server) {
+export function connect(server: Server) {
   // srvr = new WebSocket.Server({ server, clientTracking:true })
 
   io = socketio(server, {
@@ -97,13 +97,13 @@ async function getOwnerFromToken(
   return null
 }
 
-export const send = (body, tenant) => {
+export const send = (body: string, tenant: number) => {
   if (!io) return // io.sockets.emit('message', body)
   const clients = CLIENTS[tenant]
   if (!clients) return
   clients.forEach((c) => c.emit('message', body))
 }
 
-export const sendJson = (object, tenant: number) => {
+export const sendJson = (object: unknown, tenant: number) => {
   send(JSON.stringify(object), tenant)
 }

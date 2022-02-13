@@ -61,11 +61,11 @@ function encryptTribeBroadcast(full, contact, isTribeOwner) {
         if (isTribeOwner) {
             // has been previously decrypted
             if (message.content) {
-                const encContent = yield rsa.encrypt(contact.contactKey, message.content);
+                const encContent = rsa.encrypt(contact.contactKey, message.content);
                 obj.content = encContent;
             }
             if (message.mediaKey) {
-                const encMediaKey = yield rsa.encrypt(contact.contactKey, message.mediaKey);
+                const encMediaKey = rsa.encrypt(contact.contactKey, message.mediaKey);
                 obj.mediaKey = encMediaKey;
             }
         }

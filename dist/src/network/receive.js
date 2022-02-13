@@ -264,7 +264,7 @@ function doTheAction(data, owner) {
             const chat = yield models_1.models.Chat.findOne({
                 where: { uuid: payload.chat.uuid, tenant: owner.id },
             });
-            const pld = yield (0, msg_1.decryptMessage)(data, chat);
+            const pld = yield (0, msg_1.decryptMessage)({ full: data, chat });
             const me = owner;
             payload = yield (0, msg_1.encryptTribeBroadcast)(pld, me, true); // true=isTribeOwner
             if (ogContent)

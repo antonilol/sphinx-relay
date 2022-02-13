@@ -639,7 +639,7 @@ export async function replayChatHistory(chat, contact, ownerRecord) {
         includeStatus
       )
 
-      msg = await decryptMessage(msg, chat)
+      msg = await decryptMessage({ full: msg, chat })
       const data = await personalizeMessage(msg, contact, true)
       const mqttTopic = `${contact.publicKey}/${chat.uuid}`
       const replayingHistory = true

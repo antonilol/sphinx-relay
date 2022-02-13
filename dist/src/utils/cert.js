@@ -18,7 +18,7 @@ const axios_1 = require("axios");
 const forge = require("node-forge");
 const apiUrl = 'https://api.zerossl.com';
 function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 function generateCsr(keys, endpoint) {
     const csr = forge.pki.createCertificationRequest();
@@ -126,6 +126,8 @@ function downloadCert(id, apiKey) {
         return res.data;
     });
 }
+// looks unused
+// TODO remove?
 function getCertificate(domain, port, save_ssl) {
     return __awaiter(this, void 0, void 0, function* () {
         if ((0, fs_1.existsSync)(__dirname + '/zerossl/tls.cert') &&
@@ -154,21 +156,21 @@ function getCertificate(domain, port, save_ssl) {
         const certData = yield downloadCert(res.id, apiKey);
         if (save_ssl === true) {
             if (!(0, fs_1.existsSync)(__dirname + '/zerossl')) {
-                yield (0, fs_1.mkdirSync)(__dirname + '/zerossl');
+                (0, fs_1.mkdirSync)(__dirname + '/zerossl');
             }
-            yield (0, fs_1.writeFile)(__dirname + '/zerossl/tls.cert', certData['certificate.crt'], function (err) {
+            (0, fs_1.writeFile)(__dirname + '/zerossl/tls.cert', certData['certificate.crt'], function (err) {
                 if (err) {
                     return logger_1.sphinxLogger.error(err);
                 }
                 logger_1.sphinxLogger.info(`=> [ssl] wrote tls certificate`);
             });
-            yield (0, fs_1.writeFile)(__dirname + '/zerossl/ca.cert', certData['ca_bundle.crt'], function (err) {
+            (0, fs_1.writeFile)(__dirname + '/zerossl/ca.cert', certData['ca_bundle.crt'], function (err) {
                 if (err) {
                     return logger_1.sphinxLogger.error(err);
                 }
                 logger_1.sphinxLogger.info(`=> [ssl] wrote tls ca bundle`);
             });
-            yield (0, fs_1.writeFile)(__dirname + '/zerossl/tls.key', forge.pki.privateKeyToPem(keys.privateKey), function (err) {
+            (0, fs_1.writeFile)(__dirname + '/zerossl/tls.key', forge.pki.privateKeyToPem(keys.privateKey), function (err) {
                 if (err) {
                     return logger_1.sphinxLogger.error(err);
                 }

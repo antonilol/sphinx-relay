@@ -1,6 +1,7 @@
 import { sphinxLogger } from './logger'
+import { Response } from 'express'
 
-function success(res, json) {
+export function success(res: Response, json: {}) {
   res.status(200)
   res.json({
     success: true,
@@ -9,8 +10,8 @@ function success(res, json) {
   res.end()
 }
 
-function failure(res, e) {
-  const errorMessage = (e && e.message) || e
+export function failure(res: Response, e: Error | string) {
+  const errorMessage = typeof e === 'string' ? e : e.message
   sphinxLogger.error(`--> failure: ${errorMessage}`)
   res.status(400)
   res.json({
@@ -20,13 +21,11 @@ function failure(res, e) {
   res.end()
 }
 
-function failure200(res, e) {
+export function failure200(res: Response, e: Error | string) {
   res.status(200)
   res.json({
     success: false,
-    error: (e && e.message) || e,
+    error: typeof e === 'string' ? e : e.message,
   })
   res.end()
 }
-
-export { success, failure, failure200 }

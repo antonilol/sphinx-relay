@@ -63,7 +63,7 @@ function sendMessage(params) {
             if (isTribeOwner) {
                 networkType = 'mqtt'; // broadcast to all
                 // decrypt message.content and message.mediaKey w groupKey
-                msg = yield (0, msg_1.decryptMessage)(msg, chat);
+                msg = yield (0, msg_1.decryptMessage)({ full: msg, chat });
                 // console.log("SEND.TS isBotMsg")
                 logger_1.sphinxLogger.info(`[Network] => isTribeAdmin msg sending... ${msg}`, logger_1.logging.Network);
                 const isBotMsg = yield intercept.isBotMsg(msg, true, sender, forwardedFromContactId);

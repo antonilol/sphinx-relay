@@ -1,6 +1,7 @@
 import { tokenFromTerms } from './ldat'
 import * as rsa from '../crypto/rsa'
 import constants from '../constants'
+import { Contact } from '../models/ts/contact'
 
 function addInRemoteText(
   full: { [k: string]: any },
@@ -44,7 +45,7 @@ function removeAllNonAdminMembersIfTribe(full: { [k: string]: any }, destkey) {
 // by this time the content and mediaKey are already in message as string
 async function encryptTribeBroadcast(
   full: { [k: string]: any },
-  contact,
+  contact: Contact,
   isTribeOwner: boolean
 ) {
   if (!isTribeOwner) return full
@@ -56,11 +57,11 @@ async function encryptTribeBroadcast(
   if (isTribeOwner) {
     // has been previously decrypted
     if (message.content) {
-      const encContent = await rsa.encrypt(contact.contactKey, message.content)
+      const encContent = rsa.encrypt(contact.contactKey, message.content)
       obj.content = encContent
     }
     if (message.mediaKey) {
-      const encMediaKey = await rsa.encrypt(
+      const encMediaKey = rsa.encrypt(
         contact.contactKey,
         message.mediaKey
       )
@@ -150,7 +151,7 @@ async function decryptMessage(full: { [k: string]: any }, chat) {
   return fillmsg(full, obj)
 }
 
-async function personalizeMessage(m, contact, isTribeOwner: boolean) {
+async function personalizeMessage(m, contact: Contact, isTribeOwner: boolean) {
   const contactId = contact.id
   const destkey = contact.publicKey
   const senderPubkey = m.sender.pub_key

@@ -16,7 +16,6 @@ const fs = require("fs");
 const config_1 = require("./config");
 const logger_1 = require("../utils/logger");
 const config = (0, config_1.loadConfig)();
-// import * as WebSocket from 'ws'
 const socketio = require("socket.io");
 // { ownerID: [client1, client2] }
 const CLIENTS = {};

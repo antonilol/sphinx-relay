@@ -21,8 +21,8 @@ Base64 strings separated by dots:
 async function tokenFromTerms({ host, muid, ttl, pubkey, meta, ownerPubkey }) {
   const theHost = host || config.media_host || ''
 
-  const pubkeyBytes = Buffer.from(pubkey, 'hex')
-  const pubkey64 = urlBase64FromBytes(pubkeyBytes)
+  const pubkeyBuffer = Buffer.from(pubkey, 'hex')
+  const pubkey64 = urlBase64(pubkeyBuffer)
 
   const now = Math.floor(Date.now() / 1000)
   const exp = ttl ? now + 60 * 60 * 24 * 365 : 0
@@ -98,7 +98,7 @@ const termKeys = [
   },
 ]
 
-function parseLDAT(ldat) {
+function parseLDAT(ldat: string) {
   const a = ldat.split('.')
   const o: { [k: string]: any } = {}
   termKeys.forEach((t, i) => {
@@ -181,23 +181,23 @@ function deserializeMeta(str) {
   return ret
 }
 
-function urlBase64(buf) {
+function urlBase64(buf: Buffer) {
   return buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
 }
-function urlBase64FromBytes(buf) {
-  return Buffer.from(buf)
+function urlBase64FromBytes(bytes: number[]) {
+  return Buffer.from(bytes)
     .toString('base64')
     .replace(/\//g, '_')
     .replace(/\+/g, '-')
 }
-function urlBase64FromAscii(ascii) {
+function urlBase64FromAscii(ascii: string) {
   return Buffer.from(ascii, 'ascii')
     .toString('base64')
     .replace(/\//g, '_')
     .replace(/\+/g, '-')
 }
-function urlBase64FromHex(ascii) {
-  return Buffer.from(ascii, 'hex')
+function urlBase64FromHex(hex: string) {
+  return Buffer.from(hex, 'hex')
     .toString('base64')
     .replace(/\//g, '_')
     .replace(/\+/g, '-')

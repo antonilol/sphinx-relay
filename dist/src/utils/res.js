@@ -12,7 +12,7 @@ function success(res, json) {
 }
 exports.success = success;
 function failure(res, e) {
-    const errorMessage = (e && e.message) || e;
+    const errorMessage = typeof e === 'string' ? e : e.message;
     logger_1.sphinxLogger.error(`--> failure: ${errorMessage}`);
     res.status(400);
     res.json({
@@ -26,7 +26,7 @@ function failure200(res, e) {
     res.status(200);
     res.json({
         success: false,
-        error: (e && e.message) || e,
+        error: typeof e === 'string' ? e : e.message,
     });
     res.end();
 }

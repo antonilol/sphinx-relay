@@ -3,7 +3,7 @@ import * as crypto from 'crypto'
 const BLOCK_SIZE = 256
 const MAX_CHUNK_SIZE = BLOCK_SIZE - 11 // 11 is the PCKS1 padding
 
-export function encrypt(key, txt) {
+export function encrypt(key: string, txt: string) {
   try {
     const buf = Buffer.from(txt)
     let finalBuf = Buffer.from([])
@@ -26,7 +26,7 @@ export function encrypt(key, txt) {
   }
 }
 
-export function decrypt(privateKey, enc) {
+export function decrypt(privateKey: string, enc: string) {
   try {
     const buf = Buffer.from(enc, 'base64')
     let finalDec = ''

@@ -6,11 +6,11 @@ import axios from 'axios'
 import * as forge from 'node-forge'
 const apiUrl = 'https://api.zerossl.com'
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-function generateCsr(keys, endpoint) {
+function generateCsr(keys: forge.pki.rsa.KeyPair, endpoint: string) {
   const csr = forge.pki.createCertificationRequest()
   csr.publicKey = keys.publicKey
   csr.setSubject([
@@ -114,7 +114,9 @@ async function downloadCert(id, apiKey) {
   return res.data
 }
 
-async function getCertificate(domain, port, save_ssl) {
+// looks unused
+// TODO remove?
+async function getCertificate(domain: string, port, save_ssl) {
   if (
     existsSync(__dirname + '/zerossl/tls.cert') &&
     existsSync(__dirname + '/zerossl/tls.key')
@@ -152,9 +154,9 @@ async function getCertificate(domain, port, save_ssl) {
   const certData = await downloadCert(res.id, apiKey)
   if (save_ssl === true) {
     if (!existsSync(__dirname + '/zerossl')) {
-      await mkdirSync(__dirname + '/zerossl')
+      mkdirSync(__dirname + '/zerossl')
     }
-    await writeFile(
+    writeFile(
       __dirname + '/zerossl/tls.cert',
       certData['certificate.crt'],
       function (err) {
@@ -164,7 +166,7 @@ async function getCertificate(domain, port, save_ssl) {
         sphinxLogger.info(`=> [ssl] wrote tls certificate`)
       }
     )
-    await writeFile(
+    writeFile(
       __dirname + '/zerossl/ca.cert',
       certData['ca_bundle.crt'],
       function (err) {
@@ -174,7 +176,7 @@ async function getCertificate(domain, port, save_ssl) {
         sphinxLogger.info(`=> [ssl] wrote tls ca bundle`)
       }
     )
-    await writeFile(
+    writeFile(
       __dirname + '/zerossl/tls.key',
       forge.pki.privateKeyToPem(keys.privateKey),
       function (err) {

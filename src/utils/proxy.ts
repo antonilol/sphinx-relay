@@ -21,7 +21,7 @@ export function isProxy(): boolean {
     : false
 }
 
-export function genUsersInterval(ms) {
+export function genUsersInterval(ms: number) {
   if (!isProxy()) return
   setTimeout(() => {
     // so it starts a bit later than pingHub

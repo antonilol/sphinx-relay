@@ -51,7 +51,7 @@ export async function createOrEditPerson(
   }
 }
 
-export async function deletePerson(host, id, owner_pubkey) {
+export async function deletePerson(host: string, id: number, owner_pubkey: string) {
   try {
     const token = await genSignedTimestamp(owner_pubkey)
     let protocol = 'https'

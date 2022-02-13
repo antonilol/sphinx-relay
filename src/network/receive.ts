@@ -270,7 +270,7 @@ async function doTheAction(data, owner) {
     const chat = await models.Chat.findOne({
       where: { uuid: payload.chat.uuid, tenant: owner.id },
     })
-    const pld = await decryptMessage(data, chat)
+    const pld = await decryptMessage({ full: data, chat })
     const me = owner
     payload = await encryptTribeBroadcast(pld, me, true) // true=isTribeOwner
     if (ogContent)

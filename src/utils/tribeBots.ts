@@ -68,7 +68,7 @@ export async function declare_bot({
   }
 }
 
-export async function makeBotsJSON(tribeID) {
+export async function makeBotsJSON(tribeID: number) {
   const bots = await models.ChatBot.findAll({
     where: {
       chatId: tribeID,
