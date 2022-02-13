@@ -17,3 +17,5 @@ jobs:
         uses: actions/checkout@v2
       - name: lint
         run: npm run lint
+      - name: push automatic fixes
+        run: sh .github/workflows/lint_autofix.sh
