@@ -21,7 +21,7 @@ const proxy_1 = require("./utils/proxy");
 const jwtUtils = require("./utils/jwt");
 const scopes_1 = require("./scopes");
 const rsa = require("./crypto/rsa");
-const fs = require('fs');
+const fs = require("fs");
 const config = (0, config_1.loadConfig)();
 /*
 "unlock": true,
