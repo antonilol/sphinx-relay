@@ -46,6 +46,9 @@ function hasProtocol(ip) {
 const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { contact_id, chat_id } = req.body;
     const { file } = req;
+    if (!file) {
+        throw new Error('uploadFile needs a file field in `req`');
+    }
     const ip = String(process.env.NODE_IP);
     let theIP = ip;
     if (!hasProtocol(ip)) {

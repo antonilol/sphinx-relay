@@ -37,6 +37,10 @@ export const uploadFile = async (req: Request, res: Response) => {
   const { contact_id, chat_id } = req.body
   const { file } = req
 
+  if (!file) {
+    throw new Error('uploadFile needs a file field in `req`')
+  }
+
   const ip = String(process.env.NODE_IP)
   let theIP = ip
   if (!hasProtocol(ip)) {
