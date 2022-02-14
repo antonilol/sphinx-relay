@@ -18,7 +18,7 @@ interface MeInfo {
   jwt: string
 }
 
-export async function verifyAuthRequest(req: Request, res: Response) {
+export async function verifyAuthRequest(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   try {
     const sc = [scopes.PERSONAL, scopes.BOTS]
@@ -51,7 +51,7 @@ export async function verifyAuthRequest(req: Request, res: Response) {
   }
 }
 
-export async function requestExternalTokens(req: Request, res: Response) {
+export async function requestExternalTokens(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   try {
     const result: MeInfo = {
@@ -69,7 +69,7 @@ export async function requestExternalTokens(req: Request, res: Response) {
   }
 }
 
-export async function requestTransportToken(req: Request, res: Response) {
+export async function requestTransportToken(req: Request, res: Response): Promise<void> {
   const transportPublicKey = fs.readFileSync(
     config.transportPublicKeyLocation,
     'utf8'

@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { models, Chat, Contact, Message } from '../models'
 import * as jsonUtils from '../utils/json'
 import { success, failure } from '../utils/res'
 import * as network from '../network'
@@ -13,7 +13,7 @@ import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
 import { Request, Response } from 'express'
 
-export async function joinTribe(req: Request, res: Response) {
+export async function joinTribe(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -152,7 +152,7 @@ export async function joinTribe(req: Request, res: Response) {
   })
 }
 
-export async function receiveMemberRequest(payload) {
+export async function receiveMemberRequest(payload): Promise<void> {
   sphinxLogger.info('=> receiveMemberRequest', logging.Network)
   const {
     owner,
@@ -266,7 +266,7 @@ export async function receiveMemberRequest(payload) {
   )
 }
 
-export async function editTribe(req: Request, res: Response) {
+export async function editTribe(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const {
@@ -350,7 +350,7 @@ export async function editTribe(req: Request, res: Response) {
 }
 
 type ChatMemberStatus = 'approved' | 'rejected'
-export async function approveOrRejectMember(req: Request, res: Response) {
+export async function approveOrRejectMember(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -480,7 +480,7 @@ export async function receiveMemberApprove(payload) {
   // sendNotification(chat, chat_name, "group", theOwner);
 }
 
-export async function receiveMemberReject(payload) {
+export async function receiveMemberReject(payload): Promise<void> {
   sphinxLogger.info('-> receiveMemberReject', logging.Network)
   const { owner, chat, sender, chat_name, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -519,7 +519,7 @@ export async function receiveMemberReject(payload) {
   sendNotification(chat, chat_name, 'reject', owner)
 }
 
-export async function receiveTribeDelete(payload) {
+export async function receiveTribeDelete(payload): Promise<void> {
   sphinxLogger.info('-> receiveTribeDelete', logging.Network)
   const { owner, chat, sender, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -555,7 +555,7 @@ export async function receiveTribeDelete(payload) {
   )
 }
 
-export async function replayChatHistory(chat, contact, ownerRecord) {
+export async function replayChatHistory(chat: Chat, contact: Contact, ownerRecord): Promise<void> {
   const owner = ownerRecord.dataValues || ownerRecord
   const tenant: number = owner.id
   sphinxLogger.info('-> replayHistory', logging.Tribes)
@@ -564,7 +564,7 @@ export async function replayChatHistory(chat, contact, ownerRecord) {
   }
 
   try {
-    const msgs = await models.Message.findAll({
+    const msgs: Message[] = await models.Message.findAll({
       where: {
         tenant,
         chatId: chat.id,
@@ -663,29 +663,29 @@ export async function replayChatHistory(chat, contact, ownerRecord) {
 
 export async function createTribeChatParams(
   owner,
-  contactIds,
-  name,
-  img,
-  price_per_message,
-  price_to_join,
-  escrow_amount,
-  escrow_millis,
-  unlisted,
-  is_private,
-  app_url,
-  feed_url,
-  feed_type,
+  contactIds: number[],
+  name: string,
+  img: string,
+  price_per_message: number,
+  price_to_join: number,
+  escrow_amount: number,
+  escrow_millis: number,
+  unlisted: boolean,
+  is_private: boolean,
+  app_url: string,
+  feed_url: string,
+  feed_type: number,
   tenant,
-  pin
+  pin: string
 ): Promise<{ [k: string]: any }> {
   const date = new Date()
   date.setMilliseconds(0)
-  if (!(owner && contactIds && Array.isArray(contactIds))) {
+  if (!(owner && contactIds)) {
     return {}
   }
 
   // make ts sig here w LNd pubkey - that is UUID
-  const keys: { [k: string]: string } = await rsa.genKeys()
+  const keys = await rsa.genKeys()
   const groupUUID = await tribes.genSignedTimestamp(owner.publicKey)
   const theContactIds = contactIds.includes(owner.id)
     ? contactIds
@@ -716,8 +716,8 @@ export async function createTribeChatParams(
   }
 }
 
-export async function addPendingContactIdsToChat(achat, tenant) {
-  const members = await models.ChatMember.findAll({
+export async function addPendingContactIdsToChat(achat, tenant): Promise<{ [k: string]: any }> {
+  const members: any[] = await models.ChatMember.findAll({ // TODO type
     where: {
       chatId: achat.id,
       status: constants.chat_statuses.pending, // only pending
@@ -733,7 +733,7 @@ export async function addPendingContactIdsToChat(achat, tenant) {
   }
 }
 
-async function asyncForEach(array, callback) {
+async function asyncForEach<T>(array: T[], callback: (value: T, index: number, array: T[]) => Promise<void>): Promise<void> {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array)
   }

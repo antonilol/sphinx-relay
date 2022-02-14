@@ -15,7 +15,7 @@ export enum NodeType {
   NODE_GREENLIGHT = 'node_greenlight',
 }
 
-export async function proxynodeinfo(pk: string): Promise<{ [key: string]: any }> {
+export async function proxynodeinfo(pk: string): Promise<{ [k: string]: any }> {
   const channelList = await Lightning.listChannels({})
   return new Promise(resolve => {
     try {

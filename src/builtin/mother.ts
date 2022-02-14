@@ -27,7 +27,7 @@ const builtInBotNames = {
   loopout: 'LoopBot',
 }
 
-export function init() {
+export function init(): void {
   const client = new Sphinx.Client()
   client.login('_', finalAction)
 

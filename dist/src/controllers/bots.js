@@ -394,10 +394,12 @@ function buildBotPayload(msg) {
     return m;
 }
 exports.buildBotPayload = buildBotPayload;
+//export async function receiveBotRes(payload: Msg): Promise<void> { // TODO which type Msg? Message?
 function receiveBotRes(payload) {
     return __awaiter(this, void 0, void 0, function* () {
         logger_1.sphinxLogger.info('=> receiveBotRes', logger_1.logging.Network); //, payload)
-        const dat = payload.content || payload;
+        const dat = payload;
+        // const dat = payload.content ||  payload // TODO
         if (!dat.chat || !dat.message || !dat.sender) {
             return logger_1.sphinxLogger.error('=> receiveBotRes error, no chat||msg||sender');
         }

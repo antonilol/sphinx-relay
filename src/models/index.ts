@@ -77,4 +77,5 @@ export {
   ContactType as Contact,
   ChatType as Chat,
   MessageType as Message,
+  Bot,
 }

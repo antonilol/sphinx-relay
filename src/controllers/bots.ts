@@ -1,6 +1,6 @@
 import * as tribes from '../utils/tribes'
 import * as crypto from 'crypto'
-import { models } from '../models'
+import { models, Chat, Bot } from '../models'
 import * as jsonUtils from '../utils/json'
 import { success, failure } from '../utils/res'
 import * as network from '../network'
@@ -14,7 +14,7 @@ import { logging, sphinxLogger } from '../utils/logger'
 import * as short from 'short-uuid'
 import { Request, Response } from 'express'
 
-export const getBots = async (req: Request, res: Response) => {
+export const getBots = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   try {
@@ -27,7 +27,7 @@ export const getBots = async (req: Request, res: Response) => {
   }
 }
 
-export const createBot = async (req: Request, res: Response) => {
+export const createBot = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const { name, webhook, price_per_use, img, description, tags } = req.body
@@ -64,7 +64,7 @@ export const createBot = async (req: Request, res: Response) => {
   }
 }
 
-export const deleteBot = async (req: Request, res: Response) => {
+export const deleteBot = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const id = req.params.id
@@ -84,7 +84,7 @@ export const deleteBot = async (req: Request, res: Response) => {
   }
 }
 
-export async function installBotAsTribeAdmin(chat, bot_json) {
+export async function installBotAsTribeAdmin(chat: Chat, bot_json): Promise<void> {
   const chatId = chat && chat.id
   const chat_uuid = chat && chat.uuid
   const tenant = chat.tenant
@@ -248,7 +248,7 @@ export async function botKeysend(
   }
 }
 
-export async function receiveBotInstall(payload) {
+export async function receiveBotInstall(payload): Promise<void> {
   sphinxLogger.info(['=> receiveBotInstall', payload], logging.Network)
 
   const dat = payload.content || payload
@@ -298,7 +298,7 @@ export async function receiveBotInstall(payload) {
 }
 
 // ONLY FOR BOT MAKER
-export async function receiveBotCmd(payload) {
+export async function receiveBotCmd(payload): Promise<void> {
   sphinxLogger.info('=> receiveBotCmd', logging.Network)
 
   const dat = payload.content || payload
@@ -348,8 +348,8 @@ export async function receiveBotCmd(payload) {
 }
 
 export async function postToBotServer(
-  msg,
-  bot,
+  msg: Msg,
+  bot: Bot,
   route: string
 ): Promise<boolean> {
   sphinxLogger.info('=> postToBotServer', logging.Network) //, payload)
@@ -414,9 +414,11 @@ export function buildBotPayload(msg: Msg): SphinxBot.Message {
   return m
 }
 
-export async function receiveBotRes(payload) {
+//export async function receiveBotRes(payload: Msg): Promise<void> { // TODO which type Msg? Message?
+export async function receiveBotRes(payload): Promise<void> {
   sphinxLogger.info('=> receiveBotRes', logging.Network) //, payload)
-  const dat = payload.content || payload
+  const dat = payload
+  // const dat = payload.content ||  payload // TODO
 
   if (!dat.chat || !dat.message || !dat.sender) {
     return sphinxLogger.error('=> receiveBotRes error, no chat||msg||sender')

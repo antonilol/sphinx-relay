@@ -11,7 +11,7 @@ export interface LsatRequestBody {
   issuer: string
   paths?: string
   metadata?: string
-  [key: string]: string | undefined
+  [k: string]: string | undefined
 }
 
 export interface RelayRequest extends Request {

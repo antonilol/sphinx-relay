@@ -347,7 +347,7 @@ export function listPeersResponse(
 }
 
 export type Buf = Buffer | ByteBuffer | ArrayBuffer
-type DestCustomRecords = { [key: string]: Buf }
+type DestCustomRecords = { [k: string]: Buf }
 export interface KeysendRequest {
   amt: number
   final_cltv_delta: number

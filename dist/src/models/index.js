@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.models = exports.sequelize = void 0;
+exports.Bot = exports.models = exports.sequelize = void 0;
 // parse BIGINTs to number
 const pg = require("pg");
 pg.defaults.parseInt8 = true;
@@ -15,6 +15,7 @@ const mediaKey_1 = require("./sql/mediaKey");
 const chatMember_1 = require("./sql/chatMember");
 const timer_1 = require("./sql/timer");
 const bot_1 = require("./sql/bot");
+exports.Bot = bot_1.default;
 const chatBot_1 = require("./sql/chatBot");
 const botMember_1 = require("./sql/botMember");
 const accounting_1 = require("./sql/accounting");

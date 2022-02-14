@@ -593,7 +593,7 @@ function createTribeChatParams(owner, contactIds, name, img, price_per_message, 
     return __awaiter(this, void 0, void 0, function* () {
         const date = new Date();
         date.setMilliseconds(0);
-        if (!(owner && contactIds && Array.isArray(contactIds))) {
+        if (!(owner && contactIds)) {
             return {};
         }
         // make ts sig here w LNd pubkey - that is UUID

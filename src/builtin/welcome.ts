@@ -9,7 +9,7 @@ const msg_types = Sphinx.MSG_TYPE
 
 let initted = false
 
-export function init() {
+export function init(): void {
   if (initted) return
   initted = true
 
