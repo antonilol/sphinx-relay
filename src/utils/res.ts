@@ -1,7 +1,8 @@
 import { sphinxLogger } from './logger'
 import { Response } from 'express'
 
-export function success(res: Response, json: {} | string) {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function success(res: Response, json: {} | string): void {
   res.status(200)
   res.json({
     success: true,
@@ -10,7 +11,7 @@ export function success(res: Response, json: {} | string) {
   res.end()
 }
 
-export function failure(res: Response, e: Error | string) {
+export function failure(res: Response, e: Error | string): void {
   const errorMessage = typeof e === 'string' ? e : e.message
   sphinxLogger.error(`--> failure: ${errorMessage}`)
   res.status(400)
@@ -21,7 +22,7 @@ export function failure(res: Response, e: Error | string) {
   res.end()
 }
 
-export function failure200(res: Response, e: Error | string) {
+export function failure200(res: Response, e: Error | string): void {
   res.status(200)
   res.json({
     success: false,

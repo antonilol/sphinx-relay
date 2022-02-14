@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.failure200 = exports.failure = exports.success = void 0;
 const logger_1 = require("./logger");
+// eslint-disable-next-line @typescript-eslint/ban-types
 function success(res, json) {
     res.status(200);
     res.json({

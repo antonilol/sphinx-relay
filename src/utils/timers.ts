@@ -12,13 +12,13 @@ function clearTimer(t: Timer) {
   if (name) clearTimeout(timerz[name])
 }
 
-export async function removeTimerByMsgId(msgId: number) {
+export async function removeTimerByMsgId(msgId: number): Promise<void> {
   const t = await models.Timer.findOne({ where: { msgId } })
   clearTimer(t)
   models.Timer.destroy({ where: { msgId } })
 }
 
-export async function removeTimersByContactId(contactId: number, tenant: number) {
+export async function removeTimersByContactId(contactId: number, tenant: number): Promise<void> {
   const ts: Timer[] = await models.Timer.findAll({
     where: { receiver: contactId, tenant },
   })
@@ -26,7 +26,7 @@ export async function removeTimersByContactId(contactId: number, tenant: number)
   models.Timer.destroy({ where: { receiver: contactId, tenant } })
 }
 
-export async function removeTimersByContactIdChatId(contactId: number, chatId: number, tenant: number) {
+export async function removeTimersByContactIdChatId(contactId: number, chatId: number, tenant: number): Promise<void> {
   const ts: Timer[] = await models.Timer.findAll({
     where: { receiver: contactId, chatId, tenant },
   })
@@ -41,7 +41,7 @@ export async function addTimer({
   msgId,
   chatId,
   tenant,
-}) {
+}): Promise<void> {
   const now = new Date().valueOf()
   const when = now + millis
   const t = await models.Timer.create({
@@ -56,7 +56,8 @@ export async function addTimer({
     payBack(t)
   })
 }
-export function setTimer(name: string, when: number, cb: () => void) {
+
+export function setTimer(name: string, when: number, cb: () => void): void {
   const now = new Date().valueOf()
   const ms = when - now
   if (ms < 0) {
@@ -65,12 +66,13 @@ export function setTimer(name: string, when: number, cb: () => void) {
     timerz[name] = setTimeout(cb, ms)
   }
 }
-function makeName(t: Timer) {
+
+function makeName(t: Timer): string {
   if (!t) return ''
   return `${t.chatId}_${t.receiver}_${t.msgId}`
 }
 
-export async function reloadTimers() {
+export async function reloadTimers(): Promise<void> {
   const timers: Timer[] = await models.Timer.findAll()
   timers &&
     timers.forEach((t, i) => {
@@ -82,7 +84,8 @@ export async function reloadTimers() {
       })
     })
 }
-export async function payBack(t: Timer) {
+
+export async function payBack(t: Timer): Promise<void> {
   const chat = await models.Chat.findOne({
     where: { id: t.chatId, tenant: t.tenant },
   })
