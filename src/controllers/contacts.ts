@@ -206,7 +206,7 @@ export const generateToken = async (req: Request, res: Response) => {
 
   let token = ''
   const xTransportToken = req.headers['x-transport-token']
-  if (!xTransportToken) {
+  if (typeof xTransportToken !== 'string') {
     token = req.body['token']
   } else {
     const transportTokenKeys = fs.readFileSync(
@@ -594,7 +594,7 @@ export const getLatestContacts = async (req: Request, res: Response) => {
   const tenant: number = req.owner.id
 
   try {
-    const dateToReturn = decodeURI(req.query.date)
+    const dateToReturn = decodeURI((req.query.date || '').toString())
     const local = moment.utc(dateToReturn).local().toDate()
     const where: { [k: string]: any } = {
       updatedAt: { [Op.gte]: local },
@@ -661,10 +661,10 @@ async function switchBlock(
 
 export const blockContact = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
-  switchBlock(res, req.owner.id, req.params.contact_id, true)
+  switchBlock(res, req.owner.id, parseInt(req.params.contact_id), true)
 }
 
 export const unblockContact = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
-  switchBlock(res, req.owner.id, req.params.contact_id, false)
+  switchBlock(res, req.owner.id, parseInt(req.params.contact_id), false)
 }

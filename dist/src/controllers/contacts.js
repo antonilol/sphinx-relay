@@ -204,7 +204,7 @@ const generateToken = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
     let token = '';
     const xTransportToken = req.headers['x-transport-token'];
-    if (!xTransportToken) {
+    if (typeof xTransportToken !== 'string') {
         token = req.body['token'];
     }
     else {
@@ -547,7 +547,7 @@ const getLatestContacts = (req, res) => __awaiter(void 0, void 0, void 0, functi
         return (0, res_1.failure)(res, 'no owner');
     const tenant = req.owner.id;
     try {
-        const dateToReturn = decodeURI(req.query.date);
+        const dateToReturn = decodeURI((req.query.date || '').toString());
         const local = moment.utc(dateToReturn).local().toDate();
         const where = {
             updatedAt: { [sequelize_1.Op.gte]: local },
@@ -605,13 +605,13 @@ function switchBlock(res, tenant, id, blocked) {
 const blockContact = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.owner)
         return (0, res_1.failure)(res, 'no owner');
-    switchBlock(res, req.owner.id, req.params.contact_id, true);
+    switchBlock(res, req.owner.id, parseInt(req.params.contact_id), true);
 });
 exports.blockContact = blockContact;
 const unblockContact = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.owner)
         return (0, res_1.failure)(res, 'no owner');
-    switchBlock(res, req.owner.id, req.params.contact_id, false);
+    switchBlock(res, req.owner.id, parseInt(req.params.contact_id), false);
 });
 exports.unblockContact = unblockContact;
 //# sourceMappingURL=contacts.js.map
