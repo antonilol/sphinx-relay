@@ -625,6 +625,7 @@ interface AmountsRes {
   satoshi: string
   millisatoshi: string
 }
+
 function greenlightAmoutToAmounts(a: GreenlightAmount): AmountsRes {
   let satoshi = ''
   let millisatoshi = ''
@@ -687,7 +688,6 @@ enum GreenlightChannelState {
 }
 
 function shortChanIDfromInt64(int: string): string {
-  if (typeof int !== 'string') return ''
   const l = long.fromString(int, true)
   const blockHeight = l.shiftRight(40)
   const txIndex = l.shiftRight(16).and(0xffffff)

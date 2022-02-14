@@ -52,7 +52,7 @@ export async function sendMessage(params) {
     return
   }
 
-  let contactIds =
+  let contactIds: number[] =
     (typeof chat.contactIds === 'string'
       ? JSON.parse(chat.contactIds)
       : chat.contactIds) || []

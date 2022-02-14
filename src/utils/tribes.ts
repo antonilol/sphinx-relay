@@ -11,6 +11,8 @@ import { isProxy } from './proxy'
 import { Op } from 'sequelize'
 import { logging, sphinxLogger } from './logger'
 import { sleep, asyncForEach } from '../helpers'
+import { Contact } from '../models/ts/contact'
+import { Chat } from '../models/ts/chat'
 
 export { declare_bot, delete_bot }
 
@@ -50,7 +52,7 @@ export async function getTribeOwnersChatByUUID(uuid: string): Promise<any> {
   }
 }
 
-async function initializeClient(pubkey: string, host, onMessage?: (topic: string, message: Buffer) => void): Promise<mqtt.Client> {
+async function initializeClient(pubkey: string, host: string, onMessage?: (topic: string, message: Buffer) => void): Promise<mqtt.Client> {
   return new Promise(async resolve => {
     let connected = false
     async function reconnect() {
@@ -136,15 +138,15 @@ async function lazyClient(
   return cl
 }
 
-async function initAndSubscribeTopics(onMessage: (topic: string, message: Buffer) => void) {
+async function initAndSubscribeTopics(onMessage: (topic: string, message: Buffer) => void): Promise<void> {
   const host = getHost()
   try {
     if (isProxy()) {
-      const allOwners = await models.Contact.findAll({
+      const allOwners: Contact[] = await models.Contact.findAll({
         where: { isOwner: true },
       })
       if (!(allOwners && allOwners.length)) return
-      asyncForEach(allOwners, async (c) => {
+      asyncForEach(allOwners, async c => {
         if (c.id === 1) return // the proxy non user
         if (c.publicKey && c.publicKey.length === 66) {
           await lazyClient(c.publicKey, host, onMessage)
@@ -232,7 +234,7 @@ function mqttURL(h: string) {
 // for proxy, need to get all isOwner contacts and their owned chats
 async function updateTribeStats(myPubkey) {
   if (isProxy()) return // skip on proxy for now?
-  const myTribes = await models.Chat.findAll({
+  const myTribes: Chat[] = await models.Chat.findAll({
     where: {
       ownerPubkey: myPubkey,
       deleted: false,

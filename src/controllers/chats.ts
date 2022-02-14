@@ -187,7 +187,7 @@ export async function createGroupChat(req: Request, res: Response): Promise<void
     feed_type,
     pin,
   } = req.body
-  const contact_ids = req.body.contact_ids || []
+  const contact_ids: number[] = req.body.contact_ids || []
 
   const members: { [k: string]: { [k: string]: string | number } } = {} //{pubkey:{key,alias}, ...}
   const owner = req.owner
@@ -307,7 +307,7 @@ export async function addGroupMembers(req: Request, res: Response): Promise<void
   const owner = req.owner
   const chat = await models.Chat.findOne({ where: { id, tenant } })
 
-  const contactIds = JSON.parse(chat.contactIds || '[]')
+  const contactIds: number[] = JSON.parse(chat.contactIds || '[]')
   // for all members (existing and new)
   members[owner.publicKey] = { key: owner.contactKey, alias: owner.alias }
   if (chat.type === constants.chat_types.tribe) {
