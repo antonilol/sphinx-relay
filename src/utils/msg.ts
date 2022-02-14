@@ -3,7 +3,7 @@ import * as rsa from '../crypto/rsa'
 import constants from '../constants'
 import { Contact } from '../models/ts/contact'
 import { Chat } from '../models/ts/chat'
-import { Message } from '../models/ts/message'
+import { Msg } from '../network/interfaces'
 
 function addInRemoteText(
   full: { [k: string]: any },
@@ -153,7 +153,7 @@ async function decryptMessage(full: { [k: string]: any }, chat: Chat) {
   return fillmsg(full, obj)
 }
 
-async function personalizeMessage(msg: Message, contact: Contact, isTribeOwner: boolean) {
+async function personalizeMessage(msg: Msg, contact: Contact, isTribeOwner: boolean) {
   const contactId = contact.id
   const destkey = contact.publicKey
   const senderPubkey = msg.sender.pub_key
