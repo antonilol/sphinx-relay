@@ -330,7 +330,6 @@ function approveOrRejectMember(req, res) {
         logger_1.sphinxLogger.info('=> approve or reject tribe member');
         const msgId = parseInt(req.params['messageId']);
         const contactId = parseInt(req.params['contactId']);
-        const status = req.params['status'];
         const msg = yield models_1.models.Message.findOne({ where: { id: msgId, tenant } });
         if (!msg)
             return (0, res_1.failure)(res, 'no message');
@@ -340,9 +339,10 @@ function approveOrRejectMember(req, res) {
             return (0, res_1.failure)(res, 'no chat');
         if (!msgId ||
             !contactId ||
-            !(status === 'approved' || status === 'rejected')) {
+            !(req.params['status'] === 'approved' || req.params['status'] === 'rejected')) {
             return (0, res_1.failure)(res, 'incorrect status');
         }
+        const status = req.params['status'];
         let memberStatus = constants_1.default.chat_statuses.rejected;
         let msgType = constants_1.default.message_types.member_reject;
         if (status === 'approved') {
@@ -571,7 +571,7 @@ function replayChatHistory(chat, contact, ownerRecord) {
                 const isForwarded = m.sender !== tenant;
                 const includeStatus = true;
                 let msg = network.newmsg(m.type, chat, sender, Object.assign(Object.assign(Object.assign(Object.assign({ content, uuid: m.uuid, replyUuid: m.replyUuid, status: m.status, amount: m.amount }, (mediaKeyMap && { mediaKey: mediaKeyMap })), (newMediaTerms && { mediaToken: newMediaTerms })), (m.mediaType && { mediaType: m.mediaType })), (dateString && { date: dateString })), isForwarded, includeStatus);
-                msg = yield (0, msg_1.decryptMessage)({ full: msg, chat });
+                msg = yield yield (0, msg_1.decryptMessage)({ full: msg }, chat); // did this work before? (expected 2 arguments, but got 1)
                 const data = yield (0, msg_1.personalizeMessage)(msg, contact, true);
                 const mqttTopic = `${contact.publicKey}/${chat.uuid}`;
                 const replayingHistory = true;

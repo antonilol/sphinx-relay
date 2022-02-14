@@ -1,5 +1,5 @@
 declare namespace Express {
    export interface Request {
-      owner?: any // TODO type
+     owner?: any // TODO type
    }
 }

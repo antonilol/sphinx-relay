@@ -291,7 +291,7 @@ export async function queryOnchainAddress(req: Request, res: Response) {
       return
     }
     if (queries[uuid]) {
-      success(res, queries[uuid].result)
+      success(res, queries[uuid].result || '')
       clearInterval(interval)
       delete queries[uuid]
       return

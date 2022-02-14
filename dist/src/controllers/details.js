@@ -67,7 +67,7 @@ const checkRouteByContactOrChat = (req, res) => __awaiter(void 0, void 0, void 0
     let pubkey = '';
     let routeHint = '';
     if (contactID) {
-        const contactId = parseInt(contactID);
+        const contactId = parseInt(contactID.toString());
         const contact = yield models_1.models.Contact.findOne({ where: { id: contactId } });
         if (!contact)
             return (0, res_1.failure)(res, 'cant find contact');
@@ -75,7 +75,7 @@ const checkRouteByContactOrChat = (req, res) => __awaiter(void 0, void 0, void 0
         routeHint = contact.routeHint;
     }
     else if (chatID) {
-        const chatId = parseInt(chatID);
+        const chatId = parseInt(chatID.toString());
         const chat = yield models_1.models.Chat.findOne({ where: { id: chatId } });
         if (!chat)
             return (0, res_1.failure)(res, 'cant find chat');
@@ -95,7 +95,7 @@ const checkRouteByContactOrChat = (req, res) => __awaiter(void 0, void 0, void 0
     const amount = req.query.amount;
     const owner = req.owner;
     try {
-        const amt = parseInt(amount) || constants_1.default.min_sat_amount;
+        const amt = parseInt((amount || '').toString()) || constants_1.default.min_sat_amount;
         const r = yield Lightning.queryRoute(pubkey, amt, routeHint || '', owner.publicKey);
         (0, res_1.success)(res, r);
     }
@@ -213,15 +213,15 @@ const getLocalRemoteBalance = (req, res) => __awaiter(void 0, void 0, void 0, fu
 });
 exports.getLocalRemoteBalance = getLocalRemoteBalance;
 const getNodeInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const ipOfSource = req.connection.remoteAddress;
-    if (!(ipOfSource.includes('127.0.0.1') || ipOfSource.includes('localhost'))) {
-        res.status(401);
+    const srcIP = req.connection.remoteAddress;
+    if (srcIP && ['127.0.0.1', 'localhost'].includes(srcIP)) {
+        const node = yield (0, nodeinfo_1.nodeinfo)();
+        res.status(200);
+        res.json(node);
         res.end();
         return;
     }
-    const node = yield (0, nodeinfo_1.nodeinfo)();
-    res.status(200);
-    res.json(node);
+    res.status(401);
     res.end();
 });
 exports.getNodeInfo = getNodeInfo;

@@ -357,7 +357,6 @@ export async function approveOrRejectMember(req: Request, res: Response) {
   sphinxLogger.info('=> approve or reject tribe member')
   const msgId = parseInt(req.params['messageId'])
   const contactId = parseInt(req.params['contactId'])
-  const status: ChatMemberStatus = req.params['status']
 
   const msg = await models.Message.findOne({ where: { id: msgId, tenant } })
   if (!msg) return failure(res, 'no message')
@@ -369,10 +368,11 @@ export async function approveOrRejectMember(req: Request, res: Response) {
   if (
     !msgId ||
     !contactId ||
-    !(status === 'approved' || status === 'rejected')
+    !(req.params['status'] === 'approved' || req.params['status'] === 'rejected')
   ) {
     return failure(res, 'incorrect status')
   }
+  const status: ChatMemberStatus = req.params['status']
 
   let memberStatus = constants.chat_statuses.rejected
   let msgType = constants.message_types.member_reject
@@ -640,7 +640,7 @@ export async function replayChatHistory(chat, contact, ownerRecord) {
         includeStatus
       )
 
-      msg = await decryptMessage({ full: msg, chat })
+      msg = await await decryptMessage({ full: msg }, chat) // did this work before? (expected 2 arguments, but got 1)
       const data = await personalizeMessage(msg, contact, true)
       const mqttTopic = `${contact.publicKey}/${chat.uuid}`
       const replayingHistory = true

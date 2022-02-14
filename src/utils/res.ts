@@ -1,7 +1,7 @@
 import { sphinxLogger } from './logger'
 import { Response } from 'express'
 
-export function success(res: Response, json: {}) {
+export function success(res: Response, json: {} | string) {
   res.status(200)
   res.json({
     success: true,

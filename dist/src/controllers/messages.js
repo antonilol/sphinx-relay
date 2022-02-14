@@ -102,8 +102,8 @@ const getAllMessages = (req, res) => __awaiter(void 0, void 0, void 0, function*
     if (!req.owner)
         return (0, res_1.failure)(res, 'no owner');
     const tenant = req.owner.id;
-    const limit = (req.query.limit && parseInt(req.query.limit)) || 1000;
-    const offset = (req.query.offset && parseInt(req.query.offset)) || 0;
+    const limit = (req.query.limit && parseInt(req.query.limit.toString())) || 1000;
+    const offset = (req.query.offset && parseInt(req.query.offset.toString())) || 0;
     let order = 'asc';
     if (req.query.order && req.query.order === 'desc') {
         order = 'desc';
@@ -145,8 +145,8 @@ const getMsgs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.owner)
         return (0, res_1.failure)(res, 'no owner');
     const tenant = req.owner.id;
-    const limit = req.query.limit && parseInt(req.query.limit);
-    const offset = req.query.offset && parseInt(req.query.offset);
+    const limit = req.query.limit && parseInt(req.query.limit.toString());
+    const offset = req.query.offset && parseInt(req.query.offset.toString());
     const dateToReturn = req.query.date;
     if (!dateToReturn) {
         return (0, exports.getAllMessages)(req, res);

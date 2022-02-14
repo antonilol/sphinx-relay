@@ -73,7 +73,7 @@ export async function sendMessage(params) {
     if (isTribeOwner) {
       networkType = 'mqtt' // broadcast to all
       // decrypt message.content and message.mediaKey w groupKey
-      msg = await decryptMessage({ full: msg, chat })
+      msg = await decryptMessage({ full: msg }, chat) // did this work before? (expected 2 arguments, but got 1)
       // console.log("SEND.TS isBotMsg")
       sphinxLogger.info(
         `[Network] => isTribeAdmin msg sending... ${msg}`,

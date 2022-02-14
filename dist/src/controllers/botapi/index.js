@@ -59,8 +59,8 @@ function processAction(req, res) {
             recipient_id: recipient_id ? parseInt(recipient_id) : 0,
         };
         try {
-            const r = yield finalAction(a);
-            (0, res_1.success)(res, r);
+            yield finalAction(a);
+            (0, res_1.success)(res, {});
         }
         catch (e) {
             (0, res_1.failure)(res, e);

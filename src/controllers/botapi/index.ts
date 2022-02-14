@@ -78,8 +78,8 @@ export async function processAction(req: Request, res: Response) {
   }
 
   try {
-    const r = await finalAction(a)
-    success(res, r)
+    await finalAction(a)
+    success(res, {})
   } catch (e) {
     failure(res, e)
   }

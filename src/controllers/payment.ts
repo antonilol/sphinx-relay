@@ -207,8 +207,8 @@ export const receivePayment = async (payload) => {
 export const listPayments = async (req: Request, res: Response) => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
-  const limit = (req.query.limit && parseInt(req.query.limit)) || 100
-  const offset = (req.query.offset && parseInt(req.query.offset)) || 0
+  const limit = (req.query.limit && parseInt(req.query.limit.toString())) || 100
+  const offset = (req.query.offset && parseInt(req.query.offset.toString())) || 0
 
   const MIN_VAL = constants.min_sat_amount
   try {

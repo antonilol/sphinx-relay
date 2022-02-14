@@ -283,7 +283,7 @@ function queryOnchainAddress(req, res) {
                 return;
             }
             if (queries[uuid]) {
-                (0, res_1.success)(res, queries[uuid].result);
+                (0, res_1.success)(res, queries[uuid].result || '');
                 clearInterval(interval);
                 delete queries[uuid];
                 return;

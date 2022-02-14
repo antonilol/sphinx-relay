@@ -57,13 +57,13 @@ export const checkRouteByContactOrChat = async (req: Request, res: Response) => 
   let pubkey = ''
   let routeHint = ''
   if (contactID) {
-    const contactId = parseInt(contactID)
+    const contactId = parseInt(contactID.toString())
     const contact = await models.Contact.findOne({ where: { id: contactId } })
     if (!contact) return failure(res, 'cant find contact')
     pubkey = contact.publicKey
     routeHint = contact.routeHint
   } else if (chatID) {
-    const chatId = parseInt(chatID)
+    const chatId = parseInt(chatID.toString())
     const chat = await models.Chat.findOne({ where: { id: chatId } })
     if (!chat) return failure(res, 'cant find chat')
     if (!chat.ownerPubkey) return failure(res, 'cant find owern_pubkey')
@@ -80,7 +80,7 @@ export const checkRouteByContactOrChat = async (req: Request, res: Response) => 
   const amount = req.query.amount
   const owner = req.owner
   try {
-    const amt = parseInt(amount) || constants.min_sat_amount
+    const amt = parseInt((amount || '').toString()) || constants.min_sat_amount
     const r = await Lightning.queryRoute(
       pubkey,
       amt,
@@ -197,15 +197,15 @@ export const getLocalRemoteBalance = async (req: Request, res: Response) => {
 }
 
 export const getNodeInfo = async (req: Request, res: Response) => {
-  const ipOfSource = req.connection.remoteAddress
-  if (!(ipOfSource.includes('127.0.0.1') || ipOfSource.includes('localhost'))) {
-    res.status(401)
+  const srcIP = req.connection.remoteAddress
+  if (srcIP && ['127.0.0.1', 'localhost'].includes(srcIP)) {
+    const node = await nodeinfo()
+    res.status(200)
+    res.json(node)
     res.end()
     return
   }
-  const node = await nodeinfo()
-  res.status(200)
-  res.json(node)
+  res.status(401)
   res.end()
 }
 
