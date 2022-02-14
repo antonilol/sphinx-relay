@@ -21,13 +21,13 @@ function generateCsr(keys: forge.pki.rsa.KeyPair, endpoint: string) {
     },
   ])
   csr.sign(keys.privateKey)
-  if (!csr.verify()) { // <== TODO fix
+  if (!(csr as any).verify()) {
     throw new Error('=> [ssl] Verification of CSR failed.')
   }
   return forge.pki.certificationRequestToPem(csr).trim()
 }
 
-async function requestCert(endpoint, csr, apiKey) {
+async function requestCert(endpoint: string, csr: string, apiKey: string) {
   const res = await axios({
     method: 'post',
     url: `${apiUrl}/certificates?access_key=${apiKey}`,
@@ -43,7 +43,7 @@ async function requestCert(endpoint, csr, apiKey) {
   return res.data
 }
 
-async function validateCert(port, data, endpoint, apiKey) {
+async function validateCert(port: number, data, endpoint: string, apiKey: string): Promise<void> {
   const app = express()
   const validationObject = data.validation.other_methods[endpoint]
   const replacement = new RegExp(`http://${endpoint}`, 'g')

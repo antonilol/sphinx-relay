@@ -30,7 +30,7 @@ function generateCsr(keys, endpoint) {
         },
     ]);
     csr.sign(keys.privateKey);
-    if (!csr.verify()) { // <== TODO fix
+    if (!csr.verify()) {
         throw new Error('=> [ssl] Verification of CSR failed.');
     }
     return forge.pki.certificationRequestToPem(csr).trim();
