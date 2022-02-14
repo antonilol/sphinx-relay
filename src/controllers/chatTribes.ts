@@ -640,7 +640,7 @@ export async function replayChatHistory(chat, contact, ownerRecord) {
         includeStatus
       )
 
-      msg = await await decryptMessage({ full: msg }, chat) // did this work before? (expected 2 arguments, but got 1)
+      msg = await decryptMessage({ full: msg }, chat) // did this work before? (expected 2 arguments, but got 1)
       const data = await personalizeMessage(msg, contact, true)
       const mqttTopic = `${contact.publicKey}/${chat.uuid}`
       const replayingHistory = true

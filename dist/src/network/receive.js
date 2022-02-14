@@ -264,7 +264,7 @@ function doTheAction(data, owner) {
             const chat = yield models_1.models.Chat.findOne({
                 where: { uuid: payload.chat.uuid, tenant: owner.id },
             });
-            const pld = yield yield (0, msg_1.decryptMessage)({ full: data }, chat); // did this work before? (expected 2 arguments, but got 1)
+            const pld = yield (0, msg_1.decryptMessage)({ full: data }, chat); // did this work before? (expected 2 arguments, but got 1)
             const me = owner;
             payload = yield (0, msg_1.encryptTribeBroadcast)(pld, me, true); // true=isTribeOwner
             if (ogContent)
