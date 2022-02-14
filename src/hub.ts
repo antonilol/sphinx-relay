@@ -12,6 +12,7 @@ import * as https from 'https'
 import { isProxy } from './utils/proxy'
 import { sendNotification, resetNotifyTribeCount } from './notify'
 import { logging, sphinxLogger } from './utils/logger'
+import { asyncForEach } from './helpers'
 
 const pingAgent = new https.Agent({
   keepAlive: true,
@@ -312,10 +313,4 @@ export {
   payInviteInHub,
   payInviteInvoice,
   resetNotifyTribeCount,
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
 }

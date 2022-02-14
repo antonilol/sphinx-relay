@@ -5,6 +5,7 @@ import { keysendBotCmd, postToBotServer } from '../controllers/bots'
 import * as SphinxBot from 'sphinx-bot'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
+import { asyncForEach } from '../helpers'
 
 /*
 default show or not
@@ -149,11 +150,5 @@ async function emitMessageToBot(msg, botInTribe, sender): Promise<boolean> {
       return keysendBotCmd(msg, botInTribe, sender)
     default:
       return false
-  }
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
   }
 }

@@ -23,6 +23,7 @@ import { isProxy } from '../utils/proxy'
 import * as bolt11 from '@boltz/bolt11'
 import { loadConfig } from '../utils/config'
 import { sphinxLogger } from '../utils/logger'
+import { asyncForEach } from '../helpers'
 
 const config = loadConfig()
 /*
@@ -596,11 +597,5 @@ function weave(p) {
       })
     delete chunks[ts]
     return payload
-  }
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
   }
 }

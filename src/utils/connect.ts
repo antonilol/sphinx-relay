@@ -10,6 +10,7 @@ import { sphinxLogger } from './logger'
 import * as fs from 'fs'
 import * as net from 'net'
 import { Request, Response } from 'express'
+import { asyncForEach } from '../helpers'
 
 const config = loadConfig()
 const IS_GREENLIGHT = config.lightning_provider === 'GREENLIGHT'
@@ -72,7 +73,7 @@ async function makeVarScript(): Promise<string> {
   let channelFeesBaseZero = false
   const policies = ['node1_policy', 'node2_policy']
   await asyncForEach(channels, async (chan) => {
-    const info = await Lightning.getChanInfo(chan.chan_id)
+    const info = await Lightning.getChanInfo(parseInt(chan.chan_id))
     if (!info) return
     policies.forEach((p) => {
       if (info[p]) {
@@ -194,10 +195,4 @@ export async function connect(req: Request, res: Response) {
     }
     res.end()
   })
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
 }

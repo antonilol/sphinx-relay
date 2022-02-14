@@ -8,6 +8,7 @@ import * as intercept from './intercept'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
 import { Msg } from './interfaces'
+import { asyncForEach } from '../helpers'
 
 type NetworkType = undefined | 'mqtt' | 'lightning'
 
@@ -287,11 +288,6 @@ export function newmsg(
   }
 }
 
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
-}
 async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }

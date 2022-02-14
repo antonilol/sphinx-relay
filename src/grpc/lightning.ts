@@ -14,6 +14,7 @@ import * as zbase32 from '../utils/zbase32'
 import * as secp256k1 from 'secp256k1'
 import libhsmd from './libhsmd'
 import { get_greenlight_grpc_uri } from './greenlight'
+import { asyncForEach } from '../helpers'
 
 // var protoLoader = require('@grpc/proto-loader')
 const config = loadConfig()
@@ -446,11 +447,6 @@ export async function keysendMessage(opts, ownerPubkey?: string) {
   })
 }
 
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
-}
 
 export async function signAscii(ascii: string, ownerPubkey?: string) {
   const sig = await signMessage(ascii_to_hexa(ascii), ownerPubkey)

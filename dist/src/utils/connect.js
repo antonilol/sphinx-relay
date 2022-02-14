@@ -21,6 +21,7 @@ const res_1 = require("./res");
 const logger_1 = require("./logger");
 const fs = require("fs");
 const net = require("net");
+const helpers_1 = require("../helpers");
 const config = (0, config_1.loadConfig)();
 const IS_GREENLIGHT = config.lightning_provider === 'GREENLIGHT';
 function getQR() {
@@ -80,8 +81,8 @@ function makeVarScript() {
         const hasRemoteBalance = totalRemoteBalance > 0 ? true : false;
         let channelFeesBaseZero = false;
         const policies = ['node1_policy', 'node2_policy'];
-        yield asyncForEach(channels, (chan) => __awaiter(this, void 0, void 0, function* () {
-            const info = yield Lightning.getChanInfo(chan.chan_id);
+        yield (0, helpers_1.asyncForEach)(channels, (chan) => __awaiter(this, void 0, void 0, function* () {
+            const info = yield Lightning.getChanInfo(parseInt(chan.chan_id));
             if (!info)
                 return;
             policies.forEach((p) => {
@@ -223,11 +224,4 @@ function connect(req, res) {
     });
 }
 exports.connect = connect;
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
-    });
-}
 //# sourceMappingURL=connect.js.map

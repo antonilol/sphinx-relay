@@ -19,6 +19,7 @@ const receive_1 = require("./receive");
 const intercept = require("./intercept");
 const constants_1 = require("../constants");
 const logger_1 = require("../utils/logger");
+const helpers_1 = require("../helpers");
 function sendMessage(params) {
     return __awaiter(this, void 0, void 0, function* () {
         const { type, chat, message, sender, amount, success, failure, skipPubKey, isForwarded, forwardedFromContactId, realSatsContactId, } = params;
@@ -106,7 +107,7 @@ function sendMessage(params) {
         let yes = true;
         let no = null;
         logger_1.sphinxLogger.info(`=> sending to ${contactIds.length} 'contacts'`, logger_1.logging.Network);
-        yield asyncForEach(contactIds, (contactId) => __awaiter(this, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(contactIds, (contactId) => __awaiter(this, void 0, void 0, function* () {
             // console.log("=> TENANT", tenant)
             if (contactId === tenant) {
                 // dont send to self
@@ -238,13 +239,6 @@ function newmsg(type, chat, sender, message, isForwarded, includeStatus) {
     };
 }
 exports.newmsg = newmsg;
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
-    });
-}
 function sleep(ms) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve) => setTimeout(resolve, ms));

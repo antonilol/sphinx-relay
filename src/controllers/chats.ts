@@ -16,8 +16,9 @@ import {
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
 import { Request, Response } from 'express'
+import { asyncForEach } from '../helpers'
 
-export async function updateChat(req: Request, res: Response) {
+export async function updateChat(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   sphinxLogger.info(`=> updateChat`)
@@ -44,7 +45,7 @@ export async function updateChat(req: Request, res: Response) {
   success(res, jsonUtils.chatToJson(chat))
 }
 
-export async function kickChatMember(req: Request, res: Response) {
+export async function kickChatMember(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -81,7 +82,7 @@ export async function kickChatMember(req: Request, res: Response) {
   success(res, jsonUtils.chatToJson(chat))
 }
 
-export async function receiveGroupKick(payload) {
+export async function receiveGroupKick(payload): Promise<void> {
   sphinxLogger.info(`=> receiveGroupKick`, logging.Network)
   const { owner, chat, sender, date_string, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -131,7 +132,7 @@ export async function receiveGroupKick(payload) {
   )
 }
 
-export async function getChats(req: Request, res: Response) {
+export async function getChats(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const chats = await models.Chat.findAll({
@@ -166,7 +167,7 @@ export async function mute(req: Request, res: Response) {
 
 // just add self here if tribes
 // or can u add contacts as members?
-export async function createGroupChat(req: Request, res: Response) {
+export async function createGroupChat(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -295,7 +296,7 @@ export async function createGroupChat(req: Request, res: Response) {
 }
 
 // only owner can do for tribe?
-export async function addGroupMembers(req: Request, res: Response) {
+export async function addGroupMembers(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -343,7 +344,7 @@ export async function addGroupMembers(req: Request, res: Response) {
   })
 }
 
-export const deleteChat = async (req: Request, res: Response) => {
+export const deleteChat = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -403,7 +404,7 @@ export const deleteChat = async (req: Request, res: Response) => {
   success(res, { chat_id: id })
 }
 
-export async function receiveGroupJoin(payload) {
+export async function receiveGroupJoin(payload): Promise<void> {
   sphinxLogger.info(`=> receiveGroupJoin`, logging.Network)
   const {
     owner,
@@ -543,7 +544,7 @@ export async function receiveGroupJoin(payload) {
   }
 }
 
-export async function receiveGroupLeave(payload) {
+export async function receiveGroupLeave(payload): Promise<void> {
   sphinxLogger.info(`=> receiveGroupLeave`, logging.Network)
   const {
     chat,
@@ -641,7 +642,7 @@ async function validateTribeOwner(chat_uuid: string, pubkey: string) {
   }
   return false
 }
-export async function receiveGroupCreateOrInvite(payload) {
+export async function receiveGroupCreateOrInvite(payload): Promise<void> {
   const {
     owner,
     sender_pub_key,
@@ -756,7 +757,7 @@ export async function receiveGroupCreateOrInvite(payload) {
   }
 }
 
-function createGroupChatParams(owner, contactIds, members, name) {
+function createGroupChatParams(owner, contactIds, members, name): undefined | Record<string, unknown> {
   const date = new Date()
   date.setMilliseconds(0)
   if (!(owner && members && contactIds && Array.isArray(contactIds))) {
@@ -784,11 +785,5 @@ function createGroupChatParams(owner, contactIds, members, name) {
     updatedAt: date,
     name: name,
     type: constants.chat_types.group,
-  }
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
   }
 }

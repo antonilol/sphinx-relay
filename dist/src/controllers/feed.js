@@ -15,6 +15,7 @@ const helpers = require("../helpers");
 const res_1 = require("../utils/res");
 const constants_1 = require("../constants");
 const logger_1 = require("../utils/logger");
+const helpers_1 = require("../helpers");
 const streamFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.owner)
         return (0, res_1.failure)(res, 'no owner');
@@ -49,7 +50,7 @@ const streamFeed = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
     const owner = req.owner;
     if (amount && typeof amount === 'number') {
-        yield asyncForEach(destinations, (d) => __awaiter(void 0, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(destinations, (d) => __awaiter(void 0, void 0, void 0, function* () {
             if (d.type === 'node') {
                 if (!d.address)
                     return;
@@ -115,11 +116,4 @@ function anonymousKeysend(owner, destination_key, route_hint, amount, text, onSu
     });
 }
 exports.anonymousKeysend = anonymousKeysend;
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
-    });
-}
 //# sourceMappingURL=feed.js.map

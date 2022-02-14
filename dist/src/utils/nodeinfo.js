@@ -16,6 +16,7 @@ const gitinfo_1 = require("../utils/gitinfo");
 const models_1 = require("../models");
 const config_1 = require("./config");
 const logger_1 = require("./logger");
+const helpers_1 = require("../helpers");
 const config = (0, config_1.loadConfig)();
 const IS_GREENLIGHT = config.lightning_provider === 'GREENLIGHT';
 var NodeType;
@@ -211,9 +212,9 @@ function listNonZeroPolicies() {
             if (!channelList.channels)
                 return ret;
             const { channels } = channelList;
-            yield asyncForEach(channels, (chan) => __awaiter(this, void 0, void 0, function* () {
+            yield (0, helpers_1.asyncForEach)(channels, (chan) => __awaiter(this, void 0, void 0, function* () {
                 const tryProxy = false;
-                const info = yield Lightning.getChanInfo(chan.chan_id, tryProxy);
+                const info = yield Lightning.getChanInfo(parseInt(chan.chan_id), tryProxy);
                 if (!info)
                     return;
                 policies.forEach((p) => {
@@ -236,13 +237,6 @@ function listNonZeroPolicies() {
             return ret;
         }
         return ret;
-    });
-}
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
     });
 }
 //# sourceMappingURL=nodeinfo.js.map

@@ -20,6 +20,7 @@ const config_1 = require("../utils/config");
 const hub_1 = require("../hub");
 const sequelize_1 = require("sequelize");
 const logger_1 = require("../utils/logger");
+const helpers_1 = require("../helpers");
 const config = (0, config_1.loadConfig)();
 const VERSION = 2;
 function getRelayVersion(req, res) {
@@ -114,7 +115,7 @@ function getLogsSince(req, res) {
         const logFiles = config.log_file ? [config.log_file] : defaultLogFiles;
         let txt;
         let err;
-        yield asyncForEach(logFiles, (filepath) => __awaiter(this, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(logFiles, (filepath) => __awaiter(this, void 0, void 0, function* () {
             if (!txt) {
                 try {
                     const lines = yield readLastLines.read(filepath, 500);
@@ -225,13 +226,6 @@ const getNodeInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     res.end();
 });
 exports.getNodeInfo = getNodeInfo;
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
-    });
-}
 function clearForTesting(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!req.owner)

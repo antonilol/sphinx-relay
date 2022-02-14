@@ -26,6 +26,7 @@ const notify_1 = require("./notify");
 Object.defineProperty(exports, "sendNotification", { enumerable: true, get: function () { return notify_1.sendNotification; } });
 Object.defineProperty(exports, "resetNotifyTribeCount", { enumerable: true, get: function () { return notify_1.resetNotifyTribeCount; } });
 const logger_1 = require("./utils/logger");
+const helpers_1 = require("./helpers");
 const pingAgent = new https.Agent({
     keepAlive: true,
 });
@@ -141,7 +142,7 @@ function massPingHubFromProxies(rn) {
             },
         });
         const nodes = [];
-        yield asyncForEach(owners, (o) => __awaiter(this, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(owners, (o) => __awaiter(this, void 0, void 0, function* () {
             const proxyNodeInfo = yield (0, nodeinfo_1.proxynodeinfo)(o.publicKey);
             const clean = o.authToken === null || o.authToken === '';
             nodes.push(Object.assign(Object.assign({}, proxyNodeInfo), { clean, last_active: o.lastActive, route_hint: o.routeHint, relay_commit: rn.relay_commit, lnd_version: rn.lnd_version, relay_version: rn.relay_version, testnet: rn.testnet, ip: rn.ip, public_ip: rn.public_ip, node_alias: rn.node_alias }));
@@ -283,11 +284,4 @@ function getAppVersionsFromHub() {
     });
 }
 exports.getAppVersionsFromHub = getAppVersionsFromHub;
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
-    });
-}
 //# sourceMappingURL=hub.js.map

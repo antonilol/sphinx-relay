@@ -12,6 +12,7 @@ import * as helpers from '../helpers'
 import { isProxy } from '../utils/proxy'
 import { logging, sphinxLogger } from '../utils/logger'
 import { Request, Response } from 'express'
+import { asyncForEach } from '../helpers'
 
 type QueryType = 'onchain_address'
 export interface Query {
@@ -373,11 +374,5 @@ export const receiveQueryResponse = async (payload) => {
     queries[q.uuid] = q
   } catch (e) {
     sphinxLogger.error(`=> ERROR receiveQueryResponse, ${e}`)
-  }
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
   }
 }

@@ -10,7 +10,7 @@ import { loadConfig } from './config'
 import { isProxy } from './proxy'
 import { Op } from 'sequelize'
 import { logging, sphinxLogger } from './logger'
-import { sleep } from '../helpers'
+import { sleep, asyncForEach } from '../helpers'
 
 export { declare_bot, delete_bot }
 
@@ -499,10 +499,4 @@ export function getHost(): string {
 
 function urlBase64(buf: Buffer): string {
   return buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
 }

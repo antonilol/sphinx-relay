@@ -30,6 +30,7 @@ const proxy_1 = require("../utils/proxy");
 const bolt11 = require("@boltz/bolt11");
 const config_1 = require("../utils/config");
 const logger_1 = require("../utils/logger");
+const helpers_1 = require("../helpers");
 const config = (0, config_1.loadConfig)();
 /*
 delete type:
@@ -296,7 +297,7 @@ function uniqueifyAlias(payload, sender, chat, owner) {
         });
         if (!(chatMembers && chatMembers.length))
             return payload;
-        asyncForEach(chatMembers, (cm) => {
+        (0, helpers_1.asyncForEach)(chatMembers, (cm) => {
             if (cm.contactId === senderContactId)
                 return; // dont check against self of course
             if (sender_alias === cm.lastAlias || sender_alias === owner_alias) {
@@ -597,12 +598,5 @@ function weave(p) {
         delete chunks[ts];
         return payload;
     }
-}
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
-    });
 }
 //# sourceMappingURL=receive.js.map

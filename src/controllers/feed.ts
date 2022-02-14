@@ -4,6 +4,7 @@ import { failure, success } from '../utils/res'
 import constants from '../constants'
 import { sphinxLogger } from '../utils/logger'
 import { Request, Response } from 'express'
+import { asyncForEach } from '../helpers'
 
 export interface ChatMeta {
   itemID: number
@@ -148,10 +149,4 @@ export async function anonymousKeysend(
     },
     extra_tlv,
   })
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
 }

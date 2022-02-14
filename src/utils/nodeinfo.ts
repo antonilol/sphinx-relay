@@ -5,6 +5,7 @@ import { models } from '../models'
 import * as interfaces from '../grpc/interfaces'
 import { loadConfig } from './config'
 import { sphinxLogger } from './logger'
+import { asyncForEach } from '../helpers'
 
 const config = loadConfig()
 const IS_GREENLIGHT = config.lightning_provider === 'GREENLIGHT'
@@ -200,7 +201,7 @@ async function listNonZeroPolicies() {
     const { channels } = channelList
     await asyncForEach(channels, async (chan) => {
       const tryProxy = false
-      const info = await Lightning.getChanInfo(chan.chan_id, tryProxy)
+      const info = await Lightning.getChanInfo(parseInt(chan.chan_id), tryProxy)
       if (!info) return
       policies.forEach((p) => {
         if (info[p]) {
@@ -221,10 +222,4 @@ async function listNonZeroPolicies() {
     return ret
   }
   return ret
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
 }

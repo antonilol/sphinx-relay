@@ -152,7 +152,7 @@ function initAndSubscribeTopics(onMessage) {
                 });
                 if (!(allOwners && allOwners.length))
                     return;
-                asyncForEach(allOwners, (c) => __awaiter(this, void 0, void 0, function* () {
+                (0, helpers_1.asyncForEach)(allOwners, (c) => __awaiter(this, void 0, void 0, function* () {
                     if (c.id === 1)
                         return; // the proxy non user
                     if (c.publicKey && c.publicKey.length === 66) {
@@ -250,7 +250,7 @@ function updateTribeStats(myPubkey) {
                 deleted: false,
             },
         });
-        yield asyncForEach(myTribes, (tribe) => __awaiter(this, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(myTribes, (tribe) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const contactIds = JSON.parse(tribe.contactIds);
                 const member_count = (contactIds && contactIds.length) || 0;
@@ -487,12 +487,5 @@ function getHost() {
 exports.getHost = getHost;
 function urlBase64(buf) {
     return buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-');
-}
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
-    });
 }
 //# sourceMappingURL=tribes.js.map

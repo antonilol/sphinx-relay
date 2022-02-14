@@ -9,6 +9,7 @@ import { getAppVersionsFromHub } from '../hub'
 import { Op } from 'sequelize'
 import { sphinxLogger } from '../utils/logger'
 import { Request, Response } from 'express'
+import { asyncForEach } from '../helpers'
 
 const config = loadConfig()
 
@@ -209,11 +210,6 @@ export const getNodeInfo = async (req: Request, res: Response) => {
   res.end()
 }
 
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
-}
 
 export async function clearForTesting(req: Request, res: Response) {
   if (!req.owner) return failure(res, 'no owner')

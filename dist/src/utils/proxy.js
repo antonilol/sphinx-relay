@@ -17,6 +17,7 @@ const Lightning = require("../grpc/lightning");
 const models_1 = require("../models");
 const node_fetch_1 = require("node-fetch");
 const logger_1 = require("./logger");
+const helpers_1 = require("../helpers");
 // var protoLoader = require('@grpc/proto-loader')
 const config = (0, config_1.loadConfig)();
 const LND_IP = config.lnd_ip || 'localhost';
@@ -80,7 +81,7 @@ function generateNewUsers() {
         logger_1.sphinxLogger.info(`=> gen new users: ${n}`, logger_1.logging.Proxy);
         const arr = new Array(n);
         const rootpk = yield getProxyRootPubkey();
-        yield asyncForEach(arr, () => __awaiter(this, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(arr, () => __awaiter(this, void 0, void 0, function* () {
             yield generateNewUser(rootpk);
         }));
     });
@@ -241,13 +242,6 @@ function getProxyLNDBalance() {
                 reject(err);
             }
         });
-    });
-}
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
     });
 }
 //# sourceMappingURL=proxy.js.map

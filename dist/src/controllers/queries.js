@@ -23,6 +23,7 @@ const node_fetch_1 = require("node-fetch");
 const helpers = require("../helpers");
 const proxy_1 = require("../utils/proxy");
 const logger_1 = require("../utils/logger");
+const helpers_1 = require("../helpers");
 const queries = {};
 const POLL_MINS = 10;
 let hub_pubkey = '';
@@ -159,7 +160,7 @@ function pollUTXOs() {
         if (!accs)
             return;
         // console.log("[WATCH]=> accs", accs.length)
-        yield asyncForEach(accs, (acc) => __awaiter(this, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(accs, (acc) => __awaiter(this, void 0, void 0, function* () {
             if (acc.confirmations <= 0)
                 return; // needs confs
             if (acc.amount <= 0)
@@ -175,7 +176,7 @@ function checkForConfirmedChannels() {
     return __awaiter(this, void 0, void 0, function* () {
         const received = yield getReceivedAccountings();
         // console.log('[WATCH] received accountings:', received)
-        yield asyncForEach(received, (rec) => __awaiter(this, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(received, (rec) => __awaiter(this, void 0, void 0, function* () {
             if (rec.amount <= 0)
                 return; // needs amount
             if (!rec.pubkey)
@@ -371,11 +372,4 @@ const receiveQueryResponse = (payload) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.receiveQueryResponse = receiveQueryResponse;
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
-    });
-}
 //# sourceMappingURL=queries.js.map

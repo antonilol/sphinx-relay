@@ -16,6 +16,7 @@ const bots_1 = require("../controllers/bots");
 const SphinxBot = require("sphinx-bot");
 const constants_1 = require("../constants");
 const logger_1 = require("../utils/logger");
+const helpers_1 = require("../helpers");
 /*
 default show or not
 restrictions (be able to toggle, or dont show chat)
@@ -82,7 +83,7 @@ function isBotMsg(m, sentByMe, sender, forwardedFromContactId) {
             logger_1.sphinxLogger.info(`=> botsInTribe ${botsInTribe.length}`, logger_1.logging.Network); //, payload)
             if (!(botsInTribe && botsInTribe.length))
                 return false;
-            yield asyncForEach(botsInTribe, (botInTribe) => __awaiter(this, void 0, void 0, function* () {
+            yield (0, helpers_1.asyncForEach)(botsInTribe, (botInTribe) => __awaiter(this, void 0, void 0, function* () {
                 if (botInTribe.msgTypes) {
                     // console.log('=> botInTribe.msgTypes', botInTribe)
                     try {
@@ -142,13 +143,6 @@ function emitMessageToBot(msg, botInTribe, sender) {
                 return (0, bots_1.keysendBotCmd)(msg, botInTribe, sender);
             default:
                 return false;
-        }
-    });
-}
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
         }
     });
 }

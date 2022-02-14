@@ -5,6 +5,7 @@ import * as Lightning from '../grpc/lightning'
 import { models } from '../models'
 import fetch from 'node-fetch'
 import { logging, sphinxLogger } from './logger'
+import { asyncForEach } from '../helpers'
 
 // var protoLoader = require('@grpc/proto-loader')
 const config = loadConfig()
@@ -227,10 +228,4 @@ function getProxyLNDBalance(): Promise<number> {
       }
     })
   })
-}
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
 }

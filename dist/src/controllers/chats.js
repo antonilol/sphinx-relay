@@ -23,6 +23,7 @@ const timers = require("../utils/timers");
 const chatTribes_1 = require("./chatTribes");
 const constants_1 = require("../constants");
 const logger_1 = require("../utils/logger");
+const helpers_1 = require("../helpers");
 function updateChat(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!req.owner)
@@ -187,7 +188,7 @@ function createGroupChat(req, res) {
             key: owner.contactKey,
             alias: owner.alias,
         };
-        yield asyncForEach(contact_ids, (cid) => __awaiter(this, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(contact_ids, (cid) => __awaiter(this, void 0, void 0, function* () {
             const contact = yield models_1.models.Contact.findOne({
                 where: { id: cid, tenant },
             });
@@ -295,7 +296,7 @@ function addGroupMembers(req, res) {
                 members[owner.publicKey].role = me.role;
         }
         const allContactIds = contactIds.concat(contact_ids);
-        yield asyncForEach(allContactIds, (cid) => __awaiter(this, void 0, void 0, function* () {
+        yield (0, helpers_1.asyncForEach)(allContactIds, (cid) => __awaiter(this, void 0, void 0, function* () {
             const contact = yield models_1.models.Contact.findOne({
                 where: { id: cid, tenant },
             });
@@ -699,12 +700,5 @@ function createGroupChatParams(owner, contactIds, members, name) {
         name: name,
         type: constants_1.default.chat_types.group,
     };
-}
-function asyncForEach(array, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < array.length; index++) {
-            yield callback(array[index], index, array);
-        }
-    });
 }
 //# sourceMappingURL=chats.js.map
