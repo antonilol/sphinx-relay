@@ -636,15 +636,15 @@ export function verifyMessage(
             )
           )
         )
-        const recoveredPubkey = secp256k1.ecdsaRecover(
+        const recoveredPubkey = secp256k1.recover(
+          Buffer.from(hash), // 32 byte hash of message
           sigBytes, // 64 byte signature of message (not DER, 32 byte R and 32 byte S with 0x00 padding)
           recid, // number 1 or 0. This will usually be encoded in the base64 message signature
-          Buffer.from(hash), // 32 byte hash of message
           true // true if you want result to be compressed (33 bytes), false if you want it uncompressed (65 bytes) this also is usually encoded in the base64 signature
         )
         resolve(<VerifyResponse>{
           valid: true,
-          pubkey: Buffer.from(recoveredPubkey).toString('hex'),
+          pubkey: recoveredPubkey.toString('hex'),
         })
       } else {
         const lightning = await loadLightning(true, ownerPubkey) // try proxy
