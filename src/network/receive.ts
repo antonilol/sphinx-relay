@@ -271,7 +271,7 @@ async function doTheAction(data, owner) {
     const chat = await models.Chat.findOne({
       where: { uuid: payload.chat.uuid, tenant: owner.id },
     })
-    const pld = await decryptMessage({ full: data }, chat) // did this work before? (expected 2 arguments, but got 1)
+    const pld = await decryptMessage(data, chat)
     const me = owner
     payload = await encryptTribeBroadcast(pld, me, true) // true=isTribeOwner
     if (ogContent)
