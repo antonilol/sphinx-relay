@@ -94,7 +94,8 @@ function isBotMsg(m, sentByMe, sender, forwardedFromContactId) {
                                 txt.startsWith(`${botInTribe.botPrefix} `);
                             const isNotMsg = msgType !== constants_1.default.message_types.message;
                             if (isMsgAndHasText || isNotMsg) {
-                                didEmit = yield emitMessageToBot(msg, botInTribe.dataValues, sender);
+                                didEmit = yield emitMessageToBot(msg, botInTribe.dataValues, // HELP dataValues?
+                                sender);
                             }
                         }
                     }
@@ -106,7 +107,7 @@ function isBotMsg(m, sentByMe, sender, forwardedFromContactId) {
                     // no message types defined, do all?
                     if (txt && txt.startsWith(`${botInTribe.botPrefix} `)) {
                         // console.log('=> botInTribe.msgTypes else', botInTribe.dataValues)
-                        didEmit = yield emitMessageToBot(msg, botInTribe.dataValues, sender);
+                        didEmit = yield emitMessageToBot(msg, botInTribe.dataValues, sender); // HELP dataValues?
                     }
                 }
             }));

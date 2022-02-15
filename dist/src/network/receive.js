@@ -297,14 +297,14 @@ function uniqueifyAlias(payload, sender, chat, owner) {
         });
         if (!(chatMembers && chatMembers.length))
             return payload;
-        (0, helpers_1.asyncForEach)(chatMembers, (cm) => {
+        (0, helpers_1.asyncForEach)(chatMembers, (cm) => __awaiter(this, void 0, void 0, function* () {
             if (cm.contactId === senderContactId)
                 return; // dont check against self of course
             if (sender_alias === cm.lastAlias || sender_alias === owner_alias) {
                 // impersonating! switch it up!
                 final_sender_alias = `${sender_alias}_2`;
             }
-        });
+        }));
         if (sender_alias !== final_sender_alias) {
             yield models_1.models.ChatMember.update(
             // this syntax is necessary when no unique ID on the Model

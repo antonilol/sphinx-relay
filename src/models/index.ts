@@ -78,4 +78,6 @@ export {
   ChatType as Chat,
   MessageType as Message,
   Bot,
+  ChatBot,
+  ChatMember
 }

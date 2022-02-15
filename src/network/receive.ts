@@ -5,7 +5,7 @@ import * as interfaces from '../grpc/interfaces'
 import { ACTIONS } from '../controllers'
 import * as tribes from '../utils/tribes'
 import * as signer from '../utils/signer'
-import { models } from '../models'
+import { models, ChatMember } from '../models'
 import { sendMessage } from './send'
 import {
   modifyPayloadAndSaveMediaKey,
@@ -295,11 +295,11 @@ async function uniqueifyAlias(payload, sender, chat, owner): Promise<any> {
   const owner_alias = chat.myAlias || owner.alias
   const sender_alias = payload.sender && payload.sender.alias
   let final_sender_alias = sender_alias
-  const chatMembers = await models.ChatMember.findAll({
+  const chatMembers: ChatMember[] = await models.ChatMember.findAll({
     where: { chatId: chat.id, tenant: owner.id },
   })
   if (!(chatMembers && chatMembers.length)) return payload
-  asyncForEach(chatMembers, (cm) => {
+  asyncForEach(chatMembers, async cm => {
     if (cm.contactId === senderContactId) return // dont check against self of course
     if (sender_alias === cm.lastAlias || sender_alias === owner_alias) {
       // impersonating! switch it up!

@@ -6,6 +6,7 @@ import * as SphinxBot from 'sphinx-bot'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
 import { asyncForEach } from '../helpers'
+import { ChatBot, Contact } from '../models'
 
 /*
 default show or not
@@ -74,7 +75,7 @@ export async function isBotMsg(
       }
     }
 
-    const botsInTribe = await models.ChatBot.findAll({
+    const botsInTribe: ChatBot[] = await models.ChatBot.findAll({ // TODO type  Bot?
       where: {
         chatId: chat.id,
         tenant,
@@ -98,7 +99,7 @@ export async function isBotMsg(
             if (isMsgAndHasText || isNotMsg) {
               didEmit = await emitMessageToBot(
                 msg,
-                botInTribe.dataValues,
+                botInTribe.dataValues, // HELP dataValues?
                 sender
               )
             }
@@ -110,7 +111,7 @@ export async function isBotMsg(
         // no message types defined, do all?
         if (txt && txt.startsWith(`${botInTribe.botPrefix} `)) {
           // console.log('=> botInTribe.msgTypes else', botInTribe.dataValues)
-          didEmit = await emitMessageToBot(msg, botInTribe.dataValues, sender)
+          didEmit = await emitMessageToBot(msg, botInTribe.dataValues, sender) // HELP dataValues?
         }
       }
     })
@@ -122,7 +123,7 @@ export async function isBotMsg(
   }
 }
 
-async function emitMessageToBot(msg, botInTribe, sender): Promise<boolean> {
+async function emitMessageToBot(msg: Msg, botInTribe: ChatBot, sender: Contact): Promise<boolean> {
   // console.log('=> emitMessageToBot',JSON.stringify(msg,null,2))
   sphinxLogger.info(`=> emitMessageToBot ${msg}`, logging.Network) //, payload)
 
