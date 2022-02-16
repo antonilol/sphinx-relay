@@ -75,7 +75,7 @@ export async function isBotMsg(
       }
     }
 
-    const botsInTribe: ChatBot[] = await models.ChatBot.findAll({ // TODO type  Bot?
+    const botsInTribe: ChatBot[] = await models.ChatBot.findAll({
       where: {
         chatId: chat.id,
         tenant,

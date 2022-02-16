@@ -166,7 +166,7 @@ function migrate() {
     )`);
         }
         catch (e) {
-            logger_1.sphinxLogger.error(['problem adding lsat table:', e.message], logger_1.logging.DB);
+            // sphinxLogger.error(['problem adding lsat table:', e.message], logging.DB)
         }
         // add RequestTransportToken table
         try {
@@ -191,7 +191,7 @@ function addTenant(tableName) {
             yield models_1.sequelize.query(`update ${tableName} set tenant=1 where tenant IS NULL`);
         }
         catch (e) {
-            logger_1.sphinxLogger.error(e, logger_1.logging.DB);
+            // sphinxLogger.error(e, logging.DB)
         }
     });
 }
@@ -201,7 +201,7 @@ function addTableColumn(table, column, type = 'TEXT') {
             yield models_1.sequelize.query(`alter table ${table} add ${column} ${type}`);
         }
         catch (e) {
-            logger_1.sphinxLogger.error(['=> migrate failed', e], logger_1.logging.DB);
+            // sphinxLogger.error(['=> migrate failed', e], logging.DB)
         }
     });
 }
