@@ -122,7 +122,7 @@ const checkInviteHub = (params = {}) => __awaiter(void 0, void 0, void 0, functi
     });
 });
 const pingHub = (params = {}) => __awaiter(void 0, void 0, void 0, function* () {
-    if (env != 'production' || config.dont_ping_hub === 'true') {
+    if (env != 'production' || config.dont_ping_hub) {
         return;
     }
     const node = yield (0, nodeinfo_1.nodeinfo)();

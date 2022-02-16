@@ -24,11 +24,9 @@ const LND_IP = config.lnd_ip || 'localhost';
 const PROXY_LND_IP = config.proxy_lnd_ip || 'localhost';
 const check_proxy_balance = false;
 function isProxy() {
-    return config.proxy_lnd_port &&
+    return !!(config.proxy_lnd_port &&
         config.proxy_macaroons_dir &&
-        config.proxy_tls_location
-        ? true
-        : false;
+        config.proxy_tls_location);
 }
 exports.isProxy = isProxy;
 function genUsersInterval(ms) {

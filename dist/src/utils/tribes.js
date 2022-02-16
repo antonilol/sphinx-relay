@@ -228,7 +228,7 @@ function mqttURL(h) {
     if (config.tribes_insecure) {
         protocol = 'tcp';
     }
-    let port = '8883';
+    let port = 8883;
     if (config.tribes_mqtt_port) {
         port = config.tribes_mqtt_port;
     }

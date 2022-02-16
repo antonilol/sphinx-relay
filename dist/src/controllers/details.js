@@ -234,9 +234,6 @@ function clearForTesting(req, res) {
         if (!config.allow_test_clearing) {
             return (0, res_1.failure)(res, 'nope');
         }
-        if (config.allow_test_clearing !== 'true') {
-            return (0, res_1.failure)(res, 'nope');
-        }
         try {
             yield models_1.models.Chat.destroy({ truncate: true, where: { tenant } });
             yield models_1.models.Subscription.destroy({ truncate: true, where: { tenant } });

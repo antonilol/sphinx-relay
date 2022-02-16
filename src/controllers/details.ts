@@ -218,9 +218,6 @@ export async function clearForTesting(req: Request, res: Response) {
   if (!config.allow_test_clearing) {
     return failure(res, 'nope')
   }
-  if (config.allow_test_clearing !== 'true') {
-    return failure(res, 'nope')
-  }
 
   try {
     await models.Chat.destroy({ truncate: true, where: { tenant } })

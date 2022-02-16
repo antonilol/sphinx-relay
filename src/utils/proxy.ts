@@ -15,11 +15,11 @@ const PROXY_LND_IP = config.proxy_lnd_ip || 'localhost'
 const check_proxy_balance = false
 
 export function isProxy(): boolean {
-  return config.proxy_lnd_port &&
+  return !!(
+    config.proxy_lnd_port &&
     config.proxy_macaroons_dir &&
     config.proxy_tls_location
-    ? true
-    : false
+  )
 }
 
 export function genUsersInterval(ms: number) {

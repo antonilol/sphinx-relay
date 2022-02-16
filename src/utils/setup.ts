@@ -38,7 +38,7 @@ async function setVersion() {
 }
 
 export async function setupOwnerContact(): Promise<void> {
-  let owner: Contact = await models.Contact.findOne({
+  const owner: Contact = await models.Contact.findOne({
     where: { isOwner: true, id: 1 },
   })
   if (!owner) {
