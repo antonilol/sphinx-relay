@@ -1,5 +1,5 @@
 import * as Lightning from '../grpc/lightning'
-import { sequelize, models } from '../models'
+import { sequelize, models, Contact } from '../models'
 import { exec } from 'child_process'
 import * as QRCode from 'qrcode'
 import { checkTag, checkCommitHash } from '../utils/gitinfo'
@@ -15,7 +15,7 @@ import { logging, sphinxLogger } from '../utils/logger'
 const USER_VERSION = 7
 const config = loadConfig()
 
-const setupDatabase = async () => {
+export async function setupDatabase(): Promise<void> {
   sphinxLogger.info(['=> [db] starting setup'], logging.DB)
   await setVersion()
   sphinxLogger.info(['=> [db] sync now'], logging.DB)
@@ -37,8 +37,8 @@ async function setVersion() {
   }
 }
 
-const setupOwnerContact = async () => {
-  const owner = await models.Contact.findOne({
+export async function setupOwnerContact(): Promise<void> {
+  const owner: Contact = await models.Contact.findOne({
     where: { isOwner: true, id: 1 },
   })
   if (!owner) {
@@ -74,12 +74,12 @@ const setupOwnerContact = async () => {
   }
 }
 
-const runMigrations = async () => {
+export async function runMigrations(): Promise<void> {
   await new Promise((resolve, reject) => {
-    const migration: any = exec(
+    const migration = exec(
       'node_modules/.bin/sequelize db:migrate',
       { env: process.env },
-      (err, stdout, stderr) => {
+      err => {
         if (err) {
           reject(err)
         } else {
@@ -89,21 +89,13 @@ const runMigrations = async () => {
     )
 
     // Forward stdout+stderr to this process
-    migration.stdout.pipe(process.stdout)
-    migration.stderr.pipe(process.stderr)
+    if (migration.stdout) migration.stdout.pipe(process.stdout)
+    if (migration.stderr) migration.stderr.pipe(process.stderr)
   })
 }
 
-export {
-  setupTransportToken,
-  setupDatabase,
-  setupOwnerContact,
-  runMigrations,
-  setupDone,
-}
-
-async function setupTransportToken() {
-  const transportTokenKeys: { [k: string]: string } = await rsa.genKeys()
+export async function setupTransportToken(): Promise<void> {
+  const transportTokenKeys = await rsa.genKeys()
   fs.writeFileSync(
     config.transportPrivateKeyLocation,
     transportTokenKeys.private
@@ -111,22 +103,22 @@ async function setupTransportToken() {
   fs.writeFileSync(config.transportPublicKeyLocation, transportTokenKeys.public)
 }
 
-async function setupDone() {
+export async function setupDone(): Promise<void> {
   await printGitInfo()
-  printQR()
+  await printQR()
 }
 
-async function printGitInfo() {
+async function printGitInfo(): Promise<void> {
   const commitHash = await checkCommitHash()
   const tag = await checkTag()
   sphinxLogger.info(`=> Relay version: ${tag}, commit: ${commitHash}`)
 }
 
-async function printQR() {
+async function printQR(): Promise<void> {
   const b64 = await getQR()
   if (!b64) {
     sphinxLogger.info('=> no public IP provided')
-    return ''
+    return
   }
 
   sphinxLogger.info(['>>', b64])
@@ -136,12 +128,12 @@ async function printQR() {
   if (!clean) return // skip it if already setup!
 
   sphinxLogger.info('Scan this QR in Sphinx app:')
-  QRCode.toString(b64, { type: 'terminal' }, function (err, url) {
+  QRCode.toString(b64, { type: 'terminal' }, (err, url) => {
     sphinxLogger.info(url)
   })
 }
 
-function connectionStringFile(str: string) {
+function connectionStringFile(str: string): void {
   let connectStringPath = 'connection_string.txt'
   if ('connection_string_path' in config) {
     connectStringPath = config.connection_string_path

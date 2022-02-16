@@ -59,13 +59,10 @@ exports.proxynodeinfo = proxynodeinfo;
 function nodeinfo() {
     return __awaiter(this, void 0, void 0, function* () {
         const nzp = yield listNonZeroPolicies();
-        let owner_pubkey;
         let info;
         try {
             const tryProxy = false;
             info = yield Lightning.getInfo(tryProxy);
-            if (info.identity_pubkey)
-                owner_pubkey = info.identity_pubkey;
         }
         catch (e) {
             // no LND
@@ -92,7 +89,7 @@ function nodeinfo() {
         let owner;
         try {
             owner = yield models_1.models.Contact.findOne({
-                where: { isOwner: true, publicKey: owner_pubkey },
+                where: { isOwner: true, publicKey: info.identity_pubkey },
             });
         }
         catch (e) {
@@ -180,9 +177,7 @@ function isClean() {
         const allContacts = yield models_1.models.Contact.count();
         const noMsgs = msgs === 0;
         const onlyOneContact = allContacts === 1;
-        if (cleanOwner && noMsgs && onlyOneContact)
-            return true;
-        return false;
+        return cleanOwner && noMsgs && onlyOneContact;
     });
 }
 exports.isClean = isClean;
@@ -234,7 +229,7 @@ function listNonZeroPolicies() {
             }));
         }
         catch (e) {
-            return ret;
+            // dont care about the error
         }
         return ret;
     });

@@ -1,7 +1,7 @@
 import * as Lightning from '../grpc/lightning'
 import * as publicIp from 'public-ip'
 import { checkTag, checkCommitHash } from '../utils/gitinfo'
-import { models } from '../models'
+import { models, Contact } from '../models'
 import * as interfaces from '../grpc/interfaces'
 import { loadConfig } from './config'
 import { sphinxLogger } from './logger'
@@ -43,20 +43,17 @@ export async function proxynodeinfo(pk: string): Promise<{ [k: string]: any }> {
   })
 }
 
-export async function nodeinfo() {
+export async function nodeinfo(): Promise<{ [k: string]: any } | undefined> {
   const nzp = await listNonZeroPolicies()
-
-  let owner_pubkey
 
   let info: interfaces.GetInfoResponse
 
   try {
     const tryProxy = false
     info = await Lightning.getInfo(tryProxy)
-    if (info.identity_pubkey) owner_pubkey = info.identity_pubkey
   } catch (e) {
     // no LND
-    let owner
+    let owner: Contact
     try {
       owner = await models.Contact.findOne({ where: { id: 1 } })
     } catch (e) {
@@ -75,10 +72,10 @@ export async function nodeinfo() {
     return node
   }
 
-  let owner
+  let owner: Contact
   try {
     owner = await models.Contact.findOne({
-      where: { isOwner: true, publicKey: owner_pubkey },
+      where: { isOwner: true, publicKey: info.identity_pubkey },
     })
   } catch (e) {
     return // just skip in SQLITE not open yet
@@ -158,17 +155,16 @@ export async function nodeinfo() {
   }
 }
 
-export async function isClean() {
+export async function isClean(): Promise<boolean> {
   // has owner but with no auth token (id=1?)
-  const cleanOwner = await models.Contact.findOne({
+  const cleanOwner: Contact = await models.Contact.findOne({
     where: { id: 1, isOwner: true, authToken: null },
   })
   const msgs = await models.Message.count()
   const allContacts = await models.Contact.count()
   const noMsgs = msgs === 0
   const onlyOneContact = allContacts === 1
-  if (cleanOwner && noMsgs && onlyOneContact) return true
-  return false
+  return cleanOwner && noMsgs && onlyOneContact
 }
 
 async function latestMessage(): Promise<any> {
@@ -184,16 +180,18 @@ async function latestMessage(): Promise<any> {
   }
 }
 
+type PolicyString = 'node1_policy' | 'node2_policy'
+
 interface Policy {
   chan_id: string
-  node: string // "node1_policy" or "node2_policy"
+  node: PolicyString
   fee_base_msat: number
   disabled: boolean
 }
-const policies = ['node1_policy', 'node2_policy']
-async function listNonZeroPolicies() {
-  const ret: Policy[] = []
 
+const policies: PolicyString[] = ['node1_policy', 'node2_policy']
+async function listNonZeroPolicies(): Promise<Policy[]> {
+  const ret: Policy[] = []
   try {
     const channelList = await Lightning.listChannels({})
     if (!channelList) return ret
@@ -219,7 +217,7 @@ async function listNonZeroPolicies() {
       })
     })
   } catch (e) {
-    return ret
+    // dont care about the error
   }
   return ret
 }
