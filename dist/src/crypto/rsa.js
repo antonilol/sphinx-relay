@@ -7,17 +7,16 @@ const MAX_CHUNK_SIZE = BLOCK_SIZE - 11; // 11 is the PCKS1 padding
 function encrypt(key, txt) {
     try {
         const buf = Buffer.from(txt);
-        let finalBuf = Buffer.from([]);
+        let finalBuf = Buffer.alloc(0);
         const n = Math.ceil(buf.length / MAX_CHUNK_SIZE);
-        const arr = Array(n).fill(0);
         const pubc = cert.pub(key);
-        arr.forEach((_, i) => {
+        for (let i = 0; i < n; i++) {
             const f = crypto.publicEncrypt({
                 key: pubc,
                 padding: crypto.constants.RSA_PKCS1_PADDING, // RSA_PKCS1_OAEP_PADDING
             }, buf.subarray(i * MAX_CHUNK_SIZE, i * MAX_CHUNK_SIZE + MAX_CHUNK_SIZE));
             finalBuf = Buffer.concat([finalBuf, f]);
-        });
+        }
         return finalBuf.toString('base64');
     }
     catch (e) {
@@ -30,15 +29,14 @@ function decrypt(privateKey, enc) {
         const buf = Buffer.from(enc, 'base64');
         let finalDec = '';
         const n = Math.ceil(buf.length / BLOCK_SIZE);
-        const arr = Array(n).fill(0);
         const privc = cert.priv(privateKey);
-        arr.forEach((_, i) => {
+        for (let i = 0; i < n; i++) {
             const b = crypto.privateDecrypt({
                 key: privc,
                 padding: crypto.constants.RSA_PKCS1_PADDING,
             }, buf.subarray(i * BLOCK_SIZE, i * BLOCK_SIZE + BLOCK_SIZE));
             finalDec += b.toString('utf-8');
-        });
+        }
         return finalDec;
     }
     catch (e) {
@@ -96,30 +94,14 @@ function testRSA() {
     });
 }
 exports.testRSA = testRSA;
+const beginPub = '-----BEGIN RSA PUBLIC KEY-----\n';
+const endPub = '\n-----BEGIN RSA PUBLIC KEY-----';
+const beginPriv = '-----BEGIN RSA PRIVATE KEY-----\n';
+const endPriv = '\n-----BEGIN RSA PRIVATE KEY-----';
 const cert = {
-    unpub: function (key) {
-        let s = key;
-        s = s.replace('-----BEGIN RSA PUBLIC KEY-----', '');
-        s = s.replace('-----END RSA PUBLIC KEY-----', '');
-        return s.replace(/[\r\n]+/gm, '');
-    },
-    unpriv: function (key) {
-        let s = key;
-        s = s.replace('-----BEGIN RSA PRIVATE KEY-----', '');
-        s = s.replace('-----END RSA PRIVATE KEY-----', '');
-        return s.replace(/[\r\n]+/gm, '');
-    },
-    pub: function (key) {
-        return ('-----BEGIN RSA PUBLIC KEY-----\n' +
-            key +
-            '\n' +
-            '-----END RSA PUBLIC KEY-----');
-    },
-    priv: function (key) {
-        return ('-----BEGIN RSA PRIVATE KEY-----\n' +
-            key +
-            '\n' +
-            '-----END RSA PRIVATE KEY-----');
-    },
+    unpub: (key) => key.replace(beginPub, '').replace(endPub, ''),
+    unpriv: (key) => key.replace(beginPriv, '').replace(endPriv, ''),
+    pub: (key) => beginPub + key + endPub,
+    priv: (key) => beginPriv + key + endPriv
 };
 //# sourceMappingURL=rsa.js.map
