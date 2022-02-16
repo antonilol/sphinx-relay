@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.make = exports.parse = void 0;
 const parser = require("cron-parser");
+// a day in milliseconds
+const day = 24 * 60 * 60 * 1000;
 function daily() {
     const now = new Date();
     const minute = now.getMinutes();
@@ -23,15 +25,14 @@ function monthly() {
     return `${minute} ${hour} ${dayOfMonth} * *`;
 }
 function parse(s) {
-    const interval = parser.parseExpression(s);
-    const next = interval.next().toString();
+    const next = parser.parseExpression(s).next().toString();
     if (s.endsWith(' * * *')) {
-        return { interval: 'daily', next, ms: 86400000 };
+        return { interval: 'daily', next, ms: day };
     }
     if (s.endsWith(' * *')) {
-        return { interval: 'monthly', next, ms: 86400000 * 30 };
+        return { interval: 'monthly', next, ms: day * 30 };
     }
-    return { interval: 'weekly', next, ms: 86400000 * 7 };
+    return { interval: 'weekly', next, ms: day * 7 };
 }
 exports.parse = parse;
 function make(interval) {
@@ -41,6 +42,7 @@ function make(interval) {
         return weekly();
     if (interval === 'monthly')
         return monthly();
+    throw new Error('Invalid interval');
 }
 exports.make = make;
 //# sourceMappingURL=cron.js.map

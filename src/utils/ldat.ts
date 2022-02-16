@@ -184,19 +184,19 @@ function deserializeMeta(str) {
 function urlBase64(buf: Buffer) {
   return buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
 }
-function urlBase64FromBytes(bytes: number[]) {
+function urlBase64FromBytes(bytes: Uint8Array): string {
   return Buffer.from(bytes)
     .toString('base64')
     .replace(/\//g, '_')
     .replace(/\+/g, '-')
 }
-function urlBase64FromAscii(ascii: string) {
+function urlBase64FromAscii(ascii: string): string {
   return Buffer.from(ascii, 'ascii')
     .toString('base64')
     .replace(/\//g, '_')
     .replace(/\+/g, '-')
 }
-function urlBase64FromHex(hex: string) {
+function urlBase64FromHex(hex: string): string {
   return Buffer.from(hex, 'hex')
     .toString('base64')
     .replace(/\//g, '_')

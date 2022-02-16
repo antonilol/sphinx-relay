@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.decode = exports.encode = void 0;
 require("./tv42_zbase32_gopherjs");
-function encode(b) {
-    return global['zbase32'].Encode(b);
+function encode(bytes) {
+    return global['zbase32'].Encode(bytes);
 }
 exports.encode = encode;
 function decode(txt) {
