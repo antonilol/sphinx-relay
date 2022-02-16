@@ -17,7 +17,6 @@ const Lightning = require("../grpc/lightning");
 const models_1 = require("../models");
 const node_fetch_1 = require("node-fetch");
 const logger_1 = require("./logger");
-const helpers_1 = require("../helpers");
 // var protoLoader = require('@grpc/proto-loader')
 const config = (0, config_1.loadConfig)();
 const LND_IP = config.lnd_ip || 'localhost';
@@ -67,7 +66,7 @@ function generateNewUsers() {
             if (availableBalance < SATS_PER_USER)
                 availableBalance = 1;
             const n2 = Math.floor(availableBalance / SATS_PER_USER);
-            const n = Math.min(n1, n2);
+            n = Math.min(n1, n2);
             if (!n) {
                 logger_1.sphinxLogger.error(`[proxy] not enough sats`, logger_1.logging.Proxy);
                 return;
@@ -77,11 +76,10 @@ function generateNewUsers() {
             n = n1;
         }
         logger_1.sphinxLogger.info(`=> gen new users: ${n}`, logger_1.logging.Proxy);
-        const arr = new Array(n);
         const rootpk = yield getProxyRootPubkey();
-        yield (0, helpers_1.asyncForEach)(arr, () => __awaiter(this, void 0, void 0, function* () {
+        for (let i = 0; i < n; i++) {
             yield generateNewUser(rootpk);
-        }));
+        }
     });
 }
 exports.generateNewUsers = generateNewUsers;
@@ -172,12 +170,7 @@ function loadProxyLightning(ownerPubkey) {
                 macname = ownerPubkey;
             }
             else {
-                try {
-                    macname = yield getProxyRootPubkey();
-                }
-                catch (e) {
-                    // dont care about the error
-                }
+                macname = yield getProxyRootPubkey();
             }
             const credentials = loadProxyCredentials(macname);
             const lnrpcDescriptor = grpc.load('proto/rpc_proxy.proto');

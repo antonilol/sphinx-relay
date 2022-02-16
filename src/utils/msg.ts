@@ -180,7 +180,7 @@ async function personalizeMessage(msg: Msg, contact: Contact, isTribeOwner: bool
   return encMsg
 }
 
-function fillmsg(full, props) {
+function fillmsg(full: { [k: string]: any }, props: { [k: string]: any }): { [k: string]: any } {
   return {
     ...full,
     message: {
@@ -190,7 +190,7 @@ function fillmsg(full, props) {
   }
 }
 
-function fillchatmsg(full, props) {
+function fillchatmsg(full: { [k: string]: any }, props: { [k: string]: any }): { [k: string]: any } {
   return {
     ...full,
     chat: {

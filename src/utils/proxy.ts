@@ -2,10 +2,9 @@ import * as fs from 'fs'
 import * as grpc from 'grpc'
 import { loadConfig } from './config'
 import * as Lightning from '../grpc/lightning'
-import { models } from '../models'
+import { models, Contact } from '../models'
 import fetch from 'node-fetch'
 import { logging, sphinxLogger } from './logger'
-import { asyncForEach } from '../helpers'
 
 // var protoLoader = require('@grpc/proto-loader')
 const config = loadConfig()
@@ -22,7 +21,7 @@ export function isProxy(): boolean {
   )
 }
 
-export function genUsersInterval(ms: number) {
+export function genUsersInterval(ms: number): void {
   if (!isProxy()) return
   setTimeout(() => {
     // so it starts a bit later than pingHub
@@ -36,12 +35,12 @@ const NEW_USER_NUM =
     : 2
 const SATS_PER_USER = config.proxy_initial_sats || 5000
 // isOwner users with no authToken
-export async function generateNewUsers() {
+export async function generateNewUsers(): Promise<void> {
   if (!isProxy()) {
     sphinxLogger.error(`[proxy] not proxy`, logging.Proxy)
     return
   }
-  const newusers = await models.Contact.findAll({
+  const newusers: Contact[] = await models.Contact.findAll({
     where: { isOwner: true, authToken: null },
   })
   if (newusers.length >= NEW_USER_NUM) {
@@ -49,7 +48,7 @@ export async function generateNewUsers() {
     return // we already have the mimimum
   }
   const n1 = NEW_USER_NUM - newusers.length
-  let n // the number of new users to create
+  let n: number // the number of new users to create
   if (check_proxy_balance) {
     const virtualBal = await getProxyTotalBalance()
     sphinxLogger.info(`[proxy] total balance ${virtualBal}`, logging.Proxy)
@@ -59,7 +58,7 @@ export async function generateNewUsers() {
     let availableBalance = realBal - virtualBal
     if (availableBalance < SATS_PER_USER) availableBalance = 1
     const n2 = Math.floor(availableBalance / SATS_PER_USER)
-    const n = Math.min(n1, n2)
+    n = Math.min(n1, n2)
 
     if (!n) {
       sphinxLogger.error(`[proxy] not enough sats`, logging.Proxy)
@@ -70,17 +69,16 @@ export async function generateNewUsers() {
   }
   sphinxLogger.info(`=> gen new users: ${n}`, logging.Proxy)
 
-  const arr = new Array(n)
   const rootpk = await getProxyRootPubkey()
-  await asyncForEach(arr, async () => {
+  for (let i = 0; i < n; i++) {
     await generateNewUser(rootpk)
-  })
+  }
 }
 
 const adminURL = config.proxy_admin_url
   ? config.proxy_admin_url + '/'
   : 'http://localhost:5555/'
-export async function generateNewUser(rootpk: string) {
+export async function generateNewUser(rootpk: string): Promise<void> {
   try {
     const r = await fetch(adminURL + 'generate', {
       method: 'POST',
@@ -102,7 +100,7 @@ export async function generateNewUser(rootpk: string) {
   }
 }
 
-export async function generateNewExternalUser(pubkey: string, sig: string) {
+export async function generateNewExternalUser(pubkey: string, sig: string): Promise<{ publicKey: string, routeHint: string } | undefined> {
   try {
     const r = await fetch(adminURL + 'create_external', {
       method: 'POST',
@@ -121,7 +119,7 @@ export async function generateNewExternalUser(pubkey: string, sig: string) {
 }
 
 // "total" is in msats
-export async function getProxyTotalBalance() {
+export async function getProxyTotalBalance(): Promise<number> {
   try {
     const r = await fetch(adminURL + 'balances', {
       method: 'GET',
@@ -134,7 +132,7 @@ export async function getProxyTotalBalance() {
   }
 }
 
-export function loadProxyCredentials(macPrefix: string) {
+export function loadProxyCredentials(macPrefix: string): grpc.ChannelCredentials {
   const lndCert = fs.readFileSync(config.proxy_tls_location)
   const sslCreds = grpc.credentials.createSsl(lndCert)
   const m = fs.readFileSync(
@@ -152,17 +150,13 @@ export function loadProxyCredentials(macPrefix: string) {
   return grpc.credentials.combineChannelCredentials(sslCreds, macaroonCreds)
 }
 
-export async function loadProxyLightning(ownerPubkey?: string) {
+export async function loadProxyLightning(ownerPubkey?: string): Promise<any> {
   try {
-    let macname
+    let macname: string
     if (ownerPubkey && ownerPubkey.length === 66) {
       macname = ownerPubkey
     } else {
-      try {
-        macname = await getProxyRootPubkey()
-      } catch (e) {
-        // dont care about the error
-      }
+      macname = await getProxyRootPubkey()
     }
     const credentials = loadProxyCredentials(macname)
     const lnrpcDescriptor = grpc.load('proto/rpc_proxy.proto')
