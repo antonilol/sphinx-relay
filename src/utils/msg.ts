@@ -122,10 +122,10 @@ async function finishTermsAndReceipt(
 
 // this is only for tribes
 // DECRYPT EITHER STRING OR FIRST VAL IN OBJ
-async function decryptMessage(full: { [k: string]: any }, chat: Chat): Promise<Msg> {
-  if (!chat.groupPrivateKey) return full as Msg
+async function decryptMessage(full: Msg, chat: Chat): Promise<Msg> {
+  if (!chat.groupPrivateKey) return full
   const m = full && full.message
-  if (!m) return full as Msg
+  if (!m) return full
 
   const obj: { [k: string]: any } = {}
   if (m.content) {

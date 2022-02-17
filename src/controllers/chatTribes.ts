@@ -1,4 +1,4 @@
-import { models, Chat, Contact, Message } from '../models'
+import { models, Chat, Contact, Message, MediaKey } from '../models'
 import * as jsonUtils from '../utils/json'
 import { success, failure } from '../utils/res'
 import * as network from '../network'
@@ -647,14 +647,14 @@ export async function replayChatHistory(chat: Chat, contact: Contact, ownerRecor
       if (!mdate) mdate = new Date()
       const dateString = mdate.toISOString()
 
-      let mediaKeyMap
-      let newMediaTerms
+      let mediaKeyMap: { chat: string }
+      let newMediaTerms: { muid: string }
       if (m.type === constants.message_types.attachment) {
         if (m.mediaKey && m.mediaToken) {
           const muid =
             m.mediaToken.split('.').length && m.mediaToken.split('.')[1]
           if (muid) {
-            const mediaKey = await models.MediaKey.findOne({
+            const mediaKey: MediaKey = await models.MediaKey.findOne({
               where: {
                 muid,
                 chatId: chat.id,

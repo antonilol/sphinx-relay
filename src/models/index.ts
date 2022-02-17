@@ -79,5 +79,6 @@ export {
   MessageType as Message,
   Bot,
   ChatBot,
-  ChatMember
+  ChatMember,
+  MediaKey
 }
