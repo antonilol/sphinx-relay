@@ -14,7 +14,7 @@ const expressWinston = require("express-winston");
 const winston = require("winston");
 const moment = require("moment");
 const config_1 = require("./config");
-const blgr = require("blgr");
+const blgr = require("blgr"); // doesn't exist on npm
 const config = (0, config_1.loadConfig)();
 const blgrLogger = new blgr(config.logging_level);
 const tsFormat = (ts) => moment(ts).format('YYYY-MM-DD HH:mm:ss').trim();
@@ -27,14 +27,14 @@ const logger = expressWinston.logger({
     // msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
     expressFormat: true,
     colorize: true,
-    ignoreRoute: function (req, res) {
+    ignoreRoute: function (req) {
         if (req.path.startsWith('/json'))
             return true; // debugger
         return false;
     }, // optional: allows to skip some log messages based on request and/or response
 });
 exports.default = logger;
-const logging = {
+exports.logging = {
     Express: 'EXPRESS',
     Lightning: 'LIGHTNING',
     Meme: 'MEME',
@@ -46,7 +46,6 @@ const logging = {
     Lsat: 'LSAT',
     Greenlight: 'GREENLIGHT',
 };
-exports.logging = logging;
 function sphinxLoggerBase(message, loggingType = 'MISC', level) {
     return __awaiter(this, void 0, void 0, function* () {
         if ((config.logging && config.logging.includes(loggingType)) ||
@@ -54,42 +53,42 @@ function sphinxLoggerBase(message, loggingType = 'MISC', level) {
             yield blgrLogger.open();
             const [date, time] = new Date(Date.now()).toISOString().split('.')[0].split('T');
             const dateArr = date.split('-');
-            dateArr.push((dateArr.shift()).substring(2));
+            dateArr.push(dateArr.shift().substring(2));
             blgrLogger[level](`${dateArr.join('-')}T${time}`, '[' + loggingType + ']', ...(Array.isArray(message) ? message : [message]));
         }
     });
 }
 function sphinxLoggerNone(message, loggingType) {
     return __awaiter(this, void 0, void 0, function* () {
-        sphinxLoggerBase(message, loggingType, 'none');
+        yield sphinxLoggerBase(message, loggingType, 'none');
     });
 }
 function sphinxLoggerError(message, loggingType) {
     return __awaiter(this, void 0, void 0, function* () {
-        sphinxLoggerBase(message, loggingType, 'error');
+        yield sphinxLoggerBase(message, loggingType, 'error');
     });
 }
 function sphinxLoggerWarning(message, loggingType) {
     return __awaiter(this, void 0, void 0, function* () {
-        sphinxLoggerBase(message, loggingType, 'warning');
+        yield sphinxLoggerBase(message, loggingType, 'warning');
     });
 }
 function sphinxLoggerInfo(message, loggingType) {
     return __awaiter(this, void 0, void 0, function* () {
-        sphinxLoggerBase(message, loggingType, 'info');
+        yield sphinxLoggerBase(message, loggingType, 'info');
     });
 }
 function sphinxLoggerDebug(message, loggingType) {
     return __awaiter(this, void 0, void 0, function* () {
-        sphinxLoggerBase(message, loggingType, 'debug');
+        yield sphinxLoggerBase(message, loggingType, 'debug');
     });
 }
 function sphinxLoggerSpam(message, loggingType) {
     return __awaiter(this, void 0, void 0, function* () {
-        sphinxLoggerBase(message, loggingType, 'spam');
+        yield sphinxLoggerBase(message, loggingType, 'spam');
     });
 }
-const sphinxLogger = {
+exports.sphinxLogger = {
     none: sphinxLoggerNone,
     error: sphinxLoggerError,
     warning: sphinxLoggerWarning,
@@ -97,5 +96,4 @@ const sphinxLogger = {
     debug: sphinxLoggerDebug,
     spam: sphinxLoggerSpam,
 };
-exports.sphinxLogger = sphinxLogger;
 //# sourceMappingURL=logger.js.map

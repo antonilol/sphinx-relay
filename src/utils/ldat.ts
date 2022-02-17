@@ -18,7 +18,21 @@ Base64 strings separated by dots:
 - signature of all that (concatenated bytes of each)
 */
 
-async function tokenFromTerms({ host, muid, ttl, pubkey, meta, ownerPubkey }) {
+async function tokenFromTerms({
+  host,
+  muid,
+  ttl,
+  pubkey,
+  meta,
+  ownerPubkey
+}: {
+  host: string,
+  muid: string,
+  ttl: number | null, // null means one year
+  pubkey: string,
+  meta: { [k: string]: any},
+  ownerPubkey: string
+}): Promise<string> {
   const theHost = host || config.media_host || ''
 
   const pubkeyBuffer = Buffer.from(pubkey, 'hex')
@@ -44,7 +58,7 @@ function startLDAT(
   pk: string,
   exp: number,
   meta: { [k: string]: any } = {}
-) {
+): { terms: string, bytes: Buffer } {
   const empty = Buffer.from([])
   const hostBuf = Buffer.from(host, 'ascii')
   const muidBuf = Buffer.from(muid, 'base64')
@@ -83,7 +97,7 @@ const termKeys = [
   },
   {
     key: 'ts',
-    func: (buf) => parseInt('0x' + buf.toString('hex')),
+    func: (buf) => parseInt(buf.toString('hex'), 16),
   },
   {
     key: 'meta',
@@ -98,7 +112,7 @@ const termKeys = [
   },
 ]
 
-function parseLDAT(ldat: string) {
+function parseLDAT(ldat: string): { [k: string]: any } {
   const a = ldat.split('.')
   const o: { [k: string]: any } = {}
   termKeys.forEach((t, i) => {
@@ -118,7 +132,7 @@ export {
   urlBase64FromHex,
 }
 
-async function testLDAT() {
+async function testLDAT(): Promise<void> {
   sphinxLogger.info(`testLDAT`)
   const terms = {
     host: '',
@@ -181,21 +195,24 @@ function deserializeMeta(str) {
   return ret
 }
 
-function urlBase64(buf: Buffer) {
+function urlBase64(buf: Buffer): string {
   return buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
 }
+
 function urlBase64FromBytes(bytes: Uint8Array): string {
   return Buffer.from(bytes)
     .toString('base64')
     .replace(/\//g, '_')
     .replace(/\+/g, '-')
 }
+
 function urlBase64FromAscii(ascii: string): string {
   return Buffer.from(ascii, 'ascii')
     .toString('base64')
     .replace(/\//g, '_')
     .replace(/\+/g, '-')
 }
+
 function urlBase64FromHex(hex: string): string {
   return Buffer.from(hex, 'hex')
     .toString('base64')

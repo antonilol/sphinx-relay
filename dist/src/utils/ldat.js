@@ -79,7 +79,7 @@ const termKeys = [
     },
     {
         key: 'ts',
-        func: (buf) => parseInt('0x' + buf.toString('hex')),
+        func: (buf) => parseInt(buf.toString('hex'), 16),
     },
     {
         key: 'meta',
