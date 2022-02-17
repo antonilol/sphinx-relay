@@ -213,7 +213,7 @@ const listPayments = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             offset,
         });
         const ret = msgs || [];
-        (0, res_1.success)(res, ret.map((message) => jsonUtils.messageToJson(message, null)));
+        (0, res_1.success)(res, ret.map((message) => jsonUtils.messageToJson(message)));
     }
     catch (e) {
         (0, res_1.failure)(res, 'cant find payments');

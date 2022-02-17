@@ -1,8 +1,9 @@
-import { models } from '../models'
+import { models, Contact } from '../models'
 import * as jsonUtils from '../utils/json'
 import { success, failure } from '../utils/res'
 import * as helpers from '../helpers'
 import * as network from '../network'
+import { Msg} from '../network'
 import * as socket from '../utils/socket'
 import { sendNotification } from '../hub'
 import * as md5 from 'md5'
@@ -82,7 +83,7 @@ export async function kickChatMember(req: Request, res: Response): Promise<void>
   success(res, jsonUtils.chatToJson(chat))
 }
 
-export async function receiveGroupKick(payload): Promise<void> {
+export async function receiveGroupKick(payload: Msg): Promise<void> {
   sphinxLogger.info(`=> receiveGroupKick`, logging.Network)
   const { owner, chat, sender, date_string, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -125,7 +126,7 @@ export async function receiveGroupKick(payload): Promise<void> {
       response: {
         contact: jsonUtils.contactToJson(sender),
         chat: jsonUtils.chatToJson(chat),
-        message: jsonUtils.messageToJson(message, null),
+        message: jsonUtils.messageToJson(message),
       },
     },
     tenant
@@ -143,7 +144,7 @@ export async function getChats(req: Request, res: Response): Promise<void> {
   success(res, c)
 }
 
-export async function mute(req: Request, res: Response) {
+export async function mute(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -404,7 +405,7 @@ export const deleteChat = async (req: Request, res: Response): Promise<void> => 
   success(res, { chat_id: id })
 }
 
-export async function receiveGroupJoin(payload): Promise<void> {
+export async function receiveGroupJoin(payload: Msg): Promise<void> {
   sphinxLogger.info(`=> receiveGroupJoin`, logging.Network)
   const {
     owner,
@@ -533,7 +534,7 @@ export async function receiveGroupJoin(payload): Promise<void> {
       response: {
         contact: jsonUtils.contactToJson(theSender || {}),
         chat: jsonUtils.chatToJson(theChat),
-        message: jsonUtils.messageToJson(message, null),
+        message: jsonUtils.messageToJson(message),
       },
     },
     tenant
@@ -544,7 +545,7 @@ export async function receiveGroupJoin(payload): Promise<void> {
   }
 }
 
-export async function receiveGroupLeave(payload): Promise<void> {
+export async function receiveGroupLeave(payload: Msg): Promise<void> {
   sphinxLogger.info(`=> receiveGroupLeave`, logging.Network)
   const {
     chat,
@@ -624,7 +625,7 @@ export async function receiveGroupLeave(payload): Promise<void> {
       response: {
         contact: jsonUtils.contactToJson(sender),
         chat: jsonUtils.chatToJson(chat),
-        message: jsonUtils.messageToJson(message, null),
+        message: jsonUtils.messageToJson(message),
       },
     },
     tenant
@@ -642,7 +643,7 @@ async function validateTribeOwner(chat_uuid: string, pubkey: string) {
   }
   return false
 }
-export async function receiveGroupCreateOrInvite(payload): Promise<void> {
+export async function receiveGroupCreateOrInvite(payload: Msg): Promise<void> {
   const {
     owner,
     sender_pub_key,
@@ -663,8 +664,8 @@ export async function receiveGroupCreateOrInvite(payload): Promise<void> {
       return sphinxLogger.error(`[tribes] invalid uuid signature!`)
   }
 
-  const contacts: any[] = []
-  const newContacts: any[] = []
+  const contacts: Contact[] = []
+  const newContacts: Contact[] = []
   for (const [pubkey, member] of Object.entries(chat_members)) {
     const contact = await models.Contact.findOne({
       where: { publicKey: pubkey, tenant },

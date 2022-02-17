@@ -117,7 +117,7 @@ async function downloadCert(id, apiKey) {
 
 // looks unused
 // TODO remove?
-async function getCertificate(domain: string, port, save_ssl) {
+async function getCertificate(domain: string, port: number, save_ssl: boolean): Promise<{ privateKey: string, certificate: string, caBundle: string }> {
   if (
     existsSync(__dirname + '/zerossl/tls.cert') &&
     existsSync(__dirname + '/zerossl/tls.key')

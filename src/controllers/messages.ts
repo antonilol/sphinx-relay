@@ -544,7 +544,7 @@ export const receiveRepayment = async (payload) => {
   socket.sendJson(
     {
       type: 'repayment',
-      response: jsonUtils.messageToJson(message, null, sender),
+      response: jsonUtils.messageToJson(message, undefined, sender),
     },
     tenant
   )

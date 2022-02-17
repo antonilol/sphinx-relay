@@ -67,7 +67,7 @@ export const getContacts = async (req: Request, res: Response) => {
   })
 
   const subsResponse = subscriptions.map((s) =>
-    jsonUtils.subscriptionToJson(s, null)
+    jsonUtils.subscriptionToJson(s)
   )
   const chatsResponse = chats.map((chat) => {
     const theChat = chat.dataValues || chat
@@ -461,7 +461,7 @@ export const deleteContact = async (req: Request, res: Response) => {
 }
 
 export const receiveContactKey = async (payload) => {
-  const dat = payload.content || payload
+  const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const sender_route_hint = dat.sender.route_hint
   const sender_contact_key = dat.sender.contact_key
@@ -527,7 +527,7 @@ export const receiveConfirmContactKey = async (payload) => {
     JSON.stringify(payload),
   ])
 
-  const dat = payload.content || payload
+  const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const sender_contact_key = dat.sender.contact_key
   const sender_alias = dat.sender.alias || 'Unknown'
@@ -612,7 +612,7 @@ export const getLatestContacts = async (req: Request, res: Response) => {
       jsonUtils.contactToJson(invite)
     )
     const subsResponse = subscriptions.map((s) =>
-      jsonUtils.subscriptionToJson(s, null)
+      jsonUtils.subscriptionToJson(s)
     )
     // const chatsResponse = chats.map((chat) => jsonUtils.chatToJson(chat));
     const chatIds = chats.map((c) => c.id)

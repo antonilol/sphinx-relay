@@ -1,4 +1,4 @@
-import { models, Chat, Contact, Message, MediaKey } from '../models'
+import { models, Chat, Contact, Message, MediaKey, ChatMember } from '../models'
 import * as jsonUtils from '../utils/json'
 import { success, failure } from '../utils/res'
 import * as network from '../network'
@@ -14,6 +14,7 @@ import { logging, sphinxLogger } from '../utils/logger'
 import type { Tribe } from '../models/ts/tribe'
 import { Request, Response } from 'express'
 import { asyncForEach } from '../helpers'
+import { Msg } from '../network'
 
 export async function joinTribe(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
@@ -154,7 +155,7 @@ export async function joinTribe(req: Request, res: Response): Promise<void> {
   })
 }
 
-export async function receiveMemberRequest(payload): Promise<void> {
+export async function receiveMemberRequest(payload: Msg): Promise<void> {
   sphinxLogger.info('=> receiveMemberRequest', logging.Network)
   const {
     owner,
@@ -447,7 +448,7 @@ export async function approveOrRejectMember(req: Request, res: Response): Promis
   })
 }
 
-export async function receiveMemberApprove(payload) {
+export async function receiveMemberApprove(payload: Msg): Promise<void> {
   sphinxLogger.info('-> receiveMemberApprove', logging.Network)
   const { owner, chat, sender, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -508,7 +509,7 @@ export async function receiveMemberApprove(payload) {
   // sendNotification(chat, chat_name, "group", theOwner);
 }
 
-export async function receiveMemberReject(payload): Promise<void> {
+export async function receiveMemberReject(payload: Msg): Promise<void> {
   sphinxLogger.info('-> receiveMemberReject', logging.Network)
   const { owner, chat, sender, chat_name, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -547,7 +548,7 @@ export async function receiveMemberReject(payload): Promise<void> {
   sendNotification(chat, chat_name, 'reject', owner)
 }
 
-export async function receiveTribeDelete(payload): Promise<void> {
+export async function receiveTribeDelete(payload: Msg): Promise<void> {
   sphinxLogger.info('-> receiveTribeDelete', logging.Network)
   const { owner, chat, sender, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -583,9 +584,9 @@ export async function receiveTribeDelete(payload): Promise<void> {
   )
 }
 
-export async function replayChatHistory(chat: Chat, contact: Contact, ownerRecord): Promise<void> {
-  const owner = ownerRecord.dataValues || ownerRecord
-  const tenant: number = owner.id
+export async function replayChatHistory(chat: Chat, contact: Contact, ownerRecord: Contact): Promise<void> {
+  const owner = ownerRecord.dataValues as Contact || ownerRecord
+  const tenant = owner.id
   sphinxLogger.info('-> replayHistory', logging.Tribes)
   if (!(chat && chat.id && contact && contact.id)) {
     return sphinxLogger.info('cant replay history', logging.Tribes)
@@ -710,7 +711,7 @@ export async function replayChatHistory(chat: Chat, contact: Contact, ownerRecor
 }
 
 export async function createTribeChatParams(
-  owner,
+  owner: Contact,
   contactIds: number[],
   name: string,
   img: string,
@@ -723,7 +724,7 @@ export async function createTribeChatParams(
   app_url: string,
   feed_url: string,
   feed_type: number,
-  tenant,
+  tenant: number,
   pin: string
 ): Promise<{ [k: string]: any }> {
   const date = new Date()
@@ -764,8 +765,8 @@ export async function createTribeChatParams(
   }
 }
 
-export async function addPendingContactIdsToChat(achat, tenant): Promise<{ [k: string]: any }> {
-  const members: any[] = await models.ChatMember.findAll({ // TODO type
+export async function addPendingContactIdsToChat(achat: Chat, tenant: number): Promise<Chat> {
+  const members: ChatMember[] = await models.ChatMember.findAll({ // TODO type
     where: {
       chatId: achat.id,
       status: constants.chat_statuses.pending, // only pending
@@ -778,10 +779,10 @@ export async function addPendingContactIdsToChat(achat, tenant): Promise<{ [k: s
   return {
     ...chat,
     pendingContactIds,
-  }
+  } as Chat
 }
 
-function mergeTribeAndChatData(chat, td: Tribe, owner) {
+function mergeTribeAndChatData(chat: Chat, td: Tribe, owner: Contact) {
   return {
     uuid: chat.uuid,
     name: chat.name,

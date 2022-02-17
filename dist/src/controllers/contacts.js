@@ -69,7 +69,7 @@ const getContacts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
         return contactJson;
     });
-    const subsResponse = subscriptions.map((s) => jsonUtils.subscriptionToJson(s, null));
+    const subsResponse = subscriptions.map((s) => jsonUtils.subscriptionToJson(s));
     const chatsResponse = chats.map((chat) => {
         const theChat = chat.dataValues || chat;
         if (!pendingMembers)
@@ -427,7 +427,7 @@ const deleteContact = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.deleteContact = deleteContact;
 const receiveContactKey = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const dat = payload.content || payload;
+    const dat = payload;
     const sender_pub_key = dat.sender.pub_key;
     const sender_route_hint = dat.sender.route_hint;
     const sender_contact_key = dat.sender.contact_key;
@@ -485,7 +485,7 @@ const receiveConfirmContactKey = (payload) => __awaiter(void 0, void 0, void 0, 
         `=> confirm contact key for ${payload.sender && payload.sender.pub_key}`,
         JSON.stringify(payload),
     ]);
-    const dat = payload.content || payload;
+    const dat = payload;
     const sender_pub_key = dat.sender.pub_key;
     const sender_contact_key = dat.sender.contact_key;
     const sender_alias = dat.sender.alias || 'Unknown';
@@ -559,7 +559,7 @@ const getLatestContacts = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const subscriptions = yield models_1.models.Subscription.findAll({ where });
         const contactsResponse = contacts.map((contact) => jsonUtils.contactToJson(contact));
         const invitesResponse = invites.map((invite) => jsonUtils.contactToJson(invite));
-        const subsResponse = subscriptions.map((s) => jsonUtils.subscriptionToJson(s, null));
+        const subsResponse = subscriptions.map((s) => jsonUtils.subscriptionToJson(s));
         // const chatsResponse = chats.map((chat) => jsonUtils.chatToJson(chat));
         const chatIds = chats.map((c) => c.id);
         const pendingMembers = yield models_1.models.ChatMember.findAll({

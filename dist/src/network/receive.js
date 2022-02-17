@@ -474,7 +474,7 @@ function saveAnonymousKeysend(inv, memo, sender_pubkey, tenant) {
         });
         socket.sendJson({
             type: 'keysend',
-            response: jsonUtils.messageToJson(msg, null),
+            response: jsonUtils.messageToJson(msg),
         }, tenant);
     });
 }

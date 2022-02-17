@@ -1,5 +1,5 @@
 import { success, failure } from '../utils/res'
-import { models } from '../models'
+import { models, Accounting } from '../models'
 import * as network from '../network'
 import constants from '../constants'
 import * as short from 'short-uuid'
@@ -40,19 +40,6 @@ export async function get_hub_pubkey(): Promise<string> {
   return ''
 }
 get_hub_pubkey()
-
-interface Accounting {
-  id: number
-  pubkey: string
-  onchainAddress: string
-  amount: number
-  confirmations: number
-  sourceApp: string
-  date: string
-  fundingTxid: string
-  onchainTxid: string
-  routeHint: string
-}
 
 async function getReceivedAccountings(): Promise<Accounting[]> {
   const accountings = await models.Accounting.findAll({
@@ -302,7 +289,7 @@ export async function queryOnchainAddress(req: Request, res: Response) {
 }
 
 export const receiveQuery = async (payload) => {
-  const dat = payload.content || payload
+  const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const content = dat.message.content
   const owner = dat.owner
@@ -366,7 +353,7 @@ export const receiveQuery = async (payload) => {
 
 export const receiveQueryResponse = async (payload) => {
   sphinxLogger.info(`=> receiveQueryResponse`, logging.Network)
-  const dat = payload.content || payload
+  const dat = payload
   // const sender_pub_key = dat.sender.pub_key
   const content = dat.message.content
   try {

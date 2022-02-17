@@ -55,5 +55,7 @@ export default class Accounting extends Model<Accounting> {
   @Column(DataType.BIGINT)
   extraAmount: number
 
+  confirmations: number
+
   dataValues: { [k: string]: any }
 }

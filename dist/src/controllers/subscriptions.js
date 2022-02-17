@@ -225,7 +225,7 @@ function pauseSubscription(req, res) {
                 sub.update({ paused: true });
                 if (jobs[id])
                     jobs[id].stop();
-                (0, res_1.success)(res, jsonUtils.subscriptionToJson(sub, null));
+                (0, res_1.success)(res, jsonUtils.subscriptionToJson(sub));
             }
             else {
                 (0, res_1.failure)(res, 'not found');
@@ -251,7 +251,7 @@ function restartSubscription(req, res) {
                 sub.update({ paused: false });
                 if (jobs[id])
                     jobs[id].start();
-                (0, res_1.success)(res, jsonUtils.subscriptionToJson(sub, null));
+                (0, res_1.success)(res, jsonUtils.subscriptionToJson(sub));
             }
             else {
                 (0, res_1.failure)(res, 'not found');
@@ -278,7 +278,7 @@ const getAllSubscriptions = (req, res) => __awaiter(void 0, void 0, void 0, func
     const tenant = req.owner.id;
     try {
         const subs = yield getRawSubs({ where: { tenant } });
-        (0, res_1.success)(res, subs.map((sub) => jsonUtils.subscriptionToJson(sub, null)));
+        (0, res_1.success)(res, subs.map((sub) => jsonUtils.subscriptionToJson(sub)));
     }
     catch (e) {
         logger_1.sphinxLogger.error(['ERROR getAllSubscriptions', e]);
@@ -296,7 +296,7 @@ function getSubscription(req, res) {
             const sub = yield models_1.models.Subscription.findOne({
                 where: { id: req.params.id, tenant },
             });
-            (0, res_1.success)(res, jsonUtils.subscriptionToJson(sub, null));
+            (0, res_1.success)(res, jsonUtils.subscriptionToJson(sub));
         }
         catch (e) {
             logger_1.sphinxLogger.error(['ERROR getSubscription', e]);
@@ -338,7 +338,7 @@ const getSubscriptionsForContact = (req, res) => __awaiter(void 0, void 0, void 
         const subs = yield getRawSubs({
             where: { contactId: req.params.contactId, tenant },
         });
-        (0, res_1.success)(res, subs.map((sub) => jsonUtils.subscriptionToJson(sub, null)));
+        (0, res_1.success)(res, subs.map((sub) => jsonUtils.subscriptionToJson(sub)));
     }
     catch (e) {
         logger_1.sphinxLogger.error(['ERROR getSubscriptionsForContact', e]);

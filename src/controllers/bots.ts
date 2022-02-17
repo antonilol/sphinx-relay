@@ -1,6 +1,6 @@
 import * as tribes from '../utils/tribes'
 import * as crypto from 'crypto'
-import { models, Chat, Bot } from '../models'
+import { models, Chat, Bot, ChatBot, Contact } from '../models'
 import * as jsonUtils from '../utils/json'
 import { success, failure } from '../utils/res'
 import * as network from '../network'
@@ -84,7 +84,7 @@ export const deleteBot = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export async function installBotAsTribeAdmin(chat: Chat, bot_json): Promise<void> {
+export async function installBotAsTribeAdmin(chat: Chat, bot_json: { [k: string]: any }): Promise<void> {
   const chatId = chat && chat.id
   const chat_uuid = chat && chat.uuid
   const tenant = chat.tenant
@@ -92,7 +92,7 @@ export async function installBotAsTribeAdmin(chat: Chat, bot_json): Promise<void
     return sphinxLogger.error('no chat id in installBot')
 
   sphinxLogger.info(['=> chat to install bot into', chat.name])
-  const owner = await models.Contact.findOne({ where: { id: tenant } })
+  const owner: Contact = await models.Contact.findOne({ where: { id: tenant } })
   if (!owner)
     return sphinxLogger.error('cant find owner in installBotAsTribeAdmin')
   const isTribeOwner = (owner && owner.publicKey) === (chat && chat.ownerPubkey)
@@ -148,7 +148,7 @@ export async function installBotAsTribeAdmin(chat: Chat, bot_json): Promise<void
   } else {
     // keysend to bot maker
     sphinxLogger.info(['installBot INSTALL REMOTE BOT NOW', chatBot])
-    const succeeded = await keysendBotInstall(chatBot, chat_uuid, owner)
+    const succeeded = await keysendBotInstall(chatBot as ChatBot, chat_uuid, owner)
     if (succeeded) {
       try {
         // could fail
@@ -161,9 +161,9 @@ export async function installBotAsTribeAdmin(chat: Chat, bot_json): Promise<void
 }
 
 export async function keysendBotInstall(
-  b,
+  b: ChatBot,
   chat_uuid: string,
-  owner
+  owner: Contact
 ): Promise<boolean> {
   return await botKeysend(
     constants.message_types.bot_install,
@@ -176,7 +176,7 @@ export async function keysendBotInstall(
   )
 }
 
-export async function keysendBotCmd(msg, b, sender): Promise<boolean> {
+export async function keysendBotCmd(msg: Msg, b: ChatBot, sender: Contact): Promise<boolean> {
   const amount = msg.message.amount || 0
   const amt = Math.max(amount, b.pricePerUse)
   return await botKeysend(
@@ -192,12 +192,12 @@ export async function keysendBotCmd(msg, b, sender): Promise<boolean> {
 }
 
 export async function botKeysend(
-  msg_type,
-  bot_uuid,
-  botmaker_pubkey,
-  amount,
+  msg_type: number,
+  bot_uuid: any, // network.Msg.bot_uuid: any
+  botmaker_pubkey: string,
+  amount: number,
   chat_uuid: string,
-  sender,
+  sender: Contact,
   botmaker_route_hint?: string,
   msg?: Msg
 ): Promise<boolean> {
@@ -248,10 +248,10 @@ export async function botKeysend(
   }
 }
 
-export async function receiveBotInstall(payload): Promise<void> {
+export async function receiveBotInstall(payload: Msg): Promise<void> {
   sphinxLogger.info(['=> receiveBotInstall', payload], logging.Network)
 
-  const dat = payload.content || payload
+  const dat = payload
   const sender_pub_key = dat.sender && dat.sender.pub_key
   const bot_uuid = dat.bot_uuid
   const chat_uuid = dat.chat && dat.chat.uuid
@@ -261,7 +261,7 @@ export async function receiveBotInstall(payload): Promise<void> {
   if (!chat_uuid || !sender_pub_key)
     return sphinxLogger.info('no chat uuid or sender pub key')
 
-  const bot = await models.Bot.findOne({
+  const bot: Bot = await models.Bot.findOne({
     where: {
       uuid: bot_uuid,
       tenant,
@@ -282,7 +282,7 @@ export async function receiveBotInstall(payload): Promise<void> {
     await models.BotMember.create(botMember)
   }
 
-  const contact = await models.Contact.findOne({
+  const contact: Contact = await models.Contact.findOne({
     where: {
       tenant,
       publicKey: sender_pub_key,
@@ -298,10 +298,10 @@ export async function receiveBotInstall(payload): Promise<void> {
 }
 
 // ONLY FOR BOT MAKER
-export async function receiveBotCmd(payload): Promise<void> {
+export async function receiveBotCmd(payload: Msg): Promise<void> {
   sphinxLogger.info('=> receiveBotCmd', logging.Network)
 
-  const dat = payload.content || payload
+  const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const bot_uuid = dat.bot_uuid
   const chat_uuid = dat.chat && dat.chat.uuid
@@ -341,7 +341,7 @@ export async function receiveBotCmd(payload): Promise<void> {
   }
 
   // sender id needs to be in the msg
-  payload.sender.id = sender_id || '0'
+  payload.sender.id = sender_id || 0
 
   postToBotServer(payload, bot, SphinxBot.MSG_TYPE.MESSAGE)
   // forward to the entire Action back over MQTT
@@ -415,7 +415,7 @@ export function buildBotPayload(msg: Msg): SphinxBot.Message {
 }
 
 //export async function receiveBotRes(payload: Msg): Promise<void> { // TODO which type Msg? Message?
-export async function receiveBotRes(payload): Promise<void> {
+export async function receiveBotRes(payload: Msg): Promise<void> {
   sphinxLogger.info('=> receiveBotRes', logging.Network) //, payload)
   const dat = payload
   // const dat = payload.content ||  payload // TODO

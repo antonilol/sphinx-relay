@@ -443,7 +443,7 @@ const receiveRepayment = (payload) => __awaiter(void 0, void 0, void 0, function
     });
     socket.sendJson({
         type: 'repayment',
-        response: jsonUtils.messageToJson(message, null, sender),
+        response: jsonUtils.messageToJson(message, undefined, sender),
     }, tenant);
 });
 exports.receiveRepayment = receiveRepayment;

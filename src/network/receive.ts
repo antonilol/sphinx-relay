@@ -24,6 +24,7 @@ import * as bolt11 from '@boltz/bolt11'
 import { loadConfig } from '../utils/config'
 import { sphinxLogger } from '../utils/logger'
 import { asyncForEach } from '../helpers'
+import { Msg } from '../network'
 
 const config = loadConfig()
 /*
@@ -69,7 +70,7 @@ const botMakerTypes = [
   constants.message_types.bot_install,
   constants.message_types.bot_cmd,
 ]
-async function onReceive(payload: { [k: string]: any }, dest: string) {
+async function onReceive(payload: Msg, dest: string) {
   if (dest) {
     if (typeof dest !== 'string' || dest.length !== 66)
       return sphinxLogger.error(`INVALID DEST ${dest}`)
@@ -478,7 +479,7 @@ async function saveAnonymousKeysend(inv, memo, sender_pubkey, tenant) {
   socket.sendJson(
     {
       type: 'keysend',
-      response: jsonUtils.messageToJson(msg, null),
+      response: jsonUtils.messageToJson(msg),
     },
     tenant
   )

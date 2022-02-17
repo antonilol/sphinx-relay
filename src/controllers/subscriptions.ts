@@ -229,7 +229,7 @@ export async function pauseSubscription(req: Request, res: Response) {
     if (sub) {
       sub.update({ paused: true })
       if (jobs[id]) jobs[id].stop()
-      success(res, jsonUtils.subscriptionToJson(sub, null))
+      success(res, jsonUtils.subscriptionToJson(sub))
     } else {
       failure(res, 'not found')
     }
@@ -249,7 +249,7 @@ export async function restartSubscription(req: Request, res: Response) {
     if (sub) {
       sub.update({ paused: false })
       if (jobs[id]) jobs[id].start()
-      success(res, jsonUtils.subscriptionToJson(sub, null))
+      success(res, jsonUtils.subscriptionToJson(sub))
     } else {
       failure(res, 'not found')
     }
@@ -273,7 +273,7 @@ export const getAllSubscriptions = async (req: Request, res: Response) => {
     const subs = await getRawSubs({ where: { tenant } })
     success(
       res,
-      subs.map((sub) => jsonUtils.subscriptionToJson(sub, null))
+      subs.map((sub) => jsonUtils.subscriptionToJson(sub))
     )
   } catch (e) {
     sphinxLogger.error(['ERROR getAllSubscriptions', e])
@@ -289,7 +289,7 @@ export async function getSubscription(req: Request, res: Response) {
     const sub = await models.Subscription.findOne({
       where: { id: req.params.id, tenant },
     })
-    success(res, jsonUtils.subscriptionToJson(sub, null))
+    success(res, jsonUtils.subscriptionToJson(sub))
   } catch (e) {
     sphinxLogger.error(['ERROR getSubscription', e])
     failure(res, e)
@@ -325,7 +325,7 @@ export const getSubscriptionsForContact = async (req: Request, res: Response) =>
     })
     success(
       res,
-      subs.map((sub) => jsonUtils.subscriptionToJson(sub, null))
+      subs.map((sub) => jsonUtils.subscriptionToJson(sub))
     )
   } catch (e) {
     sphinxLogger.error(['ERROR getSubscriptionsForContact', e])

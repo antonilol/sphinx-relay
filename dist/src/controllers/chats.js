@@ -134,7 +134,7 @@ function receiveGroupKick(payload) {
             response: {
                 contact: jsonUtils.contactToJson(sender),
                 chat: jsonUtils.chatToJson(chat),
-                message: jsonUtils.messageToJson(message, null),
+                message: jsonUtils.messageToJson(message),
             },
         }, tenant);
     });
@@ -492,7 +492,7 @@ function receiveGroupJoin(payload) {
             response: {
                 contact: jsonUtils.contactToJson(theSender || {}),
                 chat: jsonUtils.chatToJson(theChat),
-                message: jsonUtils.messageToJson(message, null),
+                message: jsonUtils.messageToJson(message),
             },
         }, tenant);
         if (isTribeOwner) {
@@ -567,7 +567,7 @@ function receiveGroupLeave(payload) {
             response: {
                 contact: jsonUtils.contactToJson(sender),
                 chat: jsonUtils.chatToJson(chat),
-                message: jsonUtils.messageToJson(message, null),
+                message: jsonUtils.messageToJson(message),
             },
         }, tenant);
         if (isTribeOwner) {

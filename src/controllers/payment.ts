@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { models, Message } from '../models'
 import { sendNotification } from '../hub'
 import * as socket from '../utils/socket'
 import * as jsonUtils from '../utils/json'
@@ -212,7 +212,7 @@ export const listPayments = async (req: Request, res: Response) => {
 
   const MIN_VAL = constants.min_sat_amount
   try {
-    const msgs = await models.Message.findAll({
+    const msgs: Message[] = await models.Message.findAll({
       where: {
         [Op.or]: [
           {
@@ -250,7 +250,7 @@ export const listPayments = async (req: Request, res: Response) => {
     const ret = msgs || []
     success(
       res,
-      ret.map((message) => jsonUtils.messageToJson(message, null))
+      ret.map((message) => jsonUtils.messageToJson(message))
     )
   } catch (e) {
     failure(res, 'cant find payments')

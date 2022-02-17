@@ -45,7 +45,7 @@ exports.sendConfirmation = sendConfirmation;
 function receiveConfirmation(payload) {
     return __awaiter(this, void 0, void 0, function* () {
         logger_1.sphinxLogger.info(`=> received confirmation ${payload.message && payload.message.id}`, logger_1.logging.Network);
-        const dat = payload.content || payload;
+        const dat = payload;
         const chat_uuid = dat.chat.uuid;
         const msg_id = dat.message.id;
         const sender_pub_key = dat.sender.pub_key;
@@ -139,7 +139,7 @@ function tribeOwnerAutoConfirmation(msg_id, chat_uuid, tenant) {
             });
             socket.sendJson({
                 type: 'confirmation',
-                response: jsonUtils.messageToJson(message, chat, null),
+                response: jsonUtils.messageToJson(message, chat),
             }, tenant);
         }
     });
@@ -148,16 +148,20 @@ exports.tribeOwnerAutoConfirmation = tribeOwnerAutoConfirmation;
 function receiveHeartbeat(payload) {
     return __awaiter(this, void 0, void 0, function* () {
         logger_1.sphinxLogger.info(`=> received heartbeat`, logger_1.logging.Network);
-        const dat = payload.content || payload;
+        const dat = payload;
         const sender_pub_key = dat.sender.pub_key;
         const sender_route_hint = dat.sender.route_hint;
         const receivedAmount = dat.message.amount;
         const owner = dat.owner;
         // const tenant:number = owner.id
-        if (!(sender_pub_key && sender_pub_key.length === 66))
-            return logger_1.sphinxLogger.error(`no sender`);
-        if (!receivedAmount)
-            return logger_1.sphinxLogger.error(`no amount`);
+        if (!(sender_pub_key && sender_pub_key.length === 66)) {
+            logger_1.sphinxLogger.error(`no sender`);
+            return false;
+        }
+        if (!receivedAmount) {
+            logger_1.sphinxLogger.error(`no amount`);
+            return false;
+        }
         const amount = Math.round(receivedAmount / 2);
         const amt = Math.max(amount || constants_1.default.min_sat_amount);
         const opts = {
@@ -234,7 +238,7 @@ exports.healthcheck = healthcheck;
 function receiveHeartbeatConfirmation(payload) {
     return __awaiter(this, void 0, void 0, function* () {
         logger_1.sphinxLogger.info(`=> received heartbeat confirmation`, logger_1.logging.Network);
-        const dat = payload.content || payload;
+        const dat = payload;
         const sender_pub_key = dat.sender.pub_key;
         heartbeats[sender_pub_key] = true;
     });

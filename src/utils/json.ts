@@ -1,7 +1,8 @@
 import { toSnake, toCamel } from '../utils/case'
 import * as cronUtils from './cron'
+import { Contact, Message, Chat, Subscription, Accounting, ChatBot, Invite } from '../models'
 
-function chatToJson(c) {
+function chatToJson(c: Chat): { [k: string]: any } {
   if (!c) return {}
   const ch = c.dataValues || c
   const chat = JSON.parse(JSON.stringify(ch))
@@ -16,7 +17,7 @@ function chatToJson(c) {
   })
 }
 
-function messageToJson(msg, chat, contact?) {
+function messageToJson(msg: Message, chat?: Chat, contact?: Contact): { [k: string]: any } {
   if (!msg) return {}
   const message = msg.dataValues || msg
   let statusMap = message.statusMap || null
@@ -34,20 +35,20 @@ function messageToJson(msg, chat, contact?) {
   })
 }
 
-function contactToJson(contact) {
+function contactToJson(contact: Contact): { [k: string]: any } {
   if (!contact) return {}
   return toSnake(contact.dataValues || contact)
 }
 
-const inviteToJson = (invite) => toSnake(invite.dataValues || invite)
+const inviteToJson = (invite: Invite): { [k: string]: any } => toSnake(invite.dataValues || invite)
 
-const botToJson = (bot) => toSnake(bot.dataValues || bot)
+const botToJson = (bot: ChatBot): { [k: string]: any } => toSnake(bot.dataValues || bot)
 
-const accountingToJson = (acc) => toSnake(acc.dataValues || acc)
+const accountingToJson = (acc: Accounting): { [k: string]: any } => toSnake(acc.dataValues || acc)
 
-const jsonToContact = (json) => toCamel(json)
+const jsonToContact = (json: { [k: string]: any }): Contact => toCamel(json) as Contact
 
-function subscriptionToJson(subscription, chat) {
+function subscriptionToJson(subscription: Subscription, chat?: Chat): { [k: string]: any } {
   const sub = subscription.dataValues || subscription
   const { interval, next } = cronUtils.parse(sub.cron)
   return toSnake({

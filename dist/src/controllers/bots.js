@@ -186,7 +186,8 @@ function keysendBotCmd(msg, b, sender) {
     });
 }
 exports.keysendBotCmd = keysendBotCmd;
-function botKeysend(msg_type, bot_uuid, botmaker_pubkey, amount, chat_uuid, sender, botmaker_route_hint, msg) {
+function botKeysend(msg_type, bot_uuid, // network.Msg.bot_uuid: any
+botmaker_pubkey, amount, chat_uuid, sender, botmaker_route_hint, msg) {
     return __awaiter(this, void 0, void 0, function* () {
         const content = (msg && msg.message.content) || '';
         const sender_role = (msg && msg.sender && msg.sender.role) || constants_1.default.chat_roles.reader;
@@ -236,7 +237,7 @@ exports.botKeysend = botKeysend;
 function receiveBotInstall(payload) {
     return __awaiter(this, void 0, void 0, function* () {
         logger_1.sphinxLogger.info(['=> receiveBotInstall', payload], logger_1.logging.Network);
-        const dat = payload.content || payload;
+        const dat = payload;
         const sender_pub_key = dat.sender && dat.sender.pub_key;
         const bot_uuid = dat.bot_uuid;
         const chat_uuid = dat.chat && dat.chat.uuid;
@@ -283,7 +284,7 @@ exports.receiveBotInstall = receiveBotInstall;
 function receiveBotCmd(payload) {
     return __awaiter(this, void 0, void 0, function* () {
         logger_1.sphinxLogger.info('=> receiveBotCmd', logger_1.logging.Network);
-        const dat = payload.content || payload;
+        const dat = payload;
         const sender_pub_key = dat.sender.pub_key;
         const bot_uuid = dat.bot_uuid;
         const chat_uuid = dat.chat && dat.chat.uuid;
@@ -321,7 +322,7 @@ function receiveBotCmd(payload) {
             return logger_1.sphinxLogger.error('=> receiveBotInstall no contact');
         }
         // sender id needs to be in the msg
-        payload.sender.id = sender_id || '0';
+        payload.sender.id = sender_id || 0;
         postToBotServer(payload, bot, SphinxBot.MSG_TYPE.MESSAGE);
         // forward to the entire Action back over MQTT
     });

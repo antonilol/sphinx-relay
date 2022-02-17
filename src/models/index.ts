@@ -81,5 +81,8 @@ export {
   ChatBot,
   ChatMember,
   MediaKey,
-  RequestsTransportTokens
+  RequestsTransportTokens,
+  Subscription,
+  Accounting,
+  Invite
 }

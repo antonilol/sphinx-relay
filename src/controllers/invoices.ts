@@ -232,7 +232,7 @@ export const receiveInvoice = async (payload) => {
   sphinxLogger.info(`received invoice ${payload}`)
 
   const total_spent = 1
-  const dat = payload.content || payload
+  const dat = payload
   const payment_request = dat.message.invoice
   const network_type = dat.network_type || 0
   const date = new Date()

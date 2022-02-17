@@ -32,4 +32,6 @@ export interface Chat {
   pin: string
 
   dataValues: { [k: string]: any }
+
+  pendingContactIds?: number[]
 }
