@@ -173,7 +173,7 @@ export const receivePayment = async (payload) => {
     status: constants.statuses.received,
     sender: sender.id,
     amount: amount,
-    amountMsat: parseFloat(amount) * 1000,
+    amountMsat: parseFloat(amount + '') * 1000,
     date: date,
     createdAt: date,
     updatedAt: date,

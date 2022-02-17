@@ -425,7 +425,7 @@ const receivePurchaseDeny = (payload) => __awaiter(void 0, void 0, void 0, funct
         status: constants_1.default.statuses.received,
         messageContent: 'Purchase has been denied and sats returned to you',
         amount: amount,
-        amountMsat: parseFloat(amount) * 1000,
+        amountMsat: parseFloat(amount + '') * 1000,
         mediaToken,
         date: date,
         createdAt: date,

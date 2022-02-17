@@ -199,7 +199,7 @@ function sleep(ms) {
 exports.sleep = sleep;
 function parseReceiveParams(payload) {
     return __awaiter(this, void 0, void 0, function* () {
-        const dat = payload.content || payload;
+        const dat = payload;
         const sender_pub_key = dat.sender.pub_key;
         const sender_route_hint = dat.sender.route_hint;
         const sender_alias = dat.sender.alias;

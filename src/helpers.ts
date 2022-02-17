@@ -227,8 +227,8 @@ export async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export async function parseReceiveParams(payload) {
-  const dat = payload.content || payload
+export async function parseReceiveParams(payload: network.Msg) {
+  const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const sender_route_hint = dat.sender.route_hint
   const sender_alias = dat.sender.alias
@@ -264,7 +264,7 @@ export async function parseReceiveParams(payload) {
   let owner = dat.owner
   if (!owner) {
     const ownerRecord = await models.Contact.findOne({
-      where: { isOwner: true, publicKey: dest },
+      where: { isOwner: true, publicKey: dest as string },
     })
     owner = ownerRecord.dataValues
   }
@@ -274,7 +274,7 @@ export async function parseReceiveParams(payload) {
       network_type === constants.network_types.lightning ? amount : 0
     sender = await findOrCreateContactByPubkeyAndRouteHint(
       sender_pub_key,
-      sender_route_hint,
+      sender_route_hint as string,
       sender_alias,
       owner.dataValues,
       realAmount

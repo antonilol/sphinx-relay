@@ -433,7 +433,7 @@ export const receivePurchaseAccept = async (payload) => {
   }
   const tenant: number = owner.id
 
-  const termsArray = mediaToken.split('.')
+  const termsArray = (mediaToken as string).split('.')
   // const host = termsArray[0]
   const muid = termsArray[1]
   if (!muid) {
@@ -490,7 +490,7 @@ export const receivePurchaseDeny = async (payload) => {
     status: constants.statuses.received,
     messageContent: 'Purchase has been denied and sats returned to you',
     amount: amount,
-    amountMsat: parseFloat(amount) * 1000,
+    amountMsat: parseFloat(amount + '') * 1000,
     mediaToken,
     date: date,
     createdAt: date,

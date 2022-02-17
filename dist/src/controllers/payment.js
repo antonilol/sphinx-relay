@@ -141,7 +141,7 @@ const receivePayment = (payload) => __awaiter(void 0, void 0, void 0, function* 
         status: constants_1.default.statuses.received,
         sender: sender.id,
         amount: amount,
-        amountMsat: parseFloat(amount) * 1000,
+        amountMsat: parseFloat(amount + '') * 1000,
         date: date,
         createdAt: date,
         updatedAt: date,
