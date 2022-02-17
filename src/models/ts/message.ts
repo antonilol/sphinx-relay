@@ -29,4 +29,6 @@ export interface Message {
   replyUuid: string
   network_type: number
   tenant: number
+
+  dataValues: { [k: string]: any }
 }

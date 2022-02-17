@@ -80,5 +80,6 @@ export {
   Bot,
   ChatBot,
   ChatMember,
-  MediaKey
+  MediaKey,
+  RequestsTransportTokens
 }

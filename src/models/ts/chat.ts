@@ -30,4 +30,6 @@ export interface Chat {
   tenant: number
   skipBroadcastJoins: boolean
   pin: string
+
+  dataValues: { [k: string]: any }
 }

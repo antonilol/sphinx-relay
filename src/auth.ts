@@ -1,5 +1,5 @@
 import * as crypto from 'crypto'
-import { models } from './models'
+import { models, RequestsTransportTokens, Contact } from './models'
 import { Op } from 'sequelize'
 import * as cryptoJS from 'crypto-js'
 import { success, failure } from './utils/res'
@@ -70,7 +70,7 @@ export async function unlocker(req: Request, res: Response): Promise<boolean> {
   }
 }
 
-export async function ownerMiddleware(req, res, next) {
+export async function ownerMiddleware(req: Request, res: Response, next: () => void): Promise<void> {
   if (
     req.path == '/app' ||
     req.path == '/is_setup' ||
@@ -185,7 +185,7 @@ export async function ownerMiddleware(req, res, next) {
     return
   }
 
-  let owner
+  let owner: Contact | undefined
 
   // find by auth token
   if (token) {
@@ -221,13 +221,13 @@ export async function ownerMiddleware(req, res, next) {
     if (x_transport_token) {
       // Checking the db last since it'll take the most compute power and will
       // grow if we get lots of requests and will let us reject incorrect tokens faster
-      const savedTransportTokens =
+      const savedTransportTokens: RequestsTransportTokens[] =
         await models.RequestsTransportTokens.findAll()
 
       // Here we are checking all of the saved x_transport_tokens
       // to see if we hav a repeat
       savedTransportTokens.forEach((token) => {
-        if (token.dataValues.transportToken == x_transport_token) {
+        if ((token.dataValues as RequestsTransportTokens).transportToken == x_transport_token) {
           res.writeHead(401, 'Access invalid for user', {
             'Content-Type': 'text/plain',
           })
@@ -247,7 +247,7 @@ export async function ownerMiddleware(req, res, next) {
   }
 }
 
-function decryptMacaroon(password: string, macaroon: string) {
+function decryptMacaroon(password: string, macaroon: string): string {
   try {
     const decrypted = cryptoJS.AES.decrypt(macaroon || '', password).toString(
       cryptoJS.enc.Base64
@@ -261,7 +261,7 @@ function decryptMacaroon(password: string, macaroon: string) {
   }
 }
 
-export function base64ToHex(str) {
+export function base64ToHex(str: string): string {
   const raw = atob(str)
   let result = ''
   for (let i = 0; i < raw.length; i++) {
@@ -271,16 +271,16 @@ export function base64ToHex(str) {
   return result.toUpperCase()
 }
 
-const atob = (a) => Buffer.from(a, 'base64').toString('binary')
+const atob = (a: string): string => Buffer.from(a, 'base64').toString('binary')
 
-async function sleep(ms) {
+async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 const b64regex = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/
 
 /* deprecated */
-export async function authModule(req, res, next) {
+export async function authModule(req: Request, res: Response, next: () => void): Promise<void> {
   if (
     req.path == '/app' ||
     req.path == '/' ||

@@ -34,7 +34,7 @@ function verifyJWT(token) {
         return nJwt.verify(token, signingKey);
     }
     catch (e) {
-        return false;
+        return;
     }
 }
 exports.verifyJWT = verifyJWT;
