@@ -16,7 +16,7 @@ const fs = require("fs");
 const config_1 = require("./config");
 const logger_1 = require("../utils/logger");
 const config = (0, config_1.loadConfig)();
-const socketio = require("socket.io");
+const socketio = require("socket.io"); // @types/socket.io is an empty stub
 // { ownerID: [client1, client2] }
 const CLIENTS = {};
 let io;
@@ -96,17 +96,17 @@ function getOwnerFromToken(token) {
         return null;
     });
 }
-const send = (body, tenant) => {
+function send(body, tenant) {
     if (!io)
         return; // io.sockets.emit('message', body)
     const clients = CLIENTS[tenant];
     if (!clients)
         return;
     clients.forEach((c) => c.emit('message', body));
-};
+}
 exports.send = send;
-const sendJson = (object, tenant) => {
-    (0, exports.send)(JSON.stringify(object), tenant);
-};
+function sendJson(object, tenant) {
+    send(JSON.stringify(object), tenant);
+}
 exports.sendJson = sendJson;
 //# sourceMappingURL=socket.js.map

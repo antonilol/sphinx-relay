@@ -7,7 +7,7 @@ import { Server } from 'http'
 import { Request, Response } from 'express'
 
 const config = loadConfig()
-import * as socketio from 'socket.io'
+import * as socketio from 'socket.io' // @types/socket.io is an empty stub
 
 type ClientMap = Record<number, any[]>
 // { ownerID: [client1, client2] }
@@ -16,7 +16,7 @@ const CLIENTS: ClientMap = {}
 let io: any
 // let srvr: any
 
-export function connect(server: Server) {
+export function connect(server: Server): void {
   // srvr = new WebSocket.Server({ server, clientTracking:true })
 
   io = socketio(server, {
@@ -97,13 +97,13 @@ async function getOwnerFromToken(
   return null
 }
 
-export const send = (body: string, tenant: number) => {
+export function send(body: string, tenant: number): void {
   if (!io) return // io.sockets.emit('message', body)
   const clients = CLIENTS[tenant]
   if (!clients) return
   clients.forEach((c) => c.emit('message', body))
 }
 
-export const sendJson = (object: unknown, tenant: number) => {
+export function sendJson(object: unknown, tenant: number): void {
   send(JSON.stringify(object), tenant)
 }

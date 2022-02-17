@@ -51,7 +51,7 @@ export async function createOrEditPerson(
   }
 }
 
-export async function deletePerson(host: string, id: number, owner_pubkey: string) {
+export async function deletePerson(host: string, id: number, owner_pubkey: string): Promise<void> {
   try {
     const token = await genSignedTimestamp(owner_pubkey)
     let protocol = 'https'
@@ -76,7 +76,7 @@ export async function claimOnLiquid({
   amount,
   memo,
   owner_pubkey,
-}) {
+}) { // TODO type?
   try {
     const token = await genSignedTimestamp(owner_pubkey)
     let protocol = 'https'

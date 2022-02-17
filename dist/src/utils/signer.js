@@ -18,7 +18,7 @@ const config_1 = require("./config");
 const config = (0, config_1.loadConfig)();
 const LND_IP = config.lnd_ip || 'localhost';
 let signerClient = null;
-const loadSigner = () => {
+function loadSigner() {
     if (signerClient) {
         return signerClient;
     }
@@ -29,11 +29,11 @@ const loadSigner = () => {
         signerClient = new signer.Signer(LND_IP + ':' + config.lnd_port, credentials);
         return signerClient;
     }
-};
+}
 exports.loadSigner = loadSigner;
 function signMessage(msg) {
     return __awaiter(this, void 0, void 0, function* () {
-        const signer = yield (0, exports.loadSigner)();
+        const signer = yield loadSigner();
         return new Promise((resolve, reject) => {
             try {
                 const options = {
@@ -59,7 +59,7 @@ function signMessage(msg) {
 exports.signMessage = signMessage;
 function signBuffer(msg) {
     return __awaiter(this, void 0, void 0, function* () {
-        const signer = yield (0, exports.loadSigner)();
+        const signer = yield loadSigner();
         return new Promise((resolve, reject) => {
             try {
                 const options = { msg };
@@ -82,7 +82,7 @@ function signBuffer(msg) {
 exports.signBuffer = signBuffer;
 function verifyMessage(msg, sig, pubkey) {
     return __awaiter(this, void 0, void 0, function* () {
-        const signer = yield (0, exports.loadSigner)();
+        const signer = yield loadSigner();
         return new Promise((resolve, reject) => {
             if (msg.length === 0) {
                 return reject('invalid msg');

@@ -7,15 +7,18 @@ import { loadConfig } from './config'
 const config = loadConfig()
 const LND_IP = config.lnd_ip || 'localhost'
 
-let signerClient = <any>null
+// TODO like i did with walletkit
+type SignerClient = any
 
-export const loadSigner = () => {
+let signerClient: SignerClient = null
+
+export function loadSigner(): SignerClient {
   if (signerClient) {
     return signerClient
   } else {
     const credentials = Lightning.loadCredentials('signer.macaroon')
     const lnrpcDescriptor = grpc.load('proto/signer.proto')
-    const signer: any = lnrpcDescriptor.signrpc
+    const signer: { Signer: SignerClient } = lnrpcDescriptor.signrpc as any
     signerClient = new signer.Signer(
       LND_IP + ':' + config.lnd_port,
       credentials
@@ -24,7 +27,7 @@ export const loadSigner = () => {
   }
 }
 
-export async function signMessage(msg: string) {
+export async function signMessage(msg: string): Promise<string> {
 	const signer = await loadSigner()
   return new Promise((resolve, reject) => {
     try {
@@ -46,7 +49,7 @@ export async function signMessage(msg: string) {
   })
 }
 
-export async function signBuffer(msg: Buffer) {
+export async function signBuffer(msg: Buffer): Promise<string> {
 	const signer = await loadSigner()
   return new Promise((resolve, reject) => {
     try {
@@ -96,7 +99,7 @@ async function verifyMessage(msg, sig, pubkey): Promise<{ [k: string]: any }> {
   })
 }
 
-export async function signAscii(ascii: string) {
+export async function signAscii(ascii: string): Promise<string> {
   const sig = await signMessage(ascii_to_hexa(ascii))
   return sig
 }

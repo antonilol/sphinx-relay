@@ -49,7 +49,7 @@ async function encryptTribeBroadcast(
   full: { [k: string]: any },
   contact: Contact,
   isTribeOwner: boolean
-) {
+): Promise<{ [k: string]: any }> {
   if (!isTribeOwner) return full
 
   const chat = full && full.chat
@@ -153,7 +153,7 @@ async function decryptMessage(full: Msg, chat: Chat): Promise<Msg> {
   return fillmsg(full, obj) as Msg
 }
 
-async function personalizeMessage(msg: Msg, contact: Contact, isTribeOwner: boolean) {
+async function personalizeMessage(msg: Msg, contact: Contact, isTribeOwner: boolean): Promise<{ [k: string]: any }> {
   const contactId = contact.id
   const destkey = contact.publicKey
   const senderPubkey = msg.sender.pub_key

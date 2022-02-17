@@ -92,7 +92,7 @@ async function makeVarScript(): Promise<string> {
 </script>`
 }
 
-export async function checkPeered(req: Request, res: Response) {
+export async function checkPeered(req: Request, res: Response): Promise<void> {
   const default_pubkey =
     '023d70f2f76d283c6c4e58109ee3a2816eb9d8feb40b23d62469060a2b2867b77f'
   const pubkey = req.body.pubkey || default_pubkey
@@ -118,7 +118,7 @@ export async function checkPeered(req: Request, res: Response) {
   }
 }
 
-export async function connectPeer(req: Request, res: Response) {
+export async function connectPeer(req: Request, res: Response): Promise<void> {
   try {
     await Lightning.connectPeer({
       addr: {
@@ -134,7 +134,7 @@ export async function connectPeer(req: Request, res: Response) {
   }
 }
 
-export async function genChannel(req: Request, res: Response) {
+export async function genChannel(req: Request, res: Response): Promise<void> {
   const { amount } = req.body
   if (!amount) return failure(res, 'no amount')
   try {
@@ -175,7 +175,8 @@ function greenlightConnect(req: Request, res: Response) {
     res.end()
   })
 }
-export async function connect(req: Request, res: Response) {
+
+export async function connect(req: Request, res: Response): Promise<void> {
   if (IS_GREENLIGHT) return greenlightConnect(req, res)
   fs.readFile('public/index.html', async function (error, pgResp) {
     if (error) {

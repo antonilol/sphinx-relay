@@ -115,6 +115,7 @@
     "@types/node-forge": "^1.0.0",
     "@types/pg": "^8.6.4",
     "@types/qrcode": "^1.4.2",
+    "@types/request-promise": "^4.1.48",
     "@types/secure-random": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
