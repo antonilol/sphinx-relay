@@ -6,7 +6,7 @@ import * as SphinxBot from 'sphinx-bot'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
 import { asyncForEach } from '../helpers'
-import { ChatBot, Contact } from '../models'
+import { ChatBot, Contact, Message, Chat } from '../models'
 
 /*
 default show or not
@@ -26,7 +26,7 @@ export async function isBotMsg(
     return false
   }
 
-  const msg = JSON.parse(JSON.stringify(m))
+  const msg: Msg = JSON.parse(JSON.stringify(m))
   msg.sender.id = forwardedFromContactId || tenant
 
   // console.log('=> isBotMsg', msg)
@@ -41,7 +41,7 @@ export async function isBotMsg(
   if (!uuid) return false
 
   try {
-    const chat = await models.Chat.findOne({
+    const chat: Chat = await models.Chat.findOne({
       where: { uuid, tenant },
     })
     if (!chat) return false
@@ -56,7 +56,7 @@ export async function isBotMsg(
 
     // reply back to the bot!
     if (reply_uuid) {
-      const ogBotMsg = await models.Message.findOne({
+      const ogBotMsg: Message = await models.Message.findOne({
         where: {
           uuid: reply_uuid,
           tenant,
@@ -64,14 +64,14 @@ export async function isBotMsg(
         },
       })
       if (ogBotMsg && ogBotMsg.senderAlias) {
-        const ogSenderBot = await models.ChatBot.findOne({
+        const ogSenderBot: ChatBot = await models.ChatBot.findOne({
           where: {
             chatId: chat.id,
             tenant,
             botPrefix: '/' + ogBotMsg.senderAlias,
           },
         })
-        return await emitMessageToBot(msg, ogSenderBot.dataValues, sender)
+        return await emitMessageToBot(msg, ogSenderBot.dataValues as ChatBot, sender)
       }
     }
 
@@ -99,7 +99,7 @@ export async function isBotMsg(
             if (isMsgAndHasText || isNotMsg) {
               didEmit = await emitMessageToBot(
                 msg,
-                botInTribe.dataValues, // HELP dataValues?
+                botInTribe.dataValues as ChatBot,
                 sender
               )
             }
@@ -111,7 +111,11 @@ export async function isBotMsg(
         // no message types defined, do all?
         if (txt && txt.startsWith(`${botInTribe.botPrefix} `)) {
           // console.log('=> botInTribe.msgTypes else', botInTribe.dataValues)
-          didEmit = await emitMessageToBot(msg, botInTribe.dataValues, sender) // HELP dataValues?
+          didEmit = await emitMessageToBot(
+            msg,
+            botInTribe.dataValues as ChatBot,
+            sender
+          )
         }
       }
     })
