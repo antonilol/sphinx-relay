@@ -77,12 +77,15 @@ export {
   ContactType as Contact,
   ChatType as Chat,
   MessageType as Message,
+  Invite,
+  Subscription,
+  MediaKey,
+  ChatMember,
+  Timer,
   Bot,
   ChatBot,
-  ChatMember,
-  MediaKey,
-  RequestsTransportTokens,
-  Subscription,
+  BotMember,
   Accounting,
-  Invite
+  Lsat,
+  RequestsTransportTokens
 }

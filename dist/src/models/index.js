@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Invite = exports.Accounting = exports.Subscription = exports.RequestsTransportTokens = exports.MediaKey = exports.ChatMember = exports.ChatBot = exports.Bot = exports.models = exports.sequelize = void 0;
+exports.RequestsTransportTokens = exports.Lsat = exports.Accounting = exports.BotMember = exports.ChatBot = exports.Bot = exports.Timer = exports.ChatMember = exports.MediaKey = exports.Subscription = exports.Invite = exports.models = exports.sequelize = void 0;
 // parse BIGINTs to number
 const pg = require("pg");
 pg.defaults.parseInt8 = true;
@@ -18,14 +18,17 @@ exports.MediaKey = mediaKey_1.default;
 const chatMember_1 = require("./sql/chatMember");
 exports.ChatMember = chatMember_1.default;
 const timer_1 = require("./sql/timer");
+exports.Timer = timer_1.default;
 const bot_1 = require("./sql/bot");
 exports.Bot = bot_1.default;
 const chatBot_1 = require("./sql/chatBot");
 exports.ChatBot = chatBot_1.default;
 const botMember_1 = require("./sql/botMember");
+exports.BotMember = botMember_1.default;
 const accounting_1 = require("./sql/accounting");
 exports.Accounting = accounting_1.default;
 const lsat_1 = require("./sql/lsat");
+exports.Lsat = lsat_1.default;
 const requestsTransportTokens_1 = require("./sql/requestsTransportTokens");
 exports.RequestsTransportTokens = requestsTransportTokens_1.default;
 const minimist = require("minimist");
