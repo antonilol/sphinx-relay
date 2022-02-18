@@ -1,5 +1,5 @@
 import { logging } from './utils/logger'
-import { models } from './models'
+import { Contact, Chat, models } from './models'
 import fetch from 'node-fetch'
 import { Op } from 'sequelize'
 import constants from './constants'
@@ -101,7 +101,7 @@ const sendNotification = async (
     try {
       const cids = JSON.parse(chat.contactIds || '[]')
       const notme = cids.find((id) => id !== 1)
-      const other = models.Contact.findOne({ where: { id: notme } })
+      const other = models.Contact.findOne({ where: { id: notme } }) as unknown as Contact
       if (other.blocked) return
       finalNotification(owner.id, params, isTribeOwner)
     } catch (e) {
@@ -129,7 +129,7 @@ async function finalNotification(
   }
   const mutedChats = await models.Chat.findAll({
     where: { isMuted: true },
-  })
+  }) as unknown as Chat[]
   const mutedChatIds = (mutedChats && mutedChats.map((mc) => mc.id)) || []
   mutedChatIds.push(0) // no msgs in non chat (anon keysends)
   const where: { [k: string]: any } = {

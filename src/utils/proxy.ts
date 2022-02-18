@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as grpc from 'grpc'
 import { loadConfig } from './config'
 import * as Lightning from '../grpc/lightning'
-import { models, Contact } from '../models'
+import { Contact, models } from '../models'
 import fetch from 'node-fetch'
 import { logging, sphinxLogger } from './logger'
 
@@ -42,7 +42,7 @@ export async function generateNewUsers(): Promise<void> {
   }
   const newusers: Contact[] = await models.Contact.findAll({
     where: { isOwner: true, authToken: null },
-  })
+  }) as unknown as Contact[]
   if (newusers.length >= NEW_USER_NUM) {
     sphinxLogger.error(`[proxy] already have new users`, logging.Proxy)
     return // we already have the mimimum
@@ -91,7 +91,7 @@ export async function generateNewUser(rootpk: string): Promise<void> {
       isOwner: true,
       authToken: null,
     }
-    const created = await models.Contact.create(contact)
+    const created = await models.Contact.create(contact) as unknown as Contact
     // set tenant to self!
     created.update({ tenant: created.id })
     sphinxLogger.info(`=> CREATED OWNER: ${created.dataValues.publicKey}`)

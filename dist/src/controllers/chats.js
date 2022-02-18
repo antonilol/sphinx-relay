@@ -512,9 +512,9 @@ function receiveGroupLeave(payload) {
         let sender;
         // EITHER private chat OR tribeOwner
         if (!isTribe || isTribeOwner) {
-            sender = yield models_1.models.Contact.findOne({
+            sender = (yield models_1.models.Contact.findOne({
                 where: { publicKey: sender_pub_key, tenant },
-            });
+            }));
             if (!sender)
                 return logger_1.sphinxLogger.error(`=> receiveGroupLeave cant find sender`);
             const oldContactIds = JSON.parse(chat.contactIds || '[]');

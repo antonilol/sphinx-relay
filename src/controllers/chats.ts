@@ -1,4 +1,4 @@
-import { models, Contact } from '../models'
+import { Chat, Contact, ChatMember, Message, models } from '../models'
 import * as jsonUtils from '../utils/json'
 import { success, failure } from '../utils/res'
 import * as helpers from '../helpers'
@@ -27,7 +27,7 @@ export async function updateChat(req: Request, res: Response): Promise<void> {
   if (!id) {
     return failure(res, 'missing id')
   }
-  const chat = await models.Chat.findOne({ where: { id, tenant } })
+  const chat = await models.Chat.findOne({ where: { id, tenant } }) as unknown as Chat
   if (!chat) {
     return failure(res, 'chat not found')
   }
@@ -56,7 +56,7 @@ export async function kickChatMember(req: Request, res: Response): Promise<void>
     return failure(res, 'missing param')
   }
   // remove chat.contactIds
-  const chat = await models.Chat.findOne({ where: { id: chatId, tenant } })
+  const chat = await models.Chat.findOne({ where: { id: chatId, tenant } }) as unknown as Chat
   const contactIds = JSON.parse(chat.contactIds || '[]')
   const newContactIds = contactIds.filter((cid) => cid !== contactId)
   await chat.update({ contactIds: JSON.stringify(newContactIds) })
@@ -118,7 +118,7 @@ export async function receiveGroupKick(payload: Msg): Promise<void> {
     network_type,
     tenant,
   }
-  const message = await models.Message.create(msg)
+  const message = await models.Message.create(msg) as unknown as Message
 
   socket.sendJson(
     {
@@ -139,7 +139,7 @@ export async function getChats(req: Request, res: Response): Promise<void> {
   const chats = await models.Chat.findAll({
     where: { deleted: false, tenant },
     raw: true,
-  })
+  }) as unknown as Chat[]
   const c = chats.map((chat) => jsonUtils.chatToJson(chat))
   success(res, c)
 }
@@ -155,7 +155,7 @@ export async function mute(req: Request, res: Response): Promise<void> {
     return failure(res, 'invalid option for mute')
   }
 
-  const chat = await models.Chat.findOne({ where: { id: chatId, tenant } })
+  const chat = await models.Chat.findOne({ where: { id: chatId, tenant } }) as unknown as Chat
 
   if (!chat) {
     return failure(res, 'chat not found')
@@ -200,7 +200,7 @@ export async function createGroupChat(req: Request, res: Response): Promise<void
   await asyncForEach(contact_ids, async (cid) => {
     const contact = await models.Contact.findOne({
       where: { id: cid, tenant },
-    })
+    }) as unknown as Contact
     members[contact.publicKey] = {
       key: contact.contactKey,
       alias: contact.alias || '',
@@ -276,7 +276,7 @@ export async function createGroupChat(req: Request, res: Response): Promise<void
       failure(res, e)
     },
     success: async function () {
-      const chat = await models.Chat.create(chatParams)
+      const chat = await models.Chat.create(chatParams) as unknown as Chat
       if (chat.type === constants.chat_types.tribe) {
         // save me as owner when i create
         try {
@@ -286,7 +286,7 @@ export async function createGroupChat(req: Request, res: Response): Promise<void
             role: constants.chat_roles.owner,
             status: constants.chat_statuses.approved,
             tenant,
-          })
+          }) as unknown as ChatMember
         } catch (e) {
           sphinxLogger.error(`=> createGroupChat failed to UPSERT ${e}`)
         }
@@ -306,7 +306,7 @@ export async function addGroupMembers(req: Request, res: Response): Promise<void
 
   const members: { [k: string]: { [k: string]: string } } = {} //{pubkey:{key,alias}, ...}
   const owner = req.owner
-  const chat = await models.Chat.findOne({ where: { id, tenant } })
+  const chat = await models.Chat.findOne({ where: { id, tenant } }) as unknown as Chat
 
   const contactIds: number[] = JSON.parse(chat.contactIds || '[]')
   // for all members (existing and new)
@@ -314,14 +314,14 @@ export async function addGroupMembers(req: Request, res: Response): Promise<void
   if (chat.type === constants.chat_types.tribe) {
     const me = await models.ChatMember.findOne({
       where: { contactId: owner.id, chatId: chat.id, tenant },
-    })
+    }) as unknown as ChatMember
     if (me) members[owner.publicKey].role = me.role
   }
   const allContactIds = contactIds.concat(contact_ids)
   await asyncForEach(allContactIds, async (cid) => {
     const contact = await models.Contact.findOne({
       where: { id: cid, tenant },
-    })
+    }) as unknown as Contact
     if (contact) {
       members[contact.publicKey] = {
         key: contact.contactKey,
@@ -329,7 +329,7 @@ export async function addGroupMembers(req: Request, res: Response): Promise<void
       }
       const member = await models.ChatMember.findOne({
         where: { contactId: owner.id, chatId: chat.id, tenant },
-      })
+      }) as unknown as ChatMember
       if (member) members[contact.publicKey].role = member.role
     }
   })
@@ -352,7 +352,7 @@ export const deleteChat = async (req: Request, res: Response): Promise<void> => 
   const { id } = req.params
 
   const owner = req.owner
-  const chat = await models.Chat.findOne({ where: { id, tenant } })
+  const chat = await models.Chat.findOne({ where: { id, tenant } }) as unknown as Chat
   if (!chat) {
     return failure(res, 'you are not in this group')
   }
@@ -438,7 +438,7 @@ export async function receiveGroupJoin(payload: Msg): Promise<void> {
   if (!isTribe || isTribeOwner) {
     const sender = await models.Contact.findOne({
       where: { publicKey: sender_pub_key, tenant },
-    })
+    }) as unknown as Contact
     const contactIds = JSON.parse(chat.contactIds || '[]')
     if (sender) {
       theSender = sender // might already include??
@@ -460,7 +460,7 @@ export async function receiveGroupJoin(payload: Msg): Promise<void> {
           photoUrl: sender_photo_url,
           tenant,
           routeHint: sender_route_hint || '',
-        })
+        }) as unknown as Contact
         theSender = createdContact
         contactIds.push(createdContact.id)
       }
@@ -525,7 +525,7 @@ export async function receiveGroupJoin(payload: Msg): Promise<void> {
     msg.senderAlias = sender_alias
     msg.senderPic = sender_photo_url
   }
-  const message = await models.Message.create(msg)
+  const message = await models.Message.create(msg) as unknown as Message
 
   const theChat = await addPendingContactIdsToChat(chat, tenant)
   socket.sendJson(
@@ -569,7 +569,7 @@ export async function receiveGroupLeave(payload: Msg): Promise<void> {
   if (!isTribe || isTribeOwner) {
     sender = await models.Contact.findOne({
       where: { publicKey: sender_pub_key, tenant },
-    })
+    }) as unknown as Contact
     if (!sender)
       return sphinxLogger.error(`=> receiveGroupLeave cant find sender`)
 
@@ -617,7 +617,7 @@ export async function receiveGroupLeave(payload: Msg): Promise<void> {
     msg.senderAlias = sender_alias
     msg.senderPic = sender_photo_url
   }
-  const message = await models.Message.create(msg)
+  const message = await models.Message.create(msg) as unknown as Message
 
   socket.sendJson(
     {
@@ -669,7 +669,7 @@ export async function receiveGroupCreateOrInvite(payload: Msg): Promise<void> {
   for (const [pubkey, member] of Object.entries(chat_members)) {
     const contact = await models.Contact.findOne({
       where: { publicKey: pubkey, tenant },
-    })
+    }) as unknown as Contact
     let addContact = false
     if (chat_type === constants.chat_types.group && member && member.key) {
       addContact = true
@@ -691,7 +691,7 @@ export async function receiveGroupCreateOrInvite(payload: Msg): Promise<void> {
           status: 1,
           fromGroup: true,
           tenant,
-        })
+        }) as unknown as Contact
         contacts.push({ ...createdContact.dataValues, role: member.role })
         newContacts.push(createdContact.dataValues)
       } else {
@@ -715,7 +715,7 @@ export async function receiveGroupCreateOrInvite(payload: Msg): Promise<void> {
     ...(chat_host && { host: chat_host }),
     ...(chat_key && { groupKey: chat_key }),
     tenant,
-  })
+  }) as unknown as Chat
 
   if (isTribe) {
     // IF TRIBE, ADD TO XREF
@@ -726,7 +726,7 @@ export async function receiveGroupCreateOrInvite(payload: Msg): Promise<void> {
         role: c.role || constants.chat_roles.reader,
         lastActive: date,
         status: constants.chat_statuses.approved,
-      })
+      }) as unknown as ChatMember
     })
   }
 

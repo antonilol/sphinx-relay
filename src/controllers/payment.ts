@@ -1,4 +1,4 @@
-import { models, Message } from '../models'
+import { Message, models } from '../models'
 import { sendNotification } from '../hub'
 import * as socket from '../utils/socket'
 import * as jsonUtils from '../utils/json'
@@ -97,7 +97,7 @@ export const sendPayment = async (req: Request, res: Response) => {
     msg.mediaType = media_type || ''
   }
 
-  const message = await models.Message.create(msg)
+  const message = await models.Message.create(msg) as unknown as Message
 
   const msgToSend: { [k: string]: any } = {
     id: message.id,
@@ -189,7 +189,7 @@ export const receivePayment = async (payload) => {
   }
   if (reply_uuid) msg.replyUuid = reply_uuid
 
-  const message = await models.Message.create(msg)
+  const message = await models.Message.create(msg) as unknown as Message
 
   // console.log('saved message', message.dataValues)
 
@@ -246,7 +246,7 @@ export const listPayments = async (req: Request, res: Response) => {
       order: [['createdAt', 'desc']],
       limit,
       offset,
-    })
+    }) as unknown as Message[]
     const ret = msgs || []
     success(
       res,

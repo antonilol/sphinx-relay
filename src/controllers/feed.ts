@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { Chat, Message, models } from '../models'
 import * as helpers from '../helpers'
 import { failure, success } from '../utils/res'
 import constants from '../constants'
@@ -60,7 +60,7 @@ export const streamFeed = async (req: Request, res: Response) => {
       }
       const chat = await models.Chat.findOne({
         where: { id: chat_id, tenant },
-      })
+      }) as unknown as Chat
       if (!chat) {
         return failure(res, 'no chat')
       }
@@ -137,7 +137,7 @@ export async function anonymousKeysend(
         createdAt: date,
         updatedAt: date,
         tenant,
-      })
+      }) as unknown as Message
       if (onSuccess) {
         onSuccess({ destination_key, amount })
       }

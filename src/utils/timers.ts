@@ -1,9 +1,6 @@
-import { models } from '../models'
+import { Timer, Chat, Contact, models } from '../models'
 import * as network from '../network'
 import constants from '../constants'
-
-// TODO proper interface
-type Timer = { [k: string]: any };
 
 const timerz: { [k: string]: NodeJS.Timeout } = {}
 
@@ -13,23 +10,23 @@ function clearTimer(t: Timer) {
 }
 
 export async function removeTimerByMsgId(msgId: number): Promise<void> {
-  const t = await models.Timer.findOne({ where: { msgId } })
+  const t = await models.Timer.findOne({ where: { msgId } }) as unknown as Timer
   clearTimer(t)
   models.Timer.destroy({ where: { msgId } })
 }
 
 export async function removeTimersByContactId(contactId: number, tenant: number): Promise<void> {
-  const ts: Timer[] = await models.Timer.findAll({
+  const ts = await models.Timer.findAll({
     where: { receiver: contactId, tenant },
-  })
+  }) as unknown as Timer[]
   ts.forEach((t) => clearTimer(t))
   models.Timer.destroy({ where: { receiver: contactId, tenant } })
 }
 
 export async function removeTimersByContactIdChatId(contactId: number, chatId: number, tenant: number): Promise<void> {
-  const ts: Timer[] = await models.Timer.findAll({
+  const ts = await models.Timer.findAll({
     where: { receiver: contactId, chatId, tenant },
-  })
+  }) as unknown as Timer[]
   ts.forEach((t) => clearTimer(t))
   models.Timer.destroy({ where: { receiver: contactId, chatId, tenant } })
 }
@@ -51,7 +48,7 @@ export async function addTimer({
     msgId,
     chatId,
     tenant,
-  })
+  }) as unknown as Timer
   setTimer(makeName(t), when, async () => {
     payBack(t)
   })
@@ -73,7 +70,7 @@ function makeName(t: Timer): string {
 }
 
 export async function reloadTimers(): Promise<void> {
-  const timers: Timer[] = await models.Timer.findAll()
+  const timers = await models.Timer.findAll() as unknown as Timer[]
   timers &&
     timers.forEach((t, i) => {
       const name = makeName(t)
@@ -88,8 +85,8 @@ export async function reloadTimers(): Promise<void> {
 export async function payBack(t: Timer): Promise<void> {
   const chat = await models.Chat.findOne({
     where: { id: t.chatId, tenant: t.tenant },
-  })
-  const owner = await models.Contact.findOne({ where: { id: t.tenant } })
+  }) as unknown as Chat
+  const owner = await models.Contact.findOne({ where: { id: t.tenant } }) as unknown as Contact
   if (!chat) {
     models.Timer.destroy({ where: { id: t.id } })
     return
@@ -117,7 +114,7 @@ export async function payBack(t: Timer): Promise<void> {
         status: constants.statuses.received,
         network_type: constants.network_types.lightning,
         tenant: t.tenant,
-      })
+      }) as unknown as Message
     },
   })
   models.Timer.destroy({ where: { id: t.id } })

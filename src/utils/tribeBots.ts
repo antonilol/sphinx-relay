@@ -1,4 +1,4 @@
-import { models, ChatBot } from '../models'
+import { ChatBot, models } from '../models'
 import { getHost } from './tribes'
 import fetch from 'node-fetch'
 import { loadConfig } from './config'
@@ -73,7 +73,7 @@ export async function makeBotsJSON(tribeID: number): Promise<BotJSON[]> {
     where: {
       chatId: tribeID,
     },
-  }) as ChatBot[]
+  }) as unknown as ChatBot[] as ChatBot[]
   if (!bots) return []
   if (!bots.length) return []
   return bots.map((b) => {

@@ -1,4 +1,4 @@
-import { models, Contact } from './models'
+import { Invite, Contact, models } from './models'
 import fetch from 'node-fetch'
 import { Op } from 'sequelize'
 import * as socket from './utils/socket'
@@ -30,7 +30,7 @@ const checkInviteHub = async (params = {}) => {
   }
   //console.log('[hub] checking invites ping')
 
-  const inviteStrings = await models.Invite.findAll({
+  const inviteStrings = (await models.Invite.findAll({
     where: {
       status: {
         [Op.notIn]: [
@@ -39,7 +39,7 @@ const checkInviteHub = async (params = {}) => {
         ],
       },
     },
-  }).map((invite) => invite.inviteString)
+  }) as unknown as Invite[]).map((invite) => invite.inviteString)
   if (inviteStrings.length === 0) {
     return // skip if no invites
   }
@@ -61,13 +61,13 @@ const checkInviteHub = async (params = {}) => {
 
           const dbInvite = await models.Invite.findOne({
             where: { inviteString: invite.pin },
-          })
+          }) as unknown as Invite
           const contact = await models.Contact.findOne({
             where: { id: dbInvite.contactId },
-          })
+          }) as unknown as Contact
           const owner = await models.Contact.findOne({
             where: { id: dbInvite.tenant },
-          })
+          }) as unknown as Contact
 
           if (dbInvite.status != invite.invite_status) {
             const updateObj: { [k: string]: any } = {
@@ -149,7 +149,7 @@ async function massPingHubFromProxies(rn) {
       isOwner: true,
       id: { [Op.ne]: 1 },
     },
-  })
+  }) as unknown as Contact[]
   const nodes: { [k: string]: any }[] = []
   await asyncForEach(owners, async (o: Contact) => {
     const proxyNodeInfo = await proxynodeinfo(o.publicKey)

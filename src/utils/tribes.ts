@@ -4,7 +4,7 @@ import * as LND from '../grpc/lightning'
 import * as mqtt from 'mqtt'
 import { IClientSubscribeOptions } from 'mqtt'
 import fetch from 'node-fetch'
-import { models, sequelize } from '../models'
+import { Contact, Chat, models, sequelize, Message } from '../models'
 import { makeBotsJSON, declare_bot, delete_bot } from './tribeBots'
 import { loadConfig } from './config'
 import { isProxy } from './proxy'
@@ -12,8 +12,6 @@ import { Op } from 'sequelize'
 import { logging, sphinxLogger } from './logger'
 import type { Tribe } from '../models/ts/tribe'
 import { sleep, asyncForEach } from '../helpers'
-import { Contact } from '../models/ts/contact'
-import { Chat } from '../models/ts/chat'
 export { declare_bot, delete_bot }
 
 const config = loadConfig()
@@ -143,7 +141,7 @@ async function initAndSubscribeTopics(onMessage: (topic: string, message: Buffer
     if (isProxy()) {
       const allOwners: Contact[] = await models.Contact.findAll({
         where: { isOwner: true },
-      })
+      }) as unknown as Contact[]
       if (!(allOwners && allOwners.length)) return
       asyncForEach(allOwners, async c => {
         if (c.id === 1) return // the proxy non user
@@ -175,7 +173,7 @@ async function subExtraHostsForTenant(
       tenant,
       host: { [Op.ne]: host }, // not the host from config
     },
-  })
+  }) as unknown as Chat[]
   if (!(externalTribes && externalTribes.length)) return
   const usedHosts: string[] = []
   externalTribes.forEach(async (et) => {
@@ -238,7 +236,7 @@ async function updateTribeStats(myPubkey) {
       ownerPubkey: myPubkey,
       deleted: false,
     },
-  })
+  }) as unknown as Chat[]
   await asyncForEach(myTribes, async (tribe) => {
     try {
       const contactIds = JSON.parse(tribe.contactIds)

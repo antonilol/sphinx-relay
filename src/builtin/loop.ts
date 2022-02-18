@@ -1,6 +1,6 @@
 import * as Sphinx from 'sphinx-bot'
 import { finalAction } from '../controllers/botapi'
-import { models } from '../models'
+import { ChatBot, models } from '../models'
 import constants from '../constants'
 import { spawn } from 'child_process'
 import { loadConfig } from '../utils/config'
@@ -219,7 +219,7 @@ async function getBot(tribeUUID: string) {
       botType: constants.bot_types.builtin,
       tenant: chat.tenant,
     },
-  })
+  }) as unknown as ChatBot
 }
 
 const botSVG = `<svg viewBox="64 64 896 896" height="12" width="12" fill="white">

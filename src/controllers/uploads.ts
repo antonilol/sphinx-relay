@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { Contact, Chat, models } from '../models'
 import * as path from 'path'
 import { loadConfig } from '../utils/config'
 import * as multer from 'multer'
@@ -49,12 +49,12 @@ export const uploadFile = async (req: Request, res: Response) => {
   const photo_url = theIP + '/static/uploads/' + file.filename
 
   if (contact_id) {
-    const contact = await models.Contact.findOne({ where: { id: contact_id } })
+    const contact = await models.Contact.findOne({ where: { id: contact_id } }) as unknown as Contact
     if (contact) contact.update({ photoUrl: photo_url })
   }
 
   if (chat_id) {
-    const chat = await models.Chat.findOne({ where: { id: chat_id } })
+    const chat = await models.Chat.findOne({ where: { id: chat_id } }) as unknown as Chat
     if (chat) chat.update({ photoUrl: photo_url })
   }
 

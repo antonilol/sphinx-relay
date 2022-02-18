@@ -1,5 +1,5 @@
 import * as network from '../../network'
-import { models } from '../../models'
+import { Bot, Contact, BotMember, models } from '../../models'
 import { success, failure } from '../../utils/res'
 import constants from '../../constants'
 import { getTribeOwnersChatByUUID } from '../../utils/tribes'
@@ -54,7 +54,7 @@ export async function processAction(req: Request, res: Response) {
   } = body
 
   if (!bot_id) return failure(res, 'no bot_id')
-  const bot = await models.Bot.findOne({ where: { id: bot_id } })
+  const bot = await models.Bot.findOne({ where: { id: bot_id } }) as unknown as Bot
   if (!bot) return failure(res, 'no bot')
 
   if (!(bot.secret && bot.secret === bot_secret)) {
@@ -107,7 +107,7 @@ export async function finalAction(a: Action) {
       where: {
         id: bot_id,
       },
-    })
+    }) as unknown as Bot
     if (chat_uuid) {
       const myChat = await getTribeOwnersChatByUUID(chat_uuid)
       // ACTUALLY ITS A LOCAL (FOR MY TRIBE) message! kill myBot
@@ -118,7 +118,7 @@ export async function finalAction(a: Action) {
   // console.log("=> ACTION HIT", a);
   if (myBot) {
     // IM NOT ADMIN - its my bot and i need to forward to admin - there is a chat_uuid
-    const owner = await models.Contact.findOne({ where: { id: myBot.tenant } })
+    const owner = await models.Contact.findOne({ where: { id: myBot.tenant } }) as unknown as Contact
     // THIS is a bot member cmd res (i am bot maker)
     const botMember = await models.BotMember.findOne({
       where: {
@@ -126,7 +126,7 @@ export async function finalAction(a: Action) {
         botId: bot_id,
         tenant: owner.id,
       },
-    })
+    }) as unknown as BotMember
     if (!botMember) return sphinxLogger.error(`no botMember`)
 
     const dest = botMember.memberPubkey

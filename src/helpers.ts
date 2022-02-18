@@ -1,4 +1,4 @@
-import { models, Contact } from './models'
+import { Chat, Contact, models } from './models'
 import * as md5 from 'md5'
 import * as network from './network'
 import constants from './constants'
@@ -14,21 +14,21 @@ export const findOrCreateChat = async (params) => {
   if (chat_id) {
     chat = await models.Chat.findOne({
       where: { id: chat_id, tenant: owner_id },
-    })
+    }) as unknown as Chat
     // console.log('findOrCreateChat: chat_id exists')
   } else {
     if (!owner_id || !recipient_id) return null
     sphinxLogger.info(`chat does not exists, create new`)
-    const owner = await models.Contact.findOne({ where: { id: owner_id } })
+    const owner = await models.Contact.findOne({ where: { id: owner_id } }) as unknown as Contact
     const recipient = await models.Contact.findOne({
       where: { id: recipient_id, tenant: owner_id },
-    })
+    }) as unknown as Contact
     const uuid = md5([owner.publicKey, recipient.publicKey].sort().join('-'))
 
     // find by uuid
     chat = await models.Chat.findOne({
       where: { uuid, tenant: owner_id, deleted: false },
-    })
+    }) as unknown as Chat
 
     if (!chat) {
       // no chat! create new
@@ -43,7 +43,7 @@ export const findOrCreateChat = async (params) => {
         updatedAt: date,
         type: constants.chat_types.conversation,
         tenant: owner_id,
-      })
+      }) as unknown as Chat
     }
   }
   return chat
@@ -96,7 +96,7 @@ export const sendContactKeys = async ({
     if (contactId == sender.id) {
       return
     }
-    const contact = await models.Contact.findOne({ where: { id: contactId } })
+    const contact = await models.Contact.findOne({ where: { id: contactId } }) as unknown as Contact
     if (!(contact && contact.publicKey)) return
     const destination_key: string = contact.publicKey
     const route_hint = contact.routeHint
@@ -174,7 +174,7 @@ export async function findOrCreateContactByPubkeyAndRouteHint(
 ) {
   let sender = await models.Contact.findOne({
     where: { publicKey: senderPubKey, tenant: owner.id },
-  })
+  }) as unknown as Contact
   if (!sender) {
     let unmet = false
     if (owner.priceToMeet) {
@@ -187,7 +187,7 @@ export async function findOrCreateContactByPubkeyAndRouteHint(
       status: 1,
       tenant: owner.id,
       unmet,
-    })
+    }) as unknown as Contact
     sendContactKeys({
       contactIds: [sender.id],
       sender: owner,
@@ -207,7 +207,7 @@ export async function findOrCreateContactByPubkeyAndRouteHint(
 export async function findOrCreateChatByUUID(chat_uuid, contactIds, tenant) {
   let chat = await models.Chat.findOne({
     where: { uuid: chat_uuid, tenant, deleted: false },
-  })
+  }) as unknown as Chat
   if (!chat) {
     const date = new Date()
     date.setMilliseconds(0)
@@ -218,7 +218,7 @@ export async function findOrCreateChatByUUID(chat_uuid, contactIds, tenant) {
       updatedAt: date,
       type: 0, // conversation
       tenant,
-    })
+    }) as unknown as Chat
   }
   return chat
 }
@@ -265,7 +265,7 @@ export async function parseReceiveParams(payload: network.Msg) {
   if (!owner) {
     const ownerRecord = await models.Contact.findOne({
       where: { isOwner: true, publicKey: dest as string },
-    })
+    }) as unknown as Contact
     owner = ownerRecord.dataValues
   }
   if (!owner) sphinxLogger.error(`=> parseReceiveParams cannot find owner`)
@@ -292,14 +292,14 @@ export async function parseReceiveParams(payload: network.Msg) {
     // group
     sender = await models.Contact.findOne({
       where: { publicKey: sender_pub_key, tenant: owner.id },
-    })
+    }) as unknown as Contact
     // inject a "sender" with an alias
     if (!sender && chat_type == constants.chat_types.tribe) {
       sender = { id: 0, alias: sender_alias }
     }
     chat = await models.Chat.findOne({
       where: { uuid: chat_uuid, tenant: owner.id },
-    })
+    }) as unknown as Chat
   }
   return {
     dest,

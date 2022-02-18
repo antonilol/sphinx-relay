@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { Contact, models } from '../models'
 import * as LND from '../grpc/lightning'
 import { personalizeMessage, decryptMessage } from '../utils/msg'
 import * as tribes from '../utils/tribes'
@@ -109,7 +109,7 @@ export async function sendMessage(params) {
       // if tribe, send to owner only
       const tribeOwner = await models.Contact.findOne({
         where: { publicKey: chat.ownerPubkey, tenant },
-      })
+      }) as unknown as Contact
       contactIds = tribeOwner ? [tribeOwner.id] : []
     }
   } else {
@@ -135,7 +135,7 @@ export async function sendMessage(params) {
       return
     }
 
-    const contact = await models.Contact.findOne({ where: { id: contactId } })
+    const contact = await models.Contact.findOne({ where: { id: contactId } }) as unknown as Contact
     if (!contact) {
       // console.log('=> sendMessage no contact')
       return // skip if u simply dont have the contact

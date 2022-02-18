@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { Message, MediaKey, models } from '../models'
 import * as socket from '../utils/socket'
 import * as jsonUtils from '../utils/json'
 import * as resUtils from '../utils/res'
@@ -118,7 +118,7 @@ export const sendAttachmentMessage = async (req: Request, res: Response) => {
     tenant,
   }
   if (reply_uuid) mm.replyUuid = reply_uuid
-  const message = await models.Message.create(mm)
+  const message = await models.Message.create(mm) as unknown as Message
 
   sphinxLogger.info(['saved attachment msg from me', message.id])
 
@@ -179,7 +179,7 @@ export function saveMediaKeys(
         createdAt: date,
         mediaType,
         tenant,
-      })
+      }) as unknown as MediaKey
     }
   }
 }
@@ -218,7 +218,7 @@ export const purchase = async (req: Request, res: Response) => {
     updatedAt: date,
     network_type: constants.network_types.lightning,
     tenant,
-  })
+  }) as unknown as Message
 
   const msg = {
     mediaToken: media_token,
@@ -279,7 +279,7 @@ export const receivePurchase = async (payload) => {
     updatedAt: date,
     network_type,
     tenant,
-  })
+  }) as unknown as Message
   socket.sendJson(
     {
       type: 'purchase',
@@ -304,7 +304,7 @@ export const receivePurchase = async (payload) => {
 
   const ogMessage = await models.Message.findOne({
     where: { mediaToken, tenant },
-  })
+  }) as unknown as Message
   if (!ogMessage) {
     return sphinxLogger.error('no original message')
   }
@@ -316,7 +316,7 @@ export const receivePurchase = async (payload) => {
       receiver: isTribe ? 0 : sender.id,
       tenant,
     },
-  })
+  }) as unknown as MediaKey
   // console.log('mediaKey found!',mediaKey.dataValues)
   if (!mediaKey) return // this is from another person (admin is forwarding)
 
@@ -355,7 +355,7 @@ export const receivePurchase = async (payload) => {
           createdAt: date,
           updatedAt: date,
           tenant,
-        })
+        }) as unknown as Message
         socket.sendJson(
           {
             type: 'purchase_deny',
@@ -399,7 +399,7 @@ export const receivePurchase = async (payload) => {
         createdAt: date,
         updatedAt: date,
         tenant,
-      })
+      }) as unknown as Message
       socket.sendJson(
         {
           type: 'purchase_accept',
@@ -463,7 +463,7 @@ export const receivePurchaseAccept = async (payload) => {
     updatedAt: date,
     network_type,
     tenant,
-  })
+  }) as unknown as Message
   socket.sendJson(
     {
       type: 'purchase_accept',
@@ -497,7 +497,7 @@ export const receivePurchaseDeny = async (payload) => {
     updatedAt: date,
     network_type,
     tenant,
-  })
+  }) as unknown as Message
   socket.sendJson(
     {
       type: 'purchase_deny',
@@ -557,7 +557,7 @@ export const receiveAttachment = async (payload) => {
     msg.senderPic = sender_photo_url
   }
 
-  const message = await models.Message.create(msg)
+  const message = await models.Message.create(msg) as unknown as Message
 
   // console.log('saved attachment', message.dataValues)
 

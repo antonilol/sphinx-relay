@@ -2,7 +2,7 @@
 import * as Sphinx from 'sphinx-bot'
 import { finalAction } from '../controllers/botapi'
 import { installBotAsTribeAdmin } from '../controllers/bots'
-import { models } from '../models'
+import { ChatBot, models } from '../models'
 import fetch from 'node-fetch'
 import constants from '../constants'
 import { loadConfig } from '../utils/config'
@@ -57,7 +57,7 @@ export function init(): void {
               botPrefix: '/' + botName,
               tenant: chat.tenant,
             },
-          })
+          }) as unknown as ChatBot
           if (existing) {
             const embed = new Sphinx.MessageEmbed()
               .setAuthor('MotherBot')
@@ -75,7 +75,7 @@ export function init(): void {
             pricePerUse: 0,
             tenant: chat.tenant,
           }
-          await models.ChatBot.create(chatBot)
+          await models.ChatBot.create(chatBot) as unknown as ChatBot
           // if (botName === 'welcome') {
           //   WelcomeBot.init()
           // }
@@ -116,7 +116,7 @@ export function init(): void {
             botPrefix: '/' + botName2,
             tenant: chat2.tenant,
           },
-        })
+        }) as unknown as ChatBot
         if (existing2) {
           await existing2.destroy()
           const embed = new Sphinx.MessageEmbed()

@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { Invite, Contact, models } from '../models'
 import * as crypto from 'crypto'
 import * as jsonUtils from '../utils/json'
 import { finishInviteInHub, createInviteInHub, payInviteInvoice } from '../hub'
@@ -36,7 +36,7 @@ export const payInvite = async (req: Request, res: Response) => {
   const invite_string = req.params['invite_string']
   const dbInvite = await models.Invite.findOne({
     where: { inviteString: invite_string, tenant },
-  })
+  }) as unknown as Invite
 
   const onSuccess = async (response) => {
     // const invite = response.object
@@ -97,7 +97,7 @@ export const createInvite = async (req: Request, res: Response) => {
       alias: nickname,
       status: 0,
       tenant,
-    })
+    }) as unknown as Contact
     const invite = await models.Invite.create({
       welcomeMessage: inviteCreated.message,
       contactId: contact.id,
@@ -105,7 +105,7 @@ export const createInvite = async (req: Request, res: Response) => {
       inviteString: inviteCreated.pin,
       tenant,
       // invoice: inviteCreated.invoice,
-    })
+    }) as unknown as Invite
     const contactJson = jsonUtils.contactToJson(contact)
     if (invite) {
       contactJson.invite = jsonUtils.inviteToJson(invite)

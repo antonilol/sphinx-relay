@@ -74,11 +74,11 @@ function finalAction(a) {
         let myBot;
         // not for tribe admin, for bot maker
         if (bot_id) {
-            myBot = yield models_1.models.Bot.findOne({
+            myBot = (yield models_1.models.Bot.findOne({
                 where: {
                     id: bot_id,
                 },
-            });
+            }));
             if (chat_uuid) {
                 const myChat = yield (0, tribes_1.getTribeOwnersChatByUUID)(chat_uuid);
                 // ACTUALLY ITS A LOCAL (FOR MY TRIBE) message! kill myBot

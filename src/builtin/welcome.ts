@@ -1,6 +1,6 @@
 import * as Sphinx from 'sphinx-bot'
 import { finalAction } from '../controllers/botapi'
-import { models } from '../models'
+import { ChatBot, models } from '../models'
 import constants from '../constants'
 import { getTribeOwnersChatByUUID } from '../utils/tribes'
 import { sphinxLogger } from '../utils/logger'
@@ -38,7 +38,7 @@ export function init(): void {
             botType: constants.bot_types.builtin,
             tenant: chat.tenant,
           },
-        })
+        }) as unknown as ChatBot
         if (!chatBot) return
         let meta = 'Welcome to the tribe!'
         if (chatBot && chatBot.meta) {
@@ -74,7 +74,7 @@ export function init(): void {
             botType: constants.bot_types.builtin,
             tenant: chat.tenant,
           },
-        })
+        }) as unknown as ChatBot
         if (!chatBot) return
         const meta = arr.slice(2, arr.length).join(' ')
         await chatBot.update({ meta })

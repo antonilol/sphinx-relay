@@ -1,5 +1,5 @@
 import * as network from '../../network'
-import { models } from '../../models'
+import { Contact, models, Message } from '../../models'
 import * as short from 'short-uuid'
 import * as rsa from '../../crypto/rsa'
 import * as jsonUtils from '../../utils/json'
@@ -20,7 +20,7 @@ export default async function broadcast(a: any) {
     return sphinxLogger.error(`not a tribe`)
   const owner = await models.Contact.findOne({
     where: { id: theChat.tenant },
-  })
+  }) as unknown as Contact
   const tenant: number = owner.id
 
   const encryptedForMeText = rsa.encrypt(owner.contactKey, content)
@@ -47,7 +47,7 @@ export default async function broadcast(a: any) {
     senderAlias: alias,
     tenant,
   }
-  const message = await models.Message.create(msg)
+  const message = await models.Message.create(msg) as unknown as Message
   socket.sendJson(
     {
       type: 'message',

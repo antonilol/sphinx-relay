@@ -108,9 +108,9 @@ function onReceive(payload, dest) {
         let chat;
         if (payload.chat && payload.chat.uuid) {
             isTribe = payload.chat.type === constants_1.default.chat_types.tribe;
-            chat = yield models_1.models.Chat.findOne({
+            chat = (yield models_1.models.Chat.findOne({
                 where: { uuid: payload.chat.uuid, tenant },
-            });
+            }));
             if (chat)
                 chat.update({ seen: false });
         }
@@ -499,9 +499,9 @@ function parseKeysendInvoice(i) {
                 if (!invoice.payeeNodeKey)
                     return logger_1.sphinxLogger.error(`cant get dest from pay req`);
                 dest = invoice.payeeNodeKey;
-                owner = yield models_1.models.Contact.findOne({
+                owner = (yield models_1.models.Contact.findOne({
                     where: { isOwner: true, publicKey: dest },
-                });
+                }));
             }
             catch (e) {
                 logger_1.sphinxLogger.error(`FAILURE TO DECODE PAY REQ ${e}`);
@@ -509,7 +509,7 @@ function parseKeysendInvoice(i) {
         }
         else {
             // non-proxy, only one "owner"
-            owner = yield models_1.models.Contact.findOne({ where: { isOwner: true } });
+            owner = (yield models_1.models.Contact.findOne({ where: { isOwner: true } }));
             dest = owner.publicKey;
         }
         if (!owner || !dest) {

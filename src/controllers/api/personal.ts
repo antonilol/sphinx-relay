@@ -2,7 +2,7 @@ import * as meme from '../../utils/meme'
 import * as FormData from 'form-data'
 import fetch from 'node-fetch'
 import * as people from '../../utils/people'
-import { models } from '../../models'
+import { Contact, models } from '../../models'
 import * as jsonUtils from '../../utils/json'
 import { success, failure } from '../../utils/res'
 import { loadConfig } from '../../utils/config'
@@ -21,7 +21,7 @@ export async function createPeopleProfile(req: Request, res: Response) {
   try {
     const owner = await models.Contact.findOne({
       where: { tenant, isOwner: true },
-    })
+    }) as unknown as Contact
     const {
       id,
       host,
@@ -70,7 +70,7 @@ export async function deletePersonProfile(req: Request, res: Response) {
   try {
     const owner = await models.Contact.findOne({
       where: { tenant, isOwner: true },
-    })
+    }) as unknown as Contact
     const { id, host } = req.body
     if (!id) {
       return failure(res, 'no id')
@@ -150,7 +150,7 @@ export async function claimOnLiquid(req: Request, res: Response) {
   try {
     const owner = await models.Contact.findOne({
       where: { tenant, isOwner: true },
-    })
+    }) as unknown as Contact
     const { asset, to, amount, memo } = req.body
 
     const res = await people.claimOnLiquid({

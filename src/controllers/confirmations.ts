@@ -1,5 +1,5 @@
 import lock from '../utils/lock'
-import { models, Message } from '../models'
+import { Contact, Chat, Message, models } from '../models'
 import * as socket from '../utils/socket'
 import * as jsonUtils from '../utils/json'
 import * as network from '../network'
@@ -58,10 +58,10 @@ export async function receiveConfirmation(payload: Msg): Promise<void> {
 
   const sender = await models.Contact.findOne({
     where: { publicKey: sender_pub_key, tenant },
-  })
+  }) as unknown as Contact
   const chat = await models.Chat.findOne({
     where: { uuid: chat_uuid, tenant },
-  })
+  }) as unknown as Chat
 
   // new confirmation logic
   if (msg_id) {
@@ -69,7 +69,7 @@ export async function receiveConfirmation(payload: Msg): Promise<void> {
       // console.log("update status map")
       const message = await models.Message.findOne({
         where: { id: msg_id, tenant },
-      })
+      }) as unknown as Message
       if (message) {
         let statusMap = {}
         try {
@@ -109,7 +109,7 @@ export async function receiveConfirmation(payload: Msg): Promise<void> {
         tenant,
       },
       order: [['createdAt', 'desc']],
-    })
+    }) as unknown as Message[]
 
     const message = messages[0]
     message.update({ status: constants.statuses.received })
@@ -128,10 +128,10 @@ export async function tribeOwnerAutoConfirmation(msg_id: number, chat_uuid: stri
   if (!msg_id || !chat_uuid) return
   const message: Message = await models.Message.findOne({
     where: { id: msg_id, tenant },
-  })
+  }) as unknown as Message
   const chat = await models.Chat.findOne({
     where: { uuid: chat_uuid, tenant },
-  })
+  }) as unknown as Chat
 
   if (message) {
     let statusMap = {}

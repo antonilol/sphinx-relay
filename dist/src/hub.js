@@ -40,7 +40,7 @@ const checkInviteHub = (params = {}) => __awaiter(void 0, void 0, void 0, functi
         return;
     }
     //console.log('[hub] checking invites ping')
-    const inviteStrings = yield models_1.models.Invite.findAll({
+    const inviteStrings = (yield models_1.models.Invite.findAll({
         where: {
             status: {
                 [sequelize_1.Op.notIn]: [
@@ -49,7 +49,7 @@ const checkInviteHub = (params = {}) => __awaiter(void 0, void 0, void 0, functi
                 ],
             },
         },
-    }).map((invite) => invite.inviteString);
+    })).map((invite) => invite.inviteString);
     if (inviteStrings.length === 0) {
         return; // skip if no invites
     }

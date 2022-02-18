@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { Contact, models } from '../models'
 import * as crypto from 'crypto'
 import * as fs from 'fs'
 import { loadConfig } from './config'
@@ -90,7 +90,7 @@ async function getOwnerFromToken(
   const hashedToken = crypto.createHash('sha256').update(token).digest('base64')
   const owner = await models.Contact.findOne({
     where: { authToken: hashedToken, isOwner: true },
-  })
+  }) as unknown as Contact
   if (owner && owner.id) {
     return owner.dataValues // failed
   }

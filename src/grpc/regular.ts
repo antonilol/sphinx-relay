@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { Message, Contact, Chat, models } from '../models'
 import * as socket from '../utils/socket'
 import { sendNotification, sendInvoice } from '../hub'
 import * as jsonUtils from '../utils/json'
@@ -34,13 +34,13 @@ export async function receiveNonKeysend(response) {
       type: constants.message_types.invoice,
       payment_request: response['payment_request'],
     },
-  })
+  }) as unknown as Message
   if (invoice == null) {
     if (!decoded.payeeNodeKey)
       return sphinxLogger.error(`subscribeInvoices: cant get dest from pay req`)
     const owner = await models.Contact.findOne({
       where: { isOwner: true, publicKey: decoded.payeeNodeKey },
-    })
+    }) as unknown as Contact
     if (!owner) return sphinxLogger.error(`subscribeInvoices: no owner found`)
     const tenant: number = owner.id
     const payReq = response['payment_request']
@@ -69,12 +69,12 @@ export async function receiveNonKeysend(response) {
       updatedAt: new Date(settleDate),
       network_type: constants.network_types.lightning,
       tenant,
-    })
+    }) as unknown as Message
     return
   }
   // invoice is defined
   const tenant: number = invoice.tenant
-  const owner = await models.Contact.findOne({ where: { id: tenant } })
+  const owner = await models.Contact.findOne({ where: { id: tenant } }) as unknown as Contact
   models.Message.update(
     { status: constants.statuses.confirmed },
     { where: { id: invoice.id } }
@@ -82,7 +82,7 @@ export async function receiveNonKeysend(response) {
 
   const chat = await models.Chat.findOne({
     where: { id: invoice.chatId, tenant },
-  })
+  }) as unknown as Chat
   const contactIds = JSON.parse(chat.contactIds)
   const senderId = contactIds.find((id) => id != invoice.sender)
 
@@ -100,11 +100,11 @@ export async function receiveNonKeysend(response) {
     updatedAt: new Date(settleDate),
     network_type: constants.network_types.lightning,
     tenant,
-  })
+  }) as unknown as Message
 
   const sender = await models.Contact.findOne({
     where: { id: senderId, tenant },
-  })
+  }) as unknown as Contact
 
   socket.sendJson(
     {

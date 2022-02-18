@@ -1,7 +1,7 @@
 import * as Lightning from '../grpc/lightning'
 import * as publicIp from 'public-ip'
 import { checkTag, checkCommitHash } from '../utils/gitinfo'
-import { models, Contact } from '../models'
+import { Contact, Message, models } from '../models'
 import * as interfaces from '../grpc/interfaces'
 import { loadConfig } from './config'
 import { sphinxLogger } from './logger'
@@ -55,7 +55,7 @@ export async function nodeinfo(): Promise<{ [k: string]: any } | undefined> {
     // no LND
     let owner: Contact
     try {
-      owner = await models.Contact.findOne({ where: { id: 1 } })
+      owner = await models.Contact.findOne({ where: { id: 1 } }) as unknown as Contact
     } catch (e) {
       return // just skip in SQLITE not open yet
     }
@@ -76,7 +76,7 @@ export async function nodeinfo(): Promise<{ [k: string]: any } | undefined> {
   try {
     owner = await models.Contact.findOne({
       where: { isOwner: true, publicKey: info.identity_pubkey },
-    })
+    }) as unknown as Contact
   } catch (e) {
     return // just skip in SQLITE not open yet
   }
@@ -159,7 +159,7 @@ export async function isClean(): Promise<boolean> {
   // has owner but with no auth token (id=1?)
   const cleanOwner: Contact = await models.Contact.findOne({
     where: { id: 1, isOwner: true, authToken: null },
-  })
+  }) as unknown as Contact
   const msgs = await models.Message.count()
   const allContacts = await models.Contact.count()
   const noMsgs = msgs === 0
@@ -171,7 +171,7 @@ async function latestMessage(): Promise<any> {
   const lasts = await models.Message.findAll({
     limit: 1,
     order: [['createdAt', 'DESC']],
-  })
+  }) as unknown as Message[]
   const last = lasts && lasts[0]
   if (last) {
     return last.createdAt

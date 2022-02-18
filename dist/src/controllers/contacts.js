@@ -269,9 +269,9 @@ const updateContact = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return;
     }
     // send updated owner info to others!
-    const contactIds = yield models_1.models.Contact.findAll({
+    const contactIds = (yield models_1.models.Contact.findAll({
         where: { deleted: false, tenant },
-    })
+    }))
         .filter((c) => c.id !== tenant && c.publicKey)
         .map((c) => c.id);
     if (contactIds.length == 0)

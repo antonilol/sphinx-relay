@@ -1,12 +1,11 @@
 import { Msg } from './interfaces'
-import { models } from '../models'
+import { Chat, Message, ChatBot, Bot, models, Contact } from '../models'
 import { builtinBotEmit } from '../builtin'
 import { keysendBotCmd, postToBotServer } from '../controllers/bots'
 import * as SphinxBot from 'sphinx-bot'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
 import { asyncForEach } from '../helpers'
-import { ChatBot, Contact, Message, Chat } from '../models'
 
 /*
 default show or not
@@ -43,7 +42,7 @@ export async function isBotMsg(
   try {
     const chat: Chat = await models.Chat.findOne({
       where: { uuid, tenant },
-    })
+    }) as unknown as Chat
     if (!chat) return false
 
     let didEmit = false
@@ -62,7 +61,7 @@ export async function isBotMsg(
           tenant,
           sender: -1,
         },
-      })
+      }) as unknown as Message
       if (ogBotMsg && ogBotMsg.senderAlias) {
         const ogSenderBot: ChatBot = await models.ChatBot.findOne({
           where: {
@@ -70,7 +69,7 @@ export async function isBotMsg(
             tenant,
             botPrefix: '/' + ogBotMsg.senderAlias,
           },
-        })
+        }) as unknown as ChatBot
         return await emitMessageToBot(msg, ogSenderBot.dataValues as ChatBot, sender)
       }
     }
@@ -80,7 +79,7 @@ export async function isBotMsg(
         chatId: chat.id,
         tenant,
       },
-    })
+    }) as unknown as ChatBot[]
     sphinxLogger.info(`=> botsInTribe ${botsInTribe.length}`, logging.Network) //, payload)
 
     if (!(botsInTribe && botsInTribe.length)) return false
@@ -148,7 +147,7 @@ async function emitMessageToBot(msg: Msg, botInTribe: ChatBot, sender: Contact):
             uuid: botInTribe.botUuid,
             tenant,
           },
-        }),
+        }) as unknown as Bot,
         SphinxBot.MSG_TYPE.MESSAGE
       )
     case constants.bot_types.remote:

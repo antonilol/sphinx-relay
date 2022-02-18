@@ -176,9 +176,9 @@ function ownerMiddleware(req, res, next) {
                 .createHash('sha256')
                 .update(token)
                 .digest('base64');
-            owner = yield models_1.models.Contact.findOne({
+            owner = (yield models_1.models.Contact.findOne({
                 where: { authToken: hashedToken, isOwner: true },
-            });
+            }));
         }
         // find by JWT
         if (jwt) {
@@ -187,9 +187,9 @@ function ownerMiddleware(req, res, next) {
                 const publicKey = parsed.body.pubkey;
                 const allowed = (0, scopes_1.allowedJwtRoutes)(parsed.body, req.path);
                 if (allowed && publicKey) {
-                    owner = yield models_1.models.Contact.findOne({
+                    owner = (yield models_1.models.Contact.findOne({
                         where: { publicKey, isOwner: true },
-                    });
+                    }));
                 }
             }
         }

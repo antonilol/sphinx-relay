@@ -4,7 +4,7 @@ import * as rsa from '../crypto/rsa'
 import * as crypto from 'crypto'
 import * as meme from '../utils/meme'
 import * as FormData from 'form-data'
-import { models } from '../models'
+import { MediaKey, Message, Contact, models } from '../models'
 import * as RNCryptor from 'jscryptor-2'
 import { sendMessage } from './send'
 // import { Op } from 'sequelize'
@@ -51,7 +51,7 @@ export async function purchaseFromOriginalSender(
 
   const mediaKey = await models.MediaKey.findOne({
     where: { originalMuid: muid, tenant },
-  })
+  }) as unknown as MediaKey
 
   const terms = parseLDAT(mt)
   const price = terms.meta && terms.meta.amt
@@ -98,7 +98,7 @@ export async function purchaseFromOriginalSender(
   } else {
     const ogmsg = await models.Message.findOne({
       where: { chatId: chat.id, mediaToken: mt, tenant },
-    })
+    }) as unknown as Message
     if (!ogmsg) return
     // purchase it from creator (send "purchase")
     const msg = { mediaToken: mt, purchaser: purchaser.id }
@@ -138,7 +138,7 @@ export async function sendFinalMemeIfFirstPurchaser(
 
   const existingMediaKey = await models.MediaKey.findOne({
     where: { muid, tenant },
-  })
+  }) as unknown as MediaKey
   if (existingMediaKey) return // no need, its already been sent
 
   // const host = mt.split('.')[0]
@@ -149,7 +149,7 @@ export async function sendFinalMemeIfFirstPurchaser(
       id: purchaserID,
       tenant,
     },
-  })
+  }) as unknown as Contact
 
   if (!ogPurchaser) return
 
@@ -295,6 +295,6 @@ export async function downloadAndUploadAndSaveReturningTermsAndKey(
     originalMuid: ogmuid,
     mediaType: typ,
     tenant,
-  })
+  }) as unknown as MediaKey
   return { mediaTerms, mediaKey: encKey }
 }

@@ -200,7 +200,7 @@ function deleteMessage(req, res) {
         const chat_id = message.chatId;
         let chat;
         if (chat_id) {
-            chat = yield models_1.models.Chat.findOne({ where: { id: chat_id, tenant } });
+            chat = (yield models_1.models.Chat.findOne({ where: { id: chat_id, tenant } }));
         }
         (0, res_1.success)(res, jsonUtils.messageToJson(message, chat));
         if (!chat) {

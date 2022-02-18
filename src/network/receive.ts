@@ -5,7 +5,7 @@ import * as interfaces from '../grpc/interfaces'
 import { ACTIONS } from '../controllers'
 import * as tribes from '../utils/tribes'
 import * as signer from '../utils/signer'
-import { models, ChatMember } from '../models'
+import { Contact, Chat, ChatMember, Message, models } from '../models'
 import { sendMessage } from './send'
 import {
   modifyPayloadAndSaveMediaKey,
@@ -83,7 +83,7 @@ async function onReceive(payload: Msg, dest: string) {
 
   const owner = await models.Contact.findOne({
     where: { isOwner: true, publicKey: dest },
-  })
+  }) as unknown as Contact
   if (!owner) return sphinxLogger.error(`=> RECEIVE: owner not found`)
   const tenant: number = owner.id
 
@@ -110,7 +110,7 @@ async function onReceive(payload: Msg, dest: string) {
     isTribe = payload.chat.type === constants.chat_types.tribe
     chat = await models.Chat.findOne({
       where: { uuid: payload.chat.uuid, tenant },
-    })
+    }) as unknown as Chat
     if (chat) chat.update({ seen: false })
   }
   if (isTribe) {
@@ -126,14 +126,14 @@ async function onReceive(payload: Msg, dest: string) {
     // CHECK THEY ARE IN THE GROUP if message
     const senderContact = await models.Contact.findOne({
       where: { publicKey: payload.sender.pub_key, tenant },
-    })
+    }) as unknown as Contact
     // if (!senderContact) return console.log("=> no sender contact")
     const senderContactId = senderContact && senderContact.id
     forwardedFromContactId = senderContactId
     if (needsPricePerMessage && senderContactId) {
       const senderMember = await models.ChatMember.findOne({
         where: { contactId: senderContactId, chatId: chat.id, tenant },
-      })
+      }) as unknown as ChatMember
       if (!senderMember) doAction = false
     }
     // CHECK PRICES
@@ -162,7 +162,7 @@ async function onReceive(payload: Msg, dest: string) {
         // check if has been approved
         const senderMember = await models.ChatMember.findOne({
           where: { contactId: senderContactId, chatId: chat.id, tenant },
-        })
+        }) as unknown as ChatMember
         if (
           !(
             senderMember &&
@@ -183,7 +183,7 @@ async function onReceive(payload: Msg, dest: string) {
             sender: senderContactId,
             tenant,
           },
-        })
+        }) as unknown as Message
         if (ogMsg) doAction = true
       }
     }
@@ -196,7 +196,7 @@ async function onReceive(payload: Msg, dest: string) {
           uuid: payload.message.replyUuid,
           tenant,
         },
-      })
+      }) as unknown as Message
       if (ogMsg && ogMsg.sender) {
         // even include "me"
         const theAmtToForward =
@@ -236,12 +236,12 @@ async function onReceive(payload: Msg, dest: string) {
         sender: tenant,
         tenant,
       },
-    })
+    }) as unknown as Message
     if (!myAttachmentMessage) {
       // someone else's attachment
       const senderContact = await models.Contact.findOne({
         where: { publicKey: payload.sender.pub_key, tenant },
-      })
+      }) as unknown as Contact
       purchaseFromOriginalSender(payload, chat, senderContact, owner)
       doAction = false
     }
@@ -252,7 +252,7 @@ async function onReceive(payload: Msg, dest: string) {
     if (!iAmPurchaser) {
       const senderContact = await models.Contact.findOne({
         where: { publicKey: payload.sender.pub_key, tenant },
-      })
+      }) as unknown as Contact
       sendFinalMemeIfFirstPurchaser(payload, chat, senderContact, owner)
       doAction = false // skip this! we dont need it
     }
@@ -271,7 +271,7 @@ async function doTheAction(data, owner) {
     /* decrypt and re-encrypt with phone's pubkey for storage */
     const chat = await models.Chat.findOne({
       where: { uuid: payload.chat.uuid, tenant: owner.id },
-    })
+    }) as unknown as Chat
     const pld = await decryptMessage(data, chat)
     const me = owner
     payload = await encryptTribeBroadcast(pld, me, true) // true=isTribeOwner
@@ -298,7 +298,7 @@ async function uniqueifyAlias(payload, sender, chat, owner): Promise<any> {
   let final_sender_alias = sender_alias
   const chatMembers: ChatMember[] = await models.ChatMember.findAll({
     where: { chatId: chat.id, tenant: owner.id },
-  })
+  }) as unknown as ChatMember[]
   if (!(chatMembers && chatMembers.length)) return payload
   asyncForEach(chatMembers, async cm => {
     if (cm.contactId === senderContactId) return // dont check against self of course
@@ -337,7 +337,7 @@ async function forwardMessageToTribe(
   const tenant = owner.id
   const chat = await models.Chat.findOne({
     where: { uuid: ogpayload.chat.uuid, tenant },
-  })
+  }) as unknown as Chat
   if (!chat) return
 
   if (chat.skipBroadcastJoins) {
@@ -453,7 +453,7 @@ async function saveAnonymousKeysend(inv, memo, sender_pubkey, tenant) {
   if (sender_pubkey) {
     const theSender = await models.Contact.findOne({
       where: { publicKey: sender_pubkey, tenant },
-    })
+    }) as unknown as Contact
     if (theSender && theSender.id) {
       sender = theSender.id
     }
@@ -475,7 +475,7 @@ async function saveAnonymousKeysend(inv, memo, sender_pubkey, tenant) {
     updatedAt: date,
     network_type: constants.network_types.lightning,
     tenant,
-  })
+  }) as unknown as Message
   socket.sendJson(
     {
       type: 'keysend',
@@ -508,13 +508,13 @@ export async function parseKeysendInvoice(i: interfaces.Invoice) {
       dest = invoice.payeeNodeKey
       owner = await models.Contact.findOne({
         where: { isOwner: true, publicKey: dest },
-      })
+      }) as unknown as Contact
     } catch (e) {
       sphinxLogger.error(`FAILURE TO DECODE PAY REQ ${e}`)
     }
   } else {
     // non-proxy, only one "owner"
-    owner = await models.Contact.findOne({ where: { isOwner: true } })
+    owner = await models.Contact.findOne({ where: { isOwner: true } }) as unknown as Contact
     dest = owner.publicKey
   }
   if (!owner || !dest) {

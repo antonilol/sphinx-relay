@@ -1,5 +1,5 @@
 import * as crypto from 'crypto'
-import { models, RequestsTransportTokens, Contact } from './models'
+import { Contact, RequestsTransportTokens, models } from './models'
 import { Op } from 'sequelize'
 import * as cryptoJS from 'crypto-js'
 import { success, failure } from './utils/res'
@@ -159,14 +159,14 @@ export async function ownerMiddleware(req: Request, res: Response, next: () => v
         .digest('base64')
       const owner = await models.Contact.findOne({
         where: { authToken: hashedToken, isOwner: true },
-      })
+      }) as unknown as Contact
       if (owner) {
         req.owner = owner.dataValues
       }
     } else if (!isProxy()) {
       const owner2 = await models.Contact.findOne({
         where: { isOwner: true },
-      })
+      }) as unknown as Contact
       if (owner2) req.owner = owner2.dataValues
     }
     if (req.path === '/invoices') {
@@ -195,7 +195,7 @@ export async function ownerMiddleware(req: Request, res: Response, next: () => v
       .digest('base64')
     owner = await models.Contact.findOne({
       where: { authToken: hashedToken, isOwner: true },
-    })
+    }) as unknown as Contact
   }
 
   // find by JWT
@@ -207,7 +207,7 @@ export async function ownerMiddleware(req: Request, res: Response, next: () => v
       if (allowed && publicKey) {
         owner = await models.Contact.findOne({
           where: { publicKey, isOwner: true },
-        })
+        }) as unknown as Contact
       }
     }
   }
@@ -222,7 +222,7 @@ export async function ownerMiddleware(req: Request, res: Response, next: () => v
       // Checking the db last since it'll take the most compute power and will
       // grow if we get lots of requests and will let us reject incorrect tokens faster
       const savedTransportTokens: RequestsTransportTokens[] =
-        await models.RequestsTransportTokens.findAll()
+        await models.RequestsTransportTokens.findAll() as unknown as RequestsTransportTokens[]
 
       // Here we are checking all of the saved x_transport_tokens
       // to see if we hav a repeat
@@ -239,7 +239,7 @@ export async function ownerMiddleware(req: Request, res: Response, next: () => v
       // Here we are saving the x_transport_token that we just
       // used into the db to be checked against later
       const transportTokenDBValues = { transportToken: x_transport_token }
-      await models.RequestsTransportTokens.create(transportTokenDBValues)
+      await models.RequestsTransportTokens.create(transportTokenDBValues) as unknown as RequestsTransportTokens
     }
 
     req.owner = owner.dataValues
@@ -313,7 +313,7 @@ export async function authModule(req: Request, res: Response, next: () => void):
     })
     res.end('Invalid credentials')
   } else {
-    const user = await models.Contact.findOne({ where: { isOwner: true } })
+    const user = await models.Contact.findOne({ where: { isOwner: true } }) as unknown as Contact
     const hashedToken = crypto
       .createHash('sha256')
       .update(token)

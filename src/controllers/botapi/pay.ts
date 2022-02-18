@@ -1,5 +1,5 @@
 import * as network from '../../network'
-import { models } from '../../models'
+import { Contact, models, Message } from '../../models'
 import * as short from 'short-uuid'
 import * as jsonUtils from '../../utils/json'
 import * as socket from '../../utils/socket'
@@ -19,7 +19,7 @@ export default async function pay(a) {
     return sphinxLogger.error(`not a tribe`)
   const owner = await models.Contact.findOne({
     where: { id: theChat.tenant },
-  })
+  }) as unknown as Contact
   const tenant: number = owner.id
   const alias = bot_name || owner.alias
   const botContactId = -1
@@ -40,7 +40,7 @@ export default async function pay(a) {
     senderAlias: alias,
     tenant,
   }
-  const message = await models.Message.create(msg)
+  const message = await models.Message.create(msg) as unknown as Message
   socket.sendJson(
     {
       type: 'boost',

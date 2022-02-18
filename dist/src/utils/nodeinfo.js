@@ -68,7 +68,7 @@ function nodeinfo() {
             // no LND
             let owner;
             try {
-                owner = yield models_1.models.Contact.findOne({ where: { id: 1 } });
+                owner = (yield models_1.models.Contact.findOne({ where: { id: 1 } }));
             }
             catch (e) {
                 return; // just skip in SQLITE not open yet
@@ -88,9 +88,9 @@ function nodeinfo() {
         }
         let owner;
         try {
-            owner = yield models_1.models.Contact.findOne({
+            owner = (yield models_1.models.Contact.findOne({
                 where: { isOwner: true, publicKey: info.identity_pubkey },
-            });
+            }));
         }
         catch (e) {
             return; // just skip in SQLITE not open yet

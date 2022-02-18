@@ -1,4 +1,4 @@
-import { models } from '../models'
+import { Message, models } from '../models'
 import * as chats from './chats'
 import * as chatTribes from './chatTribes'
 import * as bots from './bots'
@@ -149,7 +149,7 @@ export async function set(app) {
       limit: 1,
       order: [['createdAt', 'DESC']],
       where: { tenant },
-    })
+    }) as unknown as Message[]
     const last = lasts && lasts[0]
     if (!last) {
       res.status(404).send('Not found')

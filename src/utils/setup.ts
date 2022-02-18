@@ -1,5 +1,5 @@
 import * as Lightning from '../grpc/lightning'
-import { sequelize, models, Contact } from '../models'
+import { Contact, sequelize, models } from '../models'
 import { exec } from 'child_process'
 import * as QRCode from 'qrcode'
 import { checkTag, checkCommitHash } from '../utils/gitinfo'
@@ -40,13 +40,13 @@ async function setVersion() {
 export async function setupOwnerContact(): Promise<void> {
   const owner: Contact = await models.Contact.findOne({
     where: { isOwner: true, id: 1 },
-  })
+  }) as unknown as Contact
   if (!owner) {
     try {
       const info = await Lightning.getInfo()
       const one = await models.Contact.findOne({
         where: { isOwner: true, id: 1 },
-      })
+      }) as unknown as Contact
       if (!one) {
         let authToken: string | null = null
         let tenant: number | null = null
@@ -62,7 +62,7 @@ export async function setupOwnerContact(): Promise<void> {
           isOwner: true,
           authToken,
           tenant,
-        })
+        }) as unknown as Contact
         sphinxLogger.info(['[db] created node owner contact, id:', contact.id])
       }
     } catch (err) {

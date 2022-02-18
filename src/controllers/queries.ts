@@ -1,5 +1,5 @@
 import { success, failure } from '../utils/res'
-import { models, Accounting } from '../models'
+import { Accounting, Contact, models } from '../models'
 import * as network from '../network'
 import constants from '../constants'
 import * as short from 'short-uuid'
@@ -46,7 +46,7 @@ async function getReceivedAccountings(): Promise<Accounting[]> {
     where: {
       status: constants.statuses.received,
     },
-  })
+  }) as unknown as Accounting[]
   return accountings.map((a) => a.dataValues || a)
 }
 
@@ -60,7 +60,7 @@ async function getPendingAccountings(): Promise<Accounting[]> {
       },
       status: constants.statuses.pending,
     },
-  })
+  }) as unknown as Accounting[]
 
   // console.log('[WATCH] gotPendingAccountings', accountings.length, accountings)
   const ret: Accounting[] = []
@@ -138,7 +138,7 @@ async function genChannelAndConfirmAccounting(acc: Accounting) {
     sphinxLogger.info(`[WATCH]=> ACCOUNTINGS UPDATED to received! ${acc.id}`)
   } catch (e) {
     sphinxLogger.error(`[ACCOUNTING] error creating channel ${e}`)
-    const existing = await models.Accounting.findOne({ where: { id: acc.id } })
+    const existing = await models.Accounting.findOne({ where: { id: acc.id } }) as unknown as Accounting
     if (existing) {
       if (!existing.amount) {
         await existing.update({ amount: acc.amount })
@@ -175,7 +175,7 @@ async function checkForConfirmedChannels() {
 }
 
 async function checkChannelsAndKeysend(rec: Accounting) {
-  const owner = await models.Contact.findOne({ where: { isOwner: true } })
+  const owner = await models.Contact.findOne({ where: { isOwner: true } }) as unknown as Contact
   const chans = await lightning.listChannels({
     active_only: true,
     peer: rec.pubkey,
@@ -321,7 +321,7 @@ export const receiveQuery = async (payload) => {
         error: '',
         routeHint: sender_route_hint,
       }
-      await models.Accounting.create(acc)
+      await models.Accounting.create(acc) as unknown as Accounting
       result = addy
     }
   }
