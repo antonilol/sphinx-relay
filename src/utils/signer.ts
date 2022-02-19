@@ -2,15 +2,15 @@ import * as grpc from 'grpc'
 import * as Lightning from '../grpc/lightning'
 import * as ByteBuffer from 'bytebuffer'
 import { loadConfig } from './config'
+import { Signer, SignerClient } from './signerclient'
 
 // var protoLoader = require('@grpc/proto-loader')
 const config = loadConfig()
 const LND_IP = config.lnd_ip || 'localhost'
 
 // TODO like i did with walletkit
-type SignerClient = any
 
-let signerClient: SignerClient = null
+let signerClient: SignerClient
 
 export function loadSigner(): SignerClient {
   if (signerClient) {
@@ -18,7 +18,7 @@ export function loadSigner(): SignerClient {
   } else {
     const credentials = Lightning.loadCredentials('signer.macaroon')
     const lnrpcDescriptor = grpc.load('proto/signer.proto')
-    const signer: { Signer: SignerClient } = lnrpcDescriptor.signrpc as any
+    const signer = lnrpcDescriptor.signrpc as unknown as Signer
     signerClient = new signer.Signer(
       LND_IP + ':' + config.lnd_port,
       credentials
@@ -28,7 +28,7 @@ export function loadSigner(): SignerClient {
 }
 
 export async function signMessage(msg: string): Promise<string> {
-	const signer = await loadSigner()
+	const signer = loadSigner()
   return new Promise((resolve, reject) => {
     try {
       const options = {
@@ -50,7 +50,7 @@ export async function signMessage(msg: string): Promise<string> {
 }
 
 export async function signBuffer(msg: Buffer): Promise<string> {
-	const signer = await loadSigner()
+	const signer = loadSigner()
   return new Promise((resolve, reject) => {
     try {
       const options = { msg }
@@ -68,8 +68,8 @@ export async function signBuffer(msg: Buffer): Promise<string> {
   })
 }
 
-async function verifyMessage(msg, sig, pubkey): Promise<{ [k: string]: any }> {
-	const signer = await loadSigner()
+async function verifyMessage(msg: string, sig: string, pubkey: string): Promise<{ [k: string]: any }> {
+	const signer = loadSigner()
   return new Promise((resolve, reject) => {
     if (msg.length === 0) {
       return reject('invalid msg')
@@ -90,7 +90,7 @@ async function verifyMessage(msg, sig, pubkey): Promise<{ [k: string]: any }> {
         if (err) {
           reject(err)
         } else {
-          resolve(res)
+          resolve(res as any) // TODO what type?
         }
       })
     } catch (e) {
@@ -99,21 +99,19 @@ async function verifyMessage(msg, sig, pubkey): Promise<{ [k: string]: any }> {
   })
 }
 
-export async function signAscii(ascii: string): Promise<string> {
-  const sig = await signMessage(ascii_to_hexa(ascii))
-  return sig
+export function signAscii(ascii: string): Promise<string> {
+  return signMessage(ascii_to_hexa(ascii))
 }
 
-export async function verifyAscii(
+export function verifyAscii(
   ascii: string,
-  sig: Buffer,
+  sig: string,
   pubkey: string
 ): Promise<{ [k: string]: any }> {
-  const r = await verifyMessage(ascii_to_hexa(ascii), sig, pubkey)
-  return r
+  return verifyMessage(ascii_to_hexa(ascii), sig, pubkey)
 }
 
-function ascii_to_hexa(str: string) {
+function ascii_to_hexa(str: string): string {
   const arr1 = <string[]>[]
   for (let n = 0, l = str.length; n < l; n++) {
     const hex = Number(str.charCodeAt(n)).toString(16)

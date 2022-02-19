@@ -17,7 +17,8 @@ const config_1 = require("./config");
 // var protoLoader = require('@grpc/proto-loader')
 const config = (0, config_1.loadConfig)();
 const LND_IP = config.lnd_ip || 'localhost';
-let signerClient = null;
+// TODO like i did with walletkit
+let signerClient;
 function loadSigner() {
     if (signerClient) {
         return signerClient;
@@ -33,7 +34,7 @@ function loadSigner() {
 exports.loadSigner = loadSigner;
 function signMessage(msg) {
     return __awaiter(this, void 0, void 0, function* () {
-        const signer = yield loadSigner();
+        const signer = loadSigner();
         return new Promise((resolve, reject) => {
             try {
                 const options = {
@@ -59,7 +60,7 @@ function signMessage(msg) {
 exports.signMessage = signMessage;
 function signBuffer(msg) {
     return __awaiter(this, void 0, void 0, function* () {
-        const signer = yield loadSigner();
+        const signer = loadSigner();
         return new Promise((resolve, reject) => {
             try {
                 const options = { msg };
@@ -82,7 +83,7 @@ function signBuffer(msg) {
 exports.signBuffer = signBuffer;
 function verifyMessage(msg, sig, pubkey) {
     return __awaiter(this, void 0, void 0, function* () {
-        const signer = yield loadSigner();
+        const signer = loadSigner();
         return new Promise((resolve, reject) => {
             if (msg.length === 0) {
                 return reject('invalid msg');
@@ -104,7 +105,7 @@ function verifyMessage(msg, sig, pubkey) {
                         reject(err);
                     }
                     else {
-                        resolve(res);
+                        resolve(res); // TODO what type?
                     }
                 });
             }
@@ -115,17 +116,11 @@ function verifyMessage(msg, sig, pubkey) {
     });
 }
 function signAscii(ascii) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const sig = yield signMessage(ascii_to_hexa(ascii));
-        return sig;
-    });
+    return signMessage(ascii_to_hexa(ascii));
 }
 exports.signAscii = signAscii;
 function verifyAscii(ascii, sig, pubkey) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const r = yield verifyMessage(ascii_to_hexa(ascii), sig, pubkey);
-        return r;
-    });
+    return verifyMessage(ascii_to_hexa(ascii), sig, pubkey);
 }
 exports.verifyAscii = verifyAscii;
 function ascii_to_hexa(str) {

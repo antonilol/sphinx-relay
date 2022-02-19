@@ -1,4 +1,4 @@
-import { Timer, Chat, Contact, models } from '../models'
+import { Timer, Chat, Contact, Message, models } from '../models'
 import * as network from '../network'
 import constants from '../constants'
 
