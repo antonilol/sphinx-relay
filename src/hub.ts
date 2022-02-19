@@ -76,7 +76,7 @@ const checkInviteHub = async (params = {}) => {
             }
             if (invite.invoice) updateObj.invoice = invite.invoice
 
-            dbInvite.update(updateObj)
+            await dbInvite.update(updateObj)
 
             socket.sendJson(
               {
@@ -101,7 +101,7 @@ const checkInviteHub = async (params = {}) => {
               status: constants.contact_statuses.confirmed,
             }
             if (routeHint) updateObj.routeHint = routeHint
-            contact.update(updateObj)
+            await contact.update(updateObj)
 
             const contactJson = jsonUtils.contactToJson(contact)
             contactJson.invite = jsonUtils.inviteToJson(dbInvite)
