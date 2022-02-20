@@ -99,14 +99,14 @@ function receiveNonKeysend(response) {
             network_type: constants_1.default.network_types.lightning,
             tenant,
         });
-        const sender = yield models_1.models.Contact.findOne({
+        const sender = senderId ? yield models_1.models.Contact.findOne({
             where: { id: senderId, tenant },
-        });
+        }) : undefined;
         socket.sendJson({
             type: 'payment',
             response: jsonUtils.messageToJson(message, chat, sender),
         }, tenant);
-        (0, hub_1.sendNotification)(chat, sender.alias, 'message', owner);
+        (0, hub_1.sendNotification)(chat, sender ? sender.alias : '', 'message', owner);
     });
 }
 exports.receiveNonKeysend = receiveNonKeysend;

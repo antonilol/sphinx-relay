@@ -666,7 +666,7 @@ export async function receiveGroupCreateOrInvite(payload: Msg): Promise<void> {
 
   const contacts: Contact[] = []
   const newContacts: Contact[] = []
-  for (const [pubkey, member] of Object.entries(chat_members)) {
+  for (const [ pubkey, member ] of Object.entries(chat_members)) {
     const contact = await models.Contact.findOne({
       where: { publicKey: pubkey, tenant },
     }) as unknown as Contact
@@ -692,10 +692,10 @@ export async function receiveGroupCreateOrInvite(payload: Msg): Promise<void> {
           fromGroup: true,
           tenant,
         }) as unknown as Contact
-        contacts.push({ ...createdContact.dataValues, role: member.role })
-        newContacts.push(createdContact.dataValues)
+        contacts.push({ ...createdContact.dataValues, role: member.role } as Contact)
+        newContacts.push(createdContact.dataValues as Contact)
       } else {
-        contacts.push({ ...contact.dataValues, role: member.role })
+        contacts.push({ ...contact.dataValues, role: member.role } as Contact)
       }
     }
   }

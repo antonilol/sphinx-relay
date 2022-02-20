@@ -132,9 +132,10 @@ export const getContactsForChat = async (req: Request, res: Response): Promise<v
     }) as unknown as Contact[]
     if (pendingContacts) {
       const pendingContactsRet = pendingContacts.map((c) => {
-        const ctc = c.dataValues
-        ctc.pending = true
-        return jsonUtils.contactToJson(ctc)
+        const ctc = c.dataValues as Contact
+        const contactJson = jsonUtils.contactToJson(ctc)
+        contactJson.pending = true
+        return contactJson
       })
       finalContacts = pendingContactsRet.concat(contactsRet)
     }
@@ -609,7 +610,7 @@ export const getLatestContacts = async (req: Request, res: Response): Promise<vo
       jsonUtils.contactToJson(contact)
     )
     const invitesResponse = invites.map((invite) =>
-      jsonUtils.contactToJson(invite)
+      jsonUtils.inviteToJson(invite)
     )
     const subsResponse = subscriptions.map((s) =>
       jsonUtils.subscriptionToJson(s)

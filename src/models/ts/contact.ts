@@ -27,4 +27,5 @@ export interface Contact extends SequelizeFields {
   blocked: boolean
 
   dataValues: { [k: string]: any }
+  role?: number
 }

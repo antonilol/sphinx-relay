@@ -83,6 +83,7 @@ export async function receiveNonKeysend(response): Promise<void> {
   const chat = await models.Chat.findOne({
     where: { id: invoice.chatId, tenant },
   }) as unknown as Chat
+
   const contactIds: number[] = JSON.parse(chat.contactIds)
   const senderId = contactIds.find((id) => id != invoice.sender)
 
@@ -102,9 +103,9 @@ export async function receiveNonKeysend(response): Promise<void> {
     tenant,
   }) as unknown as Message
 
-  const sender = await models.Contact.findOne({
+  const sender = senderId ? await models.Contact.findOne({
     where: { id: senderId, tenant },
-  }) as unknown as Contact
+  }) as unknown as Contact : undefined
 
   socket.sendJson(
     {
@@ -114,5 +115,5 @@ export async function receiveNonKeysend(response): Promise<void> {
     tenant
   )
 
-  sendNotification(chat, sender.alias, 'message', owner)
+  sendNotification(chat, sender ? sender.alias : '', 'message', owner)
 }

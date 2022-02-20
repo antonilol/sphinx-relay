@@ -548,7 +548,7 @@ export async function parseKeysendInvoice(i: interfaces.Invoice): Promise<void> 
   }
   if (isKeysendType) {
     if (!memo) {
-      sendNotification({}, '', 'keysend', owner, value || 0)
+      sendNotification(undefined, '', 'keysend', owner, value || 0)
     }
     saveAnonymousKeysend(i, memo, sender_pubkey, owner.id)
     return

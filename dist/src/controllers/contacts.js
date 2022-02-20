@@ -134,8 +134,9 @@ const getContactsForChat = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (pendingContacts) {
             const pendingContactsRet = pendingContacts.map((c) => {
                 const ctc = c.dataValues;
-                ctc.pending = true;
-                return jsonUtils.contactToJson(ctc);
+                const contactJson = jsonUtils.contactToJson(ctc);
+                contactJson.pending = true;
+                return contactJson;
             });
             finalContacts = pendingContactsRet.concat(contactsRet);
         }
@@ -558,7 +559,7 @@ const getLatestContacts = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const chats = yield models_1.models.Chat.findAll({ where });
         const subscriptions = yield models_1.models.Subscription.findAll({ where });
         const contactsResponse = contacts.map((contact) => jsonUtils.contactToJson(contact));
-        const invitesResponse = invites.map((invite) => jsonUtils.contactToJson(invite));
+        const invitesResponse = invites.map((invite) => jsonUtils.inviteToJson(invite));
         const subsResponse = subscriptions.map((s) => jsonUtils.subscriptionToJson(s));
         // const chatsResponse = chats.map((chat) => jsonUtils.chatToJson(chat));
         const chatIds = chats.map((c) => c.id);

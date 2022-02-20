@@ -138,6 +138,8 @@ function sendFinalMemeIfFirstPurchaser(payload, chat, sender, owner) {
             return; // no need, its already been sent
         // const host = mt.split('.')[0]
         const terms = (0, ldat_1.parseLDAT)(mt);
+        if (purchaserID === undefined)
+            return;
         const ogPurchaser = yield models_1.models.Contact.findOne({
             where: {
                 id: purchaserID,

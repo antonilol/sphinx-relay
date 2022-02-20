@@ -37,6 +37,7 @@ export interface Msg {
   dest?: string
   owner?: any
   bot_id?: any
+  bot_uuid: string
   bot_name?: string
   recipient_id?: any
   action?: string

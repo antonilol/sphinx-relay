@@ -145,6 +145,9 @@ export async function sendFinalMemeIfFirstPurchaser(
   // const host = mt.split('.')[0]
 
   const terms = parseLDAT(mt)
+
+  if (purchaserID === undefined) return
+
   const ogPurchaser = await models.Contact.findOne({
     where: {
       id: purchaserID,

@@ -65,7 +65,7 @@ export async function receiveConfirmation(payload: Msg): Promise<void> {
 
   // new confirmation logic
   if (msg_id) {
-    lock.acquire('confirmation', async function (done) {
+    lock.acquire('confirmation', async function (done: () => void) {
       // console.log("update status map")
       const message = await models.Message.findOne({
         where: { id: msg_id, tenant },

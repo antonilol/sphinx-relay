@@ -87,7 +87,7 @@ const checkInviteHub = async (params = {}) => {
             )
 
             if (dbInvite.status == constants.invite_statuses.ready && contact) {
-              sendNotification(-1, contact.alias, 'invite', owner)
+              sendNotification(undefined, contact.alias, 'invite', owner)
             }
           }
 

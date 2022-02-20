@@ -14,7 +14,6 @@ import * as zbase32 from '../utils/zbase32'
 import * as secp256k1 from 'secp256k1'
 import libhsmd from './libhsmd'
 import { get_greenlight_grpc_uri } from './greenlight'
-import { asyncForEach } from '../helpers'
 
 // var protoLoader = require('@grpc/proto-loader')
 const config = loadConfig()
@@ -423,7 +422,7 @@ export async function keysendMessage(opts: KeysendOpts, ownerPubkey?: string): P
     let res: any = null
     const ts = new Date().valueOf()
     // WEAVE MESSAGE If TOO LARGE
-    await asyncForEach(Array.from(Array(n)), async (u, i) => {
+    for (let i = 0; i < n; i++) {
       const spliti = Math.ceil(opts.data.length / n)
       const m = opts.data.substr(i * spliti, spliti)
       const isLastThread = i === n - 1
@@ -443,7 +442,7 @@ export async function keysendMessage(opts: KeysendOpts, ownerPubkey?: string): P
         sphinxLogger.error(e)
         fail = true
       }
-    })
+    }
     if (success && !fail) {
       resolve(res)
     } else {

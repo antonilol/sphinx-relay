@@ -23,7 +23,7 @@ const sendNotification = async (
   amount?: number
 ): Promise<void> => {
   if (!owner) return sphinxLogger.error(`=> sendNotification error: no owner`)
-
+  
   let message = `You have a new message from ${name}`
   if (type === 'invite') {
     message = `Your invite to ${name} is ready`

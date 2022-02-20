@@ -26,7 +26,6 @@ const zbase32 = require("../utils/zbase32");
 const secp256k1 = require("secp256k1");
 const libhsmd_1 = require("./libhsmd");
 const greenlight_1 = require("./greenlight");
-const helpers_2 = require("../helpers");
 // var protoLoader = require('@grpc/proto-loader')
 const config = (0, config_1.loadConfig)();
 const LND_IP = config.lnd_ip || 'localhost';
@@ -411,7 +410,7 @@ function keysendMessage(opts, ownerPubkey) {
                 let res = null;
                 const ts = new Date().valueOf();
                 // WEAVE MESSAGE If TOO LARGE
-                yield (0, helpers_2.asyncForEach)(Array.from(Array(n)), (u, i) => __awaiter(this, void 0, void 0, function* () {
+                for (let i = 0; i < n; i++) {
                     const spliti = Math.ceil(opts.data.length / n);
                     const m = opts.data.substr(i * spliti, spliti);
                     const isLastThread = i === n - 1;
@@ -425,7 +424,7 @@ function keysendMessage(opts, ownerPubkey) {
                         logger_1.sphinxLogger.error(e);
                         fail = true;
                     }
-                }));
+                }
                 if (success && !fail) {
                     resolve(res);
                 }

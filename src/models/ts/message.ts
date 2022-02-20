@@ -31,4 +31,5 @@ export interface Message {
   tenant: number
 
   dataValues: { [k: string]: any }
+  update: Function
 }
