@@ -1,6 +1,6 @@
 import { toSnake, toCamel } from '../utils/case'
 import * as cronUtils from './cron'
-import { Contact, Message, Chat, Subscription, Accounting, ChatBot, Invite } from '../models'
+import { Contact, Message, Chat, Subscription, Accounting, Bot, Invite } from '../models'
 
 function chatToJson(c: Chat): { [k: string]: any } {
   if (!c) return {}
@@ -42,7 +42,7 @@ function contactToJson(contact: Contact): { [k: string]: any } {
 
 const inviteToJson = (invite: Invite): { [k: string]: any } => toSnake(invite.dataValues || invite)
 
-const botToJson = (bot: ChatBot): { [k: string]: any } => toSnake(bot.dataValues || bot)
+const botToJson = (bot: Bot): { [k: string]: any } => toSnake(bot.dataValues || bot)
 
 const accountingToJson = (acc: Accounting): { [k: string]: any } => toSnake(acc.dataValues || acc)
 

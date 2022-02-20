@@ -433,13 +433,10 @@ function parseAndVerifyPayload(data) {
             }
             else {
                 logger_1.sphinxLogger.error(`no sender.pub_key`);
-                return null;
             }
         }
         catch (e) {
-            if (payload)
-                return payload; // => RM THIS
-            return null;
+            return payload; // => RM THIS
         }
     });
 }

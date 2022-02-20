@@ -16,7 +16,7 @@ type NotificationType =
   | 'boost'
 
 const sendNotification = async (
-  chat: Chat,
+  chat: Chat | undefined,
   name: string,
   type: NotificationType,
   owner: Contact,
@@ -40,6 +40,8 @@ const sendNotification = async (
   if (type === 'keysend') {
     message = `You have received a payment of ${amount} sats`
   }
+
+  if (!chat) return sphinxLogger.error(`=> sendNotification error: no chat NotificationType ${type}`)
 
   // group
   if (
@@ -72,7 +74,11 @@ const sendNotification = async (
   const isAndroid = !isIOS
 
   const params: { [k: string]: any } = { device_id }
-  const notification: { [k: string]: any } = {
+  const notification: {
+    chat_id: number,
+    sound: string,
+    message?: string
+  } = {
     chat_id: chat.id || 0,
     sound: '',
   }
@@ -91,7 +97,7 @@ const sendNotification = async (
         const count = tribeCounts[chat.id] ? tribeCounts[chat.id] + ' ' : ''
         params.notification.message = chat.isMuted
           ? ''
-          : `You have ${count}new messages in ${chat.name}`
+          : `You have ${count}new message${tribeCounts[chat.id] == 1 ? '' : 's'} in ${chat.name}`
         finalNotification(owner.id, params, isTribeOwner)
       },
       chat.id,
@@ -99,8 +105,9 @@ const sendNotification = async (
     )
   } else if (chat.type == constants.chat_types.conversation) {
     try {
-      const cids = JSON.parse(chat.contactIds || '[]')
+      const cids: number[] = JSON.parse(chat && chat.contactIds || '[]')
       const notme = cids.find((id) => id !== 1)
+      if (notme === undefined) return
       const other = models.Contact.findOne({ where: { id: notme } }) as unknown as Contact
       if (other.blocked) return
       finalNotification(owner.id, params, isTribeOwner)

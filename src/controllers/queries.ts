@@ -47,7 +47,7 @@ async function getReceivedAccountings(): Promise<Accounting[]> {
       status: constants.statuses.received,
     },
   }) as unknown as Accounting[]
-  return accountings.map((a) => a.dataValues || a)
+  return accountings.map((a) => a.dataValues as Accounting || a)
 }
 
 async function getPendingAccountings(): Promise<Accounting[]> {

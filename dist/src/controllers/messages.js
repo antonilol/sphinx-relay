@@ -89,9 +89,9 @@ const getMessages = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     res.json({
         success: true,
         response: {
-            new_messages: newMessages.map((message) => jsonUtils.messageToJson(message, chatsById[parseInt(message.chatId)])),
-            confirmed_messages: confirmedMessages.map((message) => jsonUtils.messageToJson(message, chatsById[parseInt(message.chatId)])),
-            deleted_messages: deletedMessages.map((message) => jsonUtils.messageToJson(message, chatsById[parseInt(message.chatId)])),
+            new_messages: newMessages.map((message) => jsonUtils.messageToJson(message, chatsById[message.chatId])),
+            confirmed_messages: confirmedMessages.map((message) => jsonUtils.messageToJson(message, chatsById[message.chatId])),
+            deleted_messages: deletedMessages.map((message) => jsonUtils.messageToJson(message, chatsById[message.chatId])),
         },
     });
     res.status(200);
@@ -135,7 +135,7 @@ const getAllMessages = (req, res) => __awaiter(void 0, void 0, void 0, function*
     const chatsById = (0, underscore_1.indexBy)(chats, 'id');
     // console.log("=> indexed chats");
     (0, res_1.success)(res, {
-        new_messages: messages.map((message) => jsonUtils.messageToJson(message, chatsById[parseInt(message.chatId)])),
+        new_messages: messages.map((message) => jsonUtils.messageToJson(message, chatsById[message.chatId])),
         new_messages_total: all_messages_length,
         confirmed_messages: [],
     });
@@ -183,7 +183,7 @@ const getMsgs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         : [];
     const chatsById = (0, underscore_1.indexBy)(chats, 'id');
     (0, res_1.success)(res, {
-        new_messages: messages.map((message) => jsonUtils.messageToJson(message, chatsById[parseInt(message.chatId)])),
+        new_messages: messages.map((message) => jsonUtils.messageToJson(message, chatsById[message.chatId])),
         new_messages_total: numberOfNewMessages,
     });
 });

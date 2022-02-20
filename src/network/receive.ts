@@ -409,7 +409,7 @@ export async function initTribesSubscriptions(): Promise<void> {
   tribes.connect(receiveMqttMessage)
 }
 
-function parsePayload(data) {
+function parsePayload(data: string): Msg | '' {
   const li = data.lastIndexOf('}')
   const msg = data.substring(0, li + 1)
   const payload = JSON.parse(msg)
@@ -417,8 +417,8 @@ function parsePayload(data) {
 }
 
 // VERIFY PUBKEY OF SENDER from sig
-async function parseAndVerifyPayload(data) {
-  let payload
+async function parseAndVerifyPayload(data: string): Promise<Msg | undefined> {
+  let payload: Msg | undefined
   const li = data.lastIndexOf('}')
   const msg = data.substring(0, li + 1)
   const sig = data.substring(li + 1)
@@ -440,11 +440,9 @@ async function parseAndVerifyPayload(data) {
       }
     } else {
       sphinxLogger.error(`no sender.pub_key`)
-      return null
     }
   } catch (e) {
-    if (payload) return payload // => RM THIS
-    return null
+    return payload // => RM THIS
   }
 }
 
@@ -499,7 +497,7 @@ export async function parseKeysendInvoice(i: interfaces.Invoice): Promise<void> 
   const recs = i.htlcs && i.htlcs[0] && i.htlcs[0].custom_records
 
   let dest = ''
-  let owner
+  let owner: Contact | undefined
   if (isProxy()) {
     try {
       const invoice = bolt11.decode(i.payment_request)
@@ -531,7 +529,7 @@ export async function parseKeysendInvoice(i: interfaces.Invoice): Promise<void> 
   // and should be saved even if there is NO content
   let isKeysendType = false
   let memo = ''
-  let sender_pubkey
+  let sender_pubkey: string | undefined
   if (data) {
     try {
       const payload = parsePayload(data)
@@ -577,15 +575,15 @@ export async function parseKeysendInvoice(i: interfaces.Invoice): Promise<void> 
   }
 }
 
-const chunks = {}
-function weave(p) {
+const chunks: { [ts: string]: { i: string, n: string, m: string }[] } = {}
+function weave(p: string): string | undefined {
   const pa = p.split('_')
   if (pa.length < 4) return
   const ts = pa[0]
   const i = pa[1]
   const n = pa[2]
   const m = pa.filter((u, i) => i > 2).join('_')
-  chunks[ts] = chunks[ts] ? [...chunks[ts], { i, n, m }] : [{ i, n, m }]
+  chunks[ts] = chunks[ts] ? [ ...chunks[ts], { i, n, m } ] : [ { i, n, m } ]
   if (chunks[ts].length === parseInt(n)) {
     // got em all!
     const all = chunks[ts]

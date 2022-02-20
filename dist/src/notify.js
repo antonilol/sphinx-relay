@@ -35,6 +35,8 @@ const sendNotification = (chat, name, type, owner, amount) => __awaiter(void 0, 
     if (type === 'keysend') {
         message = `You have received a payment of ${amount} sats`;
     }
+    if (!chat)
+        return logger_2.sphinxLogger.error(`=> sendNotification error: no chat NotificationType ${type}`);
     // group
     if (type === 'message' &&
         chat.type == constants_1.default.chat_types.group &&
@@ -78,14 +80,16 @@ const sendNotification = (chat, name, type, owner, amount) => __awaiter(void 0, 
             const count = tribeCounts[chat.id] ? tribeCounts[chat.id] + ' ' : '';
             params.notification.message = chat.isMuted
                 ? ''
-                : `You have ${count}new messages in ${chat.name}`;
+                : `You have ${count}new message${tribeCounts[chat.id] == 1 ? '' : 's'} in ${chat.name}`;
             finalNotification(owner.id, params, isTribeOwner);
         }, chat.id, 30000);
     }
     else if (chat.type == constants_1.default.chat_types.conversation) {
         try {
-            const cids = JSON.parse(chat.contactIds || '[]');
+            const cids = JSON.parse(chat && chat.contactIds || '[]');
             const notme = cids.find((id) => id !== 1);
+            if (notme === undefined)
+                return;
             const other = models_1.models.Contact.findOne({ where: { id: notme } });
             if (other.blocked)
                 return;

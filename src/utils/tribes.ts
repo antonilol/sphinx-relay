@@ -41,7 +41,7 @@ export async function getTribeOwnersChatByUUID(uuid: string): Promise<any> {
         model: models.Chat,
         mapToModel: true, // pass true here if you have any mapped fields
       }
-    )
+    ) as unknown as Chat
     // console.log('=> getTribeOwnersChatByUUID r:', r)
     return r && r[0] && r[0].dataValues
   } catch (e) {
