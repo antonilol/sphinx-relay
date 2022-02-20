@@ -170,7 +170,7 @@ function fillmsg(full, props) {
 }
 function sleep(ms) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve) => setTimeout(resolve, ms));
+        return new Promise(resolve => setTimeout(resolve, ms));
     });
 }
 function downloadAndUploadAndSaveReturningTermsAndKey(payload, chat, sender, owner, injectedAmount) {

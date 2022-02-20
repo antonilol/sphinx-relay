@@ -212,7 +212,8 @@ function checkIfAutoConfirm(data, tenant) {
         (0, confirmations_1.tribeOwnerAutoConfirmation)(data.message.id, data.chat.uuid, tenant);
     }
 }
-function newmsg(type, chat, sender, message, isForwarded, includeStatus) {
+function newmsg(type, chat, sender, message, // or Msg    (TODO)
+isForwarded, includeStatus) {
     const includeGroupKey = type === constants_1.default.message_types.group_create ||
         type === constants_1.default.message_types.group_invite;
     const includeAlias = sender && sender.alias && chat.type === constants_1.default.chat_types.tribe;
@@ -241,13 +242,7 @@ function newmsg(type, chat, sender, message, isForwarded, includeStatus) {
 exports.newmsg = newmsg;
 function sleep(ms) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve) => setTimeout(resolve, ms));
+        return new Promise(resolve => setTimeout(resolve, ms));
     });
 }
-// function urlBase64FromHex(ascii){
-//     return Buffer.from(ascii,'hex').toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
-// }
-// function urlBase64FromBytes(buf){
-//     return Buffer.from(buf).toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
-// }
 //# sourceMappingURL=send.js.map

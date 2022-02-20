@@ -1,4 +1,4 @@
-import { Contact, models } from '../models'
+import { Contact, models, Chat, Message } from '../models'
 import * as LND from '../grpc/lightning'
 import { personalizeMessage, decryptMessage } from '../utils/msg'
 import * as tribes from '../utils/tribes'
@@ -12,7 +12,7 @@ import { asyncForEach } from '../helpers'
 
 type NetworkType = undefined | 'mqtt' | 'lightning'
 
-export async function sendMessage(params) {
+export async function sendMessage(params): Promise<void> {
   const {
     type,
     chat,
@@ -199,7 +199,7 @@ export async function signAndSend(
   owner: { [k: string]: any },
   mqttTopic?: string,
   replayingHistory?: boolean
-) {
+): Promise<boolean> {
   // console.log('sign and send!',opts)
   const ownerPubkey = owner.publicKey
   const ownerID = owner.id
@@ -238,10 +238,10 @@ function checkIfAutoConfirm(data, tenant) {
 }
 
 export function newmsg(
-  type,
-  chat,
-  sender,
-  message,
+  type: number,
+  chat: Chat,
+  sender: Contact,
+  message: Message, // or Msg    (TODO)
   isForwarded: boolean,
   includeStatus?: boolean
 ): Msg {
@@ -288,13 +288,6 @@ export function newmsg(
   }
 }
 
-async function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
-
-// function urlBase64FromHex(ascii){
-//     return Buffer.from(ascii,'hex').toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
-// }
-// function urlBase64FromBytes(buf){
-//     return Buffer.from(buf).toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
-// }

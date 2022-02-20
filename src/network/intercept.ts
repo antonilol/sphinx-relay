@@ -16,7 +16,7 @@ restrictions (be able to toggle, or dont show chat)
 export async function isBotMsg(
   m: Msg,
   sentByMe: boolean,
-  sender,
+  sender: Contact,
   forwardedFromContactId: number
 ): Promise<boolean> {
   const tenant: number = sender.id

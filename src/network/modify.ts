@@ -4,21 +4,22 @@ import * as rsa from '../crypto/rsa'
 import * as crypto from 'crypto'
 import * as meme from '../utils/meme'
 import * as FormData from 'form-data'
-import { MediaKey, Message, Contact, models } from '../models'
+import { MediaKey, Message, Contact, Chat, models } from '../models'
 import * as RNCryptor from 'jscryptor-2'
 import { sendMessage } from './send'
 // import { Op } from 'sequelize'
 import constants from '../constants'
 import { sphinxLogger } from '../utils/logger'
+import { Msg } from '.'
 
 const msgtypes = constants.message_types
 
 export async function modifyPayloadAndSaveMediaKey(
-  payload,
-  chat,
-  sender,
-  owner
-) {
+  payload: Msg,
+  chat: Chat,
+  sender: Contact,
+  owner: Contact
+): Promise<Msg | { [k: string]: any }> {
   if (payload.type !== msgtypes.attachment) return payload
   try {
     const ret = await downloadAndUploadAndSaveReturningTermsAndKey(
@@ -36,11 +37,11 @@ export async function modifyPayloadAndSaveMediaKey(
 
 // "purchase" type
 export async function purchaseFromOriginalSender(
-  payload,
-  chat,
-  purchaser,
-  owner
-) {
+  payload: Msg,
+  chat: Chat,
+  purchaser: Contact,
+  owner: Contact
+): Promise<void> {
   const tenant = owner.id
   if (payload.type !== msgtypes.purchase) return
 
@@ -121,11 +122,11 @@ export async function purchaseFromOriginalSender(
 }
 
 export async function sendFinalMemeIfFirstPurchaser(
-  payload,
-  chat,
-  sender,
-  owner
-) {
+  payload: Msg,
+  chat: Chat,
+  sender: Contact,
+  owner: Contact
+): Promise<void> {
   const tenant = owner.id
   if (payload.type !== msgtypes.purchase_accept) return
 
@@ -191,7 +192,7 @@ export async function sendFinalMemeIfFirstPurchaser(
   })
 }
 
-function fillmsg(full, props) {
+function fillmsg(full: { [k: string]: any }, props: { [k: string]: any }): { [k: string]: any } {
   return {
     ...full,
     message: {
@@ -201,17 +202,17 @@ function fillmsg(full, props) {
   }
 }
 
-async function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 export async function downloadAndUploadAndSaveReturningTermsAndKey(
-  payload,
-  chat,
-  sender,
-  owner,
+  payload: Msg,
+  chat: Chat,
+  sender: Contact,
+  owner: Contact,
   injectedAmount?: number
-) {
+): Promise<Msg | { mediaTerms: { muid: any, ttl: number, host: string, meta: any }, mediaKey: string }> {
   const mt = payload.message && payload.message.mediaToken
   const key = payload.message && payload.message.mediaKey
   const typ = payload.message && payload.message.mediaType
@@ -272,7 +273,7 @@ export async function downloadAndUploadAndSaveReturningTermsAndKey(
   // PUT NEW TERMS, to finish in personalizeMessage
   const amt = (terms.meta && terms.meta.amt) || injectedAmount
   const ttl = terms.meta && terms.meta.ttl
-  const mediaTerms: { [k: string]: any } = {
+  const mediaTerms = {
     muid: json.muid,
     ttl: ttl || 31536000,
     host: '',

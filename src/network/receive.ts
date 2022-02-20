@@ -375,7 +375,7 @@ async function forwardMessageToTribe(
   })
 }
 
-export async function initGrpcSubscriptions(noCache?: boolean) {
+export async function initGrpcSubscriptions(noCache?: boolean): Promise<void> {
   try {
     if (config.lightning_provider === 'GREENLIGHT') {
       await Greenlight.initGreenlight()
@@ -389,7 +389,7 @@ export async function initGrpcSubscriptions(noCache?: boolean) {
   }
 }
 
-export async function receiveMqttMessage(topic, message) {
+export async function receiveMqttMessage(topic: string, message: Buffer): Promise<void> {
   try {
     const msg = message.toString()
     // check topic is signed by sender?
@@ -405,7 +405,7 @@ export async function receiveMqttMessage(topic, message) {
   }
 }
 
-export async function initTribesSubscriptions() {
+export async function initTribesSubscriptions(): Promise<void> {
   tribes.connect(receiveMqttMessage)
 }
 
@@ -487,7 +487,7 @@ async function saveAnonymousKeysend(inv, memo, sender_pubkey, tenant) {
 
 const hashCache: { [k: string]: boolean } = {}
 
-export async function parseKeysendInvoice(i: interfaces.Invoice) {
+export async function parseKeysendInvoice(i: interfaces.Invoice): Promise<void> {
   try {
     const hash = i.r_hash.toString('base64')
     if (hashCache[hash]) return

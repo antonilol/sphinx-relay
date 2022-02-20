@@ -16,12 +16,12 @@ type NotificationType =
   | 'boost'
 
 const sendNotification = async (
-  chat,
-  name,
+  chat: Chat,
+  name: string,
   type: NotificationType,
-  owner,
+  owner: Contact,
   amount?: number
-) => {
+): Promise<void> => {
   if (!owner) return sphinxLogger.error(`=> sendNotification error: no owner`)
 
   let message = `You have a new message from ${name}`
@@ -177,6 +177,6 @@ function debounce(func: () => void, id: number, delay: number) {
   }, delay)
 }
 
-export function resetNotifyTribeCount(chatID: number) {
+export function resetNotifyTribeCount(chatID: number): void {
   tribeCounts[chatID] = 0
 }
