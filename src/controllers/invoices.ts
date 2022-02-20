@@ -61,7 +61,7 @@ export const payInvoice = async (req: Request, res: Response): Promise<void> => 
     const chat = await models.Chat.findOne({
       where: { id: message.chatId, tenant },
     }) as unknown as Chat
-    const contactIds = JSON.parse(chat.contactIds)
+    const contactIds: number[] = JSON.parse(chat.contactIds)
     const senderId = contactIds.find((id) => id != message.sender)
 
     const paidMessage = await models.Message.create({
@@ -87,7 +87,7 @@ export const payInvoice = async (req: Request, res: Response): Promise<void> => 
   }
 }
 
-async function anonymousInvoice(res, payment_request: string, tenant: number) {
+async function anonymousInvoice(res: Response, payment_request: string, tenant: number): Promise<void> {
   const { memo, sat, msat, paymentHash, invoiceDate } =
     decodePaymentRequest(payment_request)
   const date = new Date()
