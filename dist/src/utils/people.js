@@ -36,8 +36,7 @@ function createOrEditPerson({ host, owner_alias, owner_pubkey, owner_route_hint,
             if (!r.ok) {
                 throw 'failed to create or edit person ' + r.status;
             }
-            const person = yield r.json();
-            return person;
+            return r.json();
         }
         catch (e) {
             logger_1.sphinxLogger.error('[tribes] unauthorized to create person');
@@ -88,8 +87,7 @@ function claimOnLiquid({ host, asset, to, amount, memo, owner_pubkey, }) {
             if (!r.ok) {
                 throw 'failed to withdraw to liquid ' + r.status;
             }
-            const res = yield r.json();
-            return res;
+            return r.json();
         }
         catch (e) {
             logger_1.sphinxLogger.error('[liquid] unauthorized to move asset', e);

@@ -19,7 +19,7 @@ export async function createOrEditPerson(
     extras,
   },
   id?: number
-) {
+): Promise<{ [k: string]: any }> {
   try {
     const token = await genSignedTimestamp(owner_pubkey)
     let protocol = 'https'
@@ -43,8 +43,7 @@ export async function createOrEditPerson(
     if (!r.ok) {
       throw 'failed to create or edit person ' + r.status
     }
-    const person = await r.json()
-    return person
+    return r.json()
   } catch (e) {
     sphinxLogger.error('[tribes] unauthorized to create person')
     throw e
@@ -76,7 +75,7 @@ export async function claimOnLiquid({
   amount,
   memo,
   owner_pubkey,
-}) { // TODO type?
+}): Promise<{ [k: string]: any }> {
   try {
     const token = await genSignedTimestamp(owner_pubkey)
     let protocol = 'https'
@@ -97,8 +96,7 @@ export async function claimOnLiquid({
     if (!r.ok) {
       throw 'failed to withdraw to liquid ' + r.status
     }
-    const res = await r.json()
-    return res
+    return r.json()
   } catch (e) {
     sphinxLogger.error('[liquid] unauthorized to move asset', e)
     throw e

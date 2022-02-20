@@ -7,7 +7,7 @@ import * as bolt11 from '@boltz/bolt11'
 import { sphinxLogger } from '../utils/logger'
 
 const oktolog = true
-export function loginvoice(response) {
+export function loginvoice(response): void {
   if (!oktolog) return
   const r = JSON.parse(JSON.stringify(response))
   r.r_hash = ''
@@ -22,7 +22,7 @@ export function loginvoice(response) {
   )
 }
 
-export async function receiveNonKeysend(response) {
+export async function receiveNonKeysend(response): Promise<void> {
   const decoded = bolt11.decode(response['payment_request'])
   const paymentHash =
     decoded.tags.find((t) => t.tagName === 'payment_hash')?.data || ''
@@ -83,7 +83,7 @@ export async function receiveNonKeysend(response) {
   const chat = await models.Chat.findOne({
     where: { id: invoice.chatId, tenant },
   }) as unknown as Chat
-  const contactIds = JSON.parse(chat.contactIds)
+  const contactIds: number[] = JSON.parse(chat.contactIds)
   const senderId = contactIds.find((id) => id != invoice.sender)
 
   const message = await models.Message.create({
