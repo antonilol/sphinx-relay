@@ -187,7 +187,7 @@ async function massPingHubFromProxies(rn) {
   }
 }
 
-async function sendHubCall(body, mass?: boolean) {
+async function sendHubCall(body: { [k: string]: any }, mass?: boolean): Promise<void> {
   try {
     // console.log("=> PING BODY", body)
     const r = await fetch(
@@ -209,15 +209,15 @@ async function sendHubCall(body, mass?: boolean) {
   }
 }
 
-const pingHubInterval = (ms) => {
+const pingHubInterval = (ms: number): void => {
   setInterval(pingHub, ms)
 }
 
-const checkInvitesHubInterval = (ms) => {
+const checkInvitesHubInterval = (ms: number): void => {
   setInterval(checkInviteHub, ms)
 }
 
-export function sendInvoice(payReq, amount) {
+export function sendInvoice(payReq: string, amount: number): void { // correct types?
   sphinxLogger.info(`[hub] sending invoice`)
   fetch(config.hub_api_url + '/invoices', {
     method: 'POST',
@@ -228,7 +228,7 @@ export function sendInvoice(payReq, amount) {
   })
 }
 
-const finishInviteInHub = (params, onSuccess, onFailure) => {
+const finishInviteInHub = (params: { [k: string]: any }, onSuccess: (j: { [k: string]: any }) => void, onFailure: (e: Error) => void): void => {
   fetch(config.hub_api_url + '/invites/finish', {
     method: 'POST',
     body: JSON.stringify(params),
@@ -245,7 +245,7 @@ const finishInviteInHub = (params, onSuccess, onFailure) => {
     })
 }
 
-const payInviteInHub = (invite_string, params, onSuccess, onFailure) => {
+const payInviteInHub = (invite_string: string, params: { [k: string]: any }, onSuccess: (j: { [k: string]: any }) => void, onFailure: (e: Error) => void): void => {
   fetch(config.hub_api_url + '/invites/' + invite_string + '/pay', {
     method: 'POST',
     body: JSON.stringify(params),
@@ -263,7 +263,7 @@ const payInviteInHub = (invite_string, params, onSuccess, onFailure) => {
     })
 }
 
-async function payInviteInvoice(invoice, pubkey: string, onSuccess, onFailure) {
+async function payInviteInvoice(invoice: string, pubkey: string, onSuccess: (j: { [k: string]: any }) => void, onFailure: (e: Error) => void): Promise<void> {
   try {
     const res = Lightning.sendPayment(invoice, pubkey)
     onSuccess(res)
@@ -272,7 +272,7 @@ async function payInviteInvoice(invoice, pubkey: string, onSuccess, onFailure) {
   }
 }
 
-const createInviteInHub = (params, onSuccess, onFailure) => {
+const createInviteInHub = (params: { [k: string]: any }, onSuccess: (j: { [k: string]: any }) => void, onFailure: (e: Error) => void): void => {
   fetch(config.hub_api_url + '/invites_new', {
     method: 'POST',
     body: JSON.stringify(params),
@@ -290,7 +290,7 @@ const createInviteInHub = (params, onSuccess, onFailure) => {
     })
 }
 
-export async function getAppVersionsFromHub() {
+export async function getAppVersionsFromHub(): Promise<{ [k: string]: any } | undefined> {
   try {
     const r = await fetch(config.hub_api_url + '/app_versions', {
       method: 'GET',
@@ -299,7 +299,7 @@ export async function getAppVersionsFromHub() {
     const j = await r.json()
     return j
   } catch (e) {
-    return null
+    // dont care about the error
   }
 }
 

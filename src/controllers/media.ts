@@ -1,4 +1,4 @@
-import { Message, MediaKey, models } from '../models'
+import { Message, MediaKey, Contact, models } from '../models'
 import * as socket from '../utils/socket'
 import * as jsonUtils from '../utils/json'
 import * as resUtils from '../utils/res'
@@ -66,7 +66,7 @@ export const sendAttachmentMessage = async (req: Request, res: Response) => {
 
   sphinxLogger.info(['[send attachment]', req.body])
 
-  const owner = req.owner
+  const owner = req.owner as Contact
   const chat = await helpers.findOrCreateChat({
     chat_id,
     owner_id: owner.id,

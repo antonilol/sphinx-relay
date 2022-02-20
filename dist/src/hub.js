@@ -279,7 +279,7 @@ function getAppVersionsFromHub() {
             return j;
         }
         catch (e) {
-            return null;
+            // dont care about the error
         }
     });
 }
