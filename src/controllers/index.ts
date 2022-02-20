@@ -23,9 +23,9 @@ import { failure } from '../utils/res'
 import * as auth from './auth'
 import * as personal from './api/personal'
 import * as lsats from './lsats'
-import { Request, Response } from 'express'
+import { Request, Response, Express } from 'express'
 
-export async function set(app) {
+export async function set(app: Express): Promise<void> {
   builtInBots.init()
 
   if (models && models.Subscription) {

@@ -14,11 +14,11 @@ import { asyncForEach } from '../helpers'
 const config = loadConfig()
 
 const VERSION = 2
-export async function getRelayVersion(req: Request, res: Response) {
+export async function getRelayVersion(req: Request, res: Response): Promise<void> {
   success(res, { version: VERSION })
 }
 
-export async function getAppVersions(req: Request, res: Response) {
+export async function getAppVersions(req: Request, res: Response): Promise<void> {
   const vs = await getAppVersionsFromHub()
   if (vs) {
     success(res, vs)
@@ -27,7 +27,7 @@ export async function getAppVersions(req: Request, res: Response) {
   }
 }
 
-export const checkRoute = async (req: Request, res: Response) => {
+export const checkRoute = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
 
   const { pubkey, amount, route_hint } = req.query
@@ -37,9 +37,9 @@ export const checkRoute = async (req: Request, res: Response) => {
   try {
     const amt = parseInt((amount || '').toString()) || constants.min_sat_amount
     const r = await Lightning.queryRoute(
-      pubkey,
+      pubkey.toString(),
       amt,
-      route_hint || '',
+      (route_hint || '').toString(),
       owner.publicKey
     )
     success(res, r)
@@ -48,7 +48,7 @@ export const checkRoute = async (req: Request, res: Response) => {
   }
 }
 
-export const checkRouteByContactOrChat = async (req: Request, res: Response) => {
+export const checkRouteByContactOrChat = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
 
   const chatID = req.query.chat_id
@@ -99,7 +99,8 @@ const defaultLogFiles = [
   '/home/lnd/.pm2/logs/app-error.log',
   '/var/log/syslog',
 ]
-export async function getLogsSince(req: Request, res: Response) {
+
+export async function getLogsSince(req: Request, res: Response): Promise<void> {
   const logFiles = config.log_file ? [config.log_file] : defaultLogFiles
   let txt
   let err
@@ -121,7 +122,7 @@ export async function getLogsSince(req: Request, res: Response) {
   else failure(res, err)
 }
 
-export const getLightningInfo = async (req: Request, res: Response) => {
+export const getLightningInfo = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   res.status(200)
   try {
@@ -133,7 +134,7 @@ export const getLightningInfo = async (req: Request, res: Response) => {
   res.end()
 }
 
-export const getChannels = async (req: Request, res: Response) => {
+export const getChannels = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
 
   res.status(200)
@@ -146,7 +147,7 @@ export const getChannels = async (req: Request, res: Response) => {
   res.end()
 }
 
-export const getBalance = async (req: Request, res: Response) => {
+export const getBalance = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -169,7 +170,7 @@ export const getBalance = async (req: Request, res: Response) => {
   res.end()
 }
 
-export const getLocalRemoteBalance = async (req: Request, res: Response) => {
+export const getLocalRemoteBalance = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   res.status(200)
   try {
@@ -197,7 +198,7 @@ export const getLocalRemoteBalance = async (req: Request, res: Response) => {
   res.end()
 }
 
-export const getNodeInfo = async (req: Request, res: Response) => {
+export const getNodeInfo = async (req: Request, res: Response): Promise<void> => {
   const srcIP = req.connection.remoteAddress
   if (srcIP && ['127.0.0.1', 'localhost'].includes(srcIP)) {
     const node = await nodeinfo()
@@ -211,7 +212,7 @@ export const getNodeInfo = async (req: Request, res: Response) => {
 }
 
 
-export async function clearForTesting(req: Request, res: Response) {
+export async function clearForTesting(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 

@@ -19,7 +19,7 @@ import { Request, Response } from 'express'
 
 const config = loadConfig()
 
-export const getContacts = async (req: Request, res: Response) => {
+export const getContacts = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -70,7 +70,7 @@ export const getContacts = async (req: Request, res: Response) => {
     jsonUtils.subscriptionToJson(s)
   )
   const chatsResponse = chats.map((chat) => {
-    const theChat = chat.dataValues || chat
+    const theChat = chat.dataValues as Chat || chat
     if (!pendingMembers) return jsonUtils.chatToJson(theChat)
     const membs = pendingMembers.filter((m) => m.chatId === chat.id) || []
     theChat.pendingContactIds = membs.map((m) => m.contactId)
@@ -84,7 +84,7 @@ export const getContacts = async (req: Request, res: Response) => {
   })
 }
 
-export const getContactsForChat = async (req: Request, res: Response) => {
+export const getContactsForChat = async (req: Request, res: Response): Promise<void> => {
   const chat_id = parseInt(req.params.chat_id)
   if (!chat_id) return failure(res, 'no chat id')
   if (!req.owner) return failure(res, 'no owner')
@@ -143,7 +143,7 @@ export const getContactsForChat = async (req: Request, res: Response) => {
   success(res, { contacts: finalContacts })
 }
 
-export async function generateOwnerWithExternalSigner(req: Request, res: Response) {
+export async function generateOwnerWithExternalSigner(req: Request, res: Response): Promise<void> {
   if (!isProxy()) {
     return failure(res, 'only proxy')
   }
@@ -170,7 +170,7 @@ export async function generateOwnerWithExternalSigner(req: Request, res: Respons
   success(res, { id: (created && created.id) || 0 })
 }
 
-export const generateToken = async (req: Request, res: Response) => {
+export const generateToken = async (req: Request, res: Response): Promise<void> => {
   sphinxLogger.info([
     '=> generateToken called',
     {
@@ -241,7 +241,7 @@ export const generateToken = async (req: Request, res: Response) => {
   })
 }
 
-export const updateContact = async (req: Request, res: Response) => {
+export const updateContact = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   sphinxLogger.info(
@@ -300,7 +300,7 @@ export const updateContact = async (req: Request, res: Response) => {
   })
 }
 
-export const exchangeKeys = async (req: Request, res: Response) => {
+export const exchangeKeys = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   sphinxLogger.info(
@@ -329,7 +329,7 @@ export const exchangeKeys = async (req: Request, res: Response) => {
   })
 }
 
-export const createContact = async (req: Request, res: Response) => {
+export const createContact = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   sphinxLogger.info(
@@ -384,7 +384,7 @@ export const createContact = async (req: Request, res: Response) => {
   })
 }
 
-export const deleteContact = async (req: Request, res: Response) => {
+export const deleteContact = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const id = parseInt(req.params.id || '0')
@@ -460,7 +460,7 @@ export const deleteContact = async (req: Request, res: Response) => {
   success(res, {})
 }
 
-export const receiveContactKey = async (payload) => {
+export const receiveContactKey = async (payload: network.Msg): Promise<void> => {
   const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const sender_route_hint = dat.sender.route_hint
@@ -521,7 +521,7 @@ export const receiveContactKey = async (payload) => {
   }
 }
 
-export const receiveConfirmContactKey = async (payload) => {
+export const receiveConfirmContactKey = async (payload: network.Msg): Promise<void> => {
   sphinxLogger.info([
     `=> confirm contact key for ${payload.sender && payload.sender.pub_key}`,
     JSON.stringify(payload),
@@ -589,7 +589,7 @@ function extractAttrs(body): { [k: string]: any } {
   return attrs
 }
 
-export const getLatestContacts = async (req: Request, res: Response) => {
+export const getLatestContacts = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -624,7 +624,7 @@ export const getLatestContacts = async (req: Request, res: Response) => {
       },
     }) as unknown as ChatMember[]
     const chatsResponse = chats.map((chat) => {
-      const theChat = chat.dataValues || chat
+      const theChat = chat.dataValues as Chat || chat
       if (!pendingMembers) return jsonUtils.chatToJson(theChat)
       const membs = pendingMembers.filter((m) => m.chatId === chat.id) || []
       theChat.pendingContactIds = membs.map((m) => m.contactId)
@@ -659,12 +659,12 @@ async function switchBlock(
   success(res, jsonUtils.contactToJson(updated))
 }
 
-export const blockContact = async (req: Request, res: Response) => {
+export const blockContact = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   switchBlock(res, req.owner.id, parseInt(req.params.contact_id), true)
 }
 
-export const unblockContact = async (req: Request, res: Response) => {
+export const unblockContact = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   switchBlock(res, req.owner.id, parseInt(req.params.contact_id), false)
 }

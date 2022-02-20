@@ -17,7 +17,7 @@ import { Request, Response } from 'express'
 const jobs = {}
 
 // init jobs from DB
-export const initializeCronJobs = async () => {
+export const initializeCronJobs = async (): Promise<void> => {
   await helpers.sleep(1000)
   const subs = await getRawSubs({ where: { ended: false } })
   subs.length &&
@@ -31,7 +31,7 @@ export const initializeCronJobs = async () => {
     })
 }
 
-async function startCronJob(sub) {
+async function startCronJob(sub): Promise<void> {
   jobs[sub.id] = new CronJob(
     sub.cron,
     async function () {
@@ -220,7 +220,7 @@ async function sendSubscriptionPayment(sub, isFirstMessage, owner) {
 }
 
 // pause sub
-export async function pauseSubscription(req: Request, res: Response) {
+export async function pauseSubscription(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const id = parseInt(req.params.id)
@@ -240,7 +240,7 @@ export async function pauseSubscription(req: Request, res: Response) {
 }
 
 // restart sub
-export async function restartSubscription(req: Request, res: Response) {
+export async function restartSubscription(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const id = parseInt(req.params.id)
@@ -259,14 +259,14 @@ export async function restartSubscription(req: Request, res: Response) {
   }
 }
 
-async function getRawSubs(opts = {}) {
+async function getRawSubs(opts = {}): Promise<Subscription[]> {
   const options: { [k: string]: any } = { order: [['id', 'asc']], ...opts }
   const subs = await models.Subscription.findAll(options) as unknown as Subscription[]
   return subs
 }
 
 // all subs
-export const getAllSubscriptions = async (req: Request, res: Response) => {
+export const getAllSubscriptions = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   try {
@@ -282,7 +282,7 @@ export const getAllSubscriptions = async (req: Request, res: Response) => {
 }
 
 // one sub by id
-export async function getSubscription(req: Request, res: Response) {
+export async function getSubscription(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   try {
@@ -297,7 +297,7 @@ export async function getSubscription(req: Request, res: Response) {
 }
 
 // delete sub by id
-export async function deleteSubscription(req: Request, res: Response) {
+export async function deleteSubscription(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const id = req.params.id
@@ -316,7 +316,7 @@ export async function deleteSubscription(req: Request, res: Response) {
 }
 
 // all subs for contact id
-export const getSubscriptionsForContact = async (req: Request, res: Response) => {
+export const getSubscriptionsForContact = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   try {
@@ -334,7 +334,7 @@ export const getSubscriptionsForContact = async (req: Request, res: Response) =>
 }
 
 // create new sub
-export async function createSubscription(req: Request, res: Response) {
+export async function createSubscription(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -376,7 +376,7 @@ export async function createSubscription(req: Request, res: Response) {
   }
 }
 
-export async function editSubscription(req: Request, res: Response) {
+export async function editSubscription(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 

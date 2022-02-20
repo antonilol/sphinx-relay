@@ -15,12 +15,12 @@ import * as bolt11 from '@boltz/bolt11'
 import { sphinxLogger } from '../utils/logger'
 import { Request, Response } from 'express'
 
-function stripLightningPrefix(s) {
+function stripLightningPrefix(s: string): string {
   if (s.toLowerCase().startsWith('lightning:')) return s.substring(10)
   return s
 }
 
-export const payInvoice = async (req: Request, res: Response) => {
+export const payInvoice = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -112,13 +112,13 @@ async function anonymousInvoice(res, payment_request: string, tenant: number) {
   })
 }
 
-export const cancelInvoice = (req: Request, res: Response) => {
+export const cancelInvoice = (req: Request, res: Response): void => {
   res.status(200)
   res.json({ success: false })
   res.end()
 }
 
-export const createInvoice = async (req: Request, res: Response) => {
+export const createInvoice = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -211,7 +211,7 @@ export const createInvoice = async (req: Request, res: Response) => {
   }
 }
 
-export const listInvoices = async (req: Request, res: Response) => {
+export const listInvoices = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
 
   const lightning = await Lightning.loadLightning()
@@ -228,7 +228,7 @@ export const listInvoices = async (req: Request, res: Response) => {
   })
 }
 
-export const receiveInvoice = async (payload) => {
+export const receiveInvoice = async (payload: network.Msg): Promise<void> => {
   sphinxLogger.info(`received invoice ${payload}`)
 
   const total_spent = 1

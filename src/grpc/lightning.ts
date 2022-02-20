@@ -607,7 +607,7 @@ export async function verifyBytes(msg: Buffer, sig: string): Promise<VerifyRespo
   return r
 }
 
-interface VerifyResponse {
+export interface VerifyResponse {
   valid: boolean
   pubkey: string
 }

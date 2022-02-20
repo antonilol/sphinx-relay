@@ -33,7 +33,7 @@ function hasProtocol(ip) {
   return false
 }
 
-export const uploadFile = async (req: Request, res: Response) => {
+export const uploadFile = async (req: Request, res: Response): Promise<void> => {
   const { contact_id, chat_id } = req.body
   const { file } = req
 

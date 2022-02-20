@@ -15,7 +15,7 @@ import { logging, sphinxLogger } from '../utils/logger'
 import { Request, Response } from 'express'
 
 // deprecated
-export const getMessages = async (req: Request, res: Response) => {
+export const getMessages = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -103,7 +103,7 @@ export const getMessages = async (req: Request, res: Response) => {
   res.end()
 }
 
-export const getAllMessages = async (req: Request, res: Response) => {
+export const getAllMessages = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -160,7 +160,7 @@ export const getAllMessages = async (req: Request, res: Response) => {
   })
 }
 
-export const getMsgs = async (req: Request, res: Response) => {
+export const getMsgs = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -219,7 +219,7 @@ export const getMsgs = async (req: Request, res: Response) => {
   })
 }
 
-export async function deleteMessage(req: Request, res: Response) {
+export async function deleteMessage(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -255,7 +255,7 @@ export async function deleteMessage(req: Request, res: Response) {
   })
 }
 
-export const sendMessage = async (req: Request, res: Response) => {
+export const sendMessage = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   // try {
@@ -373,7 +373,7 @@ export const sendMessage = async (req: Request, res: Response) => {
   network.sendMessage(sendMessageParams)
 }
 
-export const receiveMessage = async (payload) => {
+export const receiveMessage = async (payload: network.Msg): Promise<void> => {
   sphinxLogger.info(`received message ${payload}`)
 
   const {
@@ -439,7 +439,7 @@ export const receiveMessage = async (payload) => {
   sendConfirmation({ chat, sender: owner, msg_id, receiver: sender })
 }
 
-export const receiveBoost = async (payload) => {
+export const receiveBoost = async (payload: network.Msg): Promise<void> => {
   const {
     owner,
     sender,
@@ -514,7 +514,7 @@ export const receiveBoost = async (payload) => {
   }
 }
 
-export const receiveRepayment = async (payload) => {
+export const receiveRepayment = async (payload: network.Msg): Promise<void> => {
   const { owner, sender, chat, date_string, amount, network_type } =
     await helpers.parseReceiveParams(payload)
 
@@ -550,7 +550,7 @@ export const receiveRepayment = async (payload) => {
   )
 }
 
-export const receiveDeleteMessage = async (payload) => {
+export const receiveDeleteMessage = async (payload: network.Msg): Promise<void> => {
   sphinxLogger.info('=> received delete message', logging.Network)
   const { owner, sender, chat, chat_type, msg_uuid } =
     await helpers.parseReceiveParams(payload)
@@ -578,7 +578,7 @@ export const receiveDeleteMessage = async (payload) => {
   )
 }
 
-export const readMessages = async (req: Request, res: Response) => {
+export const readMessages = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
 
   const chat_id = req.params.chat_id
@@ -616,7 +616,7 @@ export const readMessages = async (req: Request, res: Response) => {
   }
 }
 
-export const clearMessages = (req: Request, res: Response) => {
+export const clearMessages = (req: Request, res: Response): void => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 

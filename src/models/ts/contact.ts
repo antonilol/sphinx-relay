@@ -24,6 +24,7 @@ export interface Contact extends SequelizeFields {
   tenant: number
   priceToMeet: number
   unmet: boolean
-  
+  blocked: boolean
+
   dataValues: { [k: string]: any }
 }

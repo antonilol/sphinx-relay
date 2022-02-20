@@ -84,7 +84,7 @@ async function getPendingAccountings(): Promise<Accounting[]> {
   return ret
 }
 
-export async function listUTXOs(req: Request, res: Response) {
+export async function listUTXOs(req: Request, res: Response): Promise<void> {
   try {
     const ret: Accounting[] = await getPendingAccountings()
     success(
@@ -228,11 +228,11 @@ async function checkChannelsAndKeysend(rec: Accounting) {
   })
 }
 
-export function startWatchingUTXOs() {
+export function startWatchingUTXOs(): void {
   setInterval(pollUTXOs, POLL_MINS * 60 * 1000) // every 1 minutes
 }
 
-export async function queryOnchainAddress(req: Request, res: Response) {
+export async function queryOnchainAddress(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
   // const tenant:number = req.owner.id
 
@@ -288,7 +288,7 @@ export async function queryOnchainAddress(req: Request, res: Response) {
   }, 1000)
 }
 
-export const receiveQuery = async (payload) => {
+export const receiveQuery = async (payload: network.Msg): Promise<void> => {
   const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const content = dat.message.content
@@ -351,7 +351,7 @@ export const receiveQuery = async (payload) => {
   }
 }
 
-export const receiveQueryResponse = async (payload) => {
+export const receiveQueryResponse = async (payload: network.Msg): Promise<void> => {
   sphinxLogger.info(`=> receiveQueryResponse`, logging.Network)
   const dat = payload
   // const sender_pub_key = dat.sender.pub_key

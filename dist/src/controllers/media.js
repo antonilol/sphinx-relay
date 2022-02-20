@@ -509,8 +509,7 @@ exports.signer = signer;
 function verifier(msg, sig) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const res = yield Lightning.verifyMessage(msg, sig);
-            return res;
+            return Lightning.verifyMessage(msg, sig);
         }
         catch (e) {
             logger_1.sphinxLogger.error(e);

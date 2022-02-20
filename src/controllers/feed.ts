@@ -1,4 +1,4 @@
-import { Chat, Message, models } from '../models'
+import { Chat, Message, Contact, models } from '../models'
 import * as helpers from '../helpers'
 import { failure, success } from '../utils/res'
 import constants from '../constants'
@@ -23,7 +23,7 @@ export interface Destination {
   custom_value: string
 }
 
-export const streamFeed = async (req: Request, res: Response) => {
+export const streamFeed = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const {
@@ -99,7 +99,7 @@ export const streamFeed = async (req: Request, res: Response) => {
 }
 
 export async function anonymousKeysend(
-  owner,
+  owner: Contact,
   destination_key: string,
   route_hint: string,
   amount: number,
@@ -107,7 +107,7 @@ export async function anonymousKeysend(
   onSuccess: (({destination_key: string, amount: number}) => void) | undefined,
   onFailure: ((error: Error) => void) | undefined,
   extra_tlv: { [k: string]: string }
-) {
+): Promise<void> {
   const tenant = owner.id
   const msg: { [k: string]: any } = {
     type: constants.message_types.keysend,

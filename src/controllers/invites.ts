@@ -7,7 +7,7 @@ import { failure } from '../utils/res'
 import { sphinxLogger } from '../utils/logger'
 import { Request, Response } from 'express'
 
-export const finishInvite = async (req: Request, res: Response) => {
+export const finishInvite = async (req: Request, res: Response): Promise<void> => {
   const { invite_string } = req.body
   const params = {
     invite: {
@@ -29,7 +29,7 @@ export const finishInvite = async (req: Request, res: Response) => {
   finishInviteInHub(params, onSuccess, onFailure)
 }
 
-export const payInvite = async (req: Request, res: Response) => {
+export const payInvite = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
 
@@ -70,7 +70,7 @@ export const payInvite = async (req: Request, res: Response) => {
   payInviteInvoice(dbInvite.invoice, req.owner.publicKey, onSuccess, onFailure)
 }
 
-export const createInvite = async (req: Request, res: Response) => {
+export const createInvite = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const { nickname, welcome_message } = req.body

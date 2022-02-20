@@ -133,7 +133,7 @@ function recoverGreenlight(gid) {
         logger_1.sphinxLogger.info('=> recoverGreenlight');
         try {
             const challenge = yield get_challenge(gid.node_id);
-            const signature = yield sign_challenge(challenge);
+            const signature = sign_challenge(challenge);
             const res = yield recover(gid.node_id, challenge, signature);
             const keyLoc = config.tls_key_location;
             const chainLoc = config.tls_chain_location;
@@ -158,7 +158,7 @@ function registerGreenlight(gid, rootkey, secretPath) {
         try {
             logger_1.sphinxLogger.info('=> registerGreenlight');
             const challenge = yield get_challenge(gid.node_id);
-            const signature = yield sign_challenge(challenge);
+            const signature = sign_challenge(challenge);
             const res = yield register(gid.node_id, gid.bip32_key + gid.bolt12_key, challenge, signature);
             const keyLoc = config.tls_key_location;
             const chainLoc = config.tls_chain_location;

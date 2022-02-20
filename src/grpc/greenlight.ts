@@ -13,14 +13,14 @@ let GID: GreenlightIdentity
 
 const config = loadConfig()
 
-export async function initGreenlight() {
+export async function initGreenlight(): Promise<void> {
   sphinxLogger.info('=> initGreenlight')
   // if (GID && GID.initialized) return
   await startGreenlightInit()
   // await streamHsmRequests()
 }
 
-export function keepalive() {
+export function keepalive(): void {
   sphinxLogger.info('=> Greenlight keepalive')
   setInterval(() => {
     Lightning.getInfo()
@@ -63,7 +63,8 @@ interface GreenlightIdentity {
   bolt12_key: string
   initialized: boolean
 }
-export async function startGreenlightInit() {
+
+export async function startGreenlightInit(): Promise<void> {
   sphinxLogger.info('=> startGreenlightInit')
   try {
     let needToRegister = false
@@ -107,6 +108,7 @@ interface ScheduleResponse {
   node_id: Buffer
   grpc_uri: string
 }
+
 export function schedule(pubkey: string): Promise<ScheduleResponse> {
   sphinxLogger.info('=> Greenlight schedule')
   return new Promise((resolve, reject) => {
@@ -132,11 +134,11 @@ export function schedule(pubkey: string): Promise<ScheduleResponse> {
   })
 }
 
-async function recoverGreenlight(gid: GreenlightIdentity) {
+async function recoverGreenlight(gid: GreenlightIdentity): Promise<void> {
   sphinxLogger.info('=> recoverGreenlight')
   try {
     const challenge = await get_challenge(gid.node_id)
-    const signature = await sign_challenge(challenge)
+    const signature = sign_challenge(challenge)
     const res = await recover(gid.node_id, challenge, signature)
     const keyLoc = config.tls_key_location
     const chainLoc = config.tls_chain_location
@@ -164,7 +166,7 @@ async function registerGreenlight(
   try {
     sphinxLogger.info('=> registerGreenlight')
     const challenge = await get_challenge(gid.node_id)
-    const signature = await sign_challenge(challenge)
+    const signature = sign_challenge(challenge)
     const res = await register(
       gid.node_id,
       gid.bip32_key + gid.bolt12_key,
@@ -287,16 +289,19 @@ interface HsmRequestContext {
   dbid: string // uint64
   capabilities: string // uint64
 }
+
 export interface HsmRequest {
   request_id: number
   context: HsmRequestContext
   raw: Buffer
 }
+
 interface HsmResponse {
   request_id: number
   raw: ByteBuffer
 }
-export async function streamHsmRequests() {
+
+export async function streamHsmRequests(): Promise<void> {
   const capabilities_bitset = 1087 // 1 + 2 + 4 + 8 + 16 + 32 + 1024
   try {
     const lightning = await loadLightning(true) // try proxy

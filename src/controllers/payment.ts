@@ -13,7 +13,7 @@ import { anonymousKeysend } from './feed'
 import { sphinxLogger } from '../utils/logger'
 import { Request, Response } from 'express'
 
-export const sendPayment = async (req: Request, res: Response) => {
+export const sendPayment = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const {
@@ -140,7 +140,7 @@ export const sendPayment = async (req: Request, res: Response) => {
   })
 }
 
-export const receivePayment = async (payload) => {
+export const receivePayment = async (payload: network.Msg): Promise<void> => {
   sphinxLogger.info(`received payment ${{ payload }}`)
 
   const date = new Date()
@@ -204,7 +204,7 @@ export const receivePayment = async (payload) => {
   sendNotification(chat, msg.senderAlias || sender.alias, 'message', owner)
 }
 
-export const listPayments = async (req: Request, res: Response) => {
+export const listPayments = async (req: Request, res: Response): Promise<void> => {
   if (!req.owner) return failure(res, 'no owner')
   const tenant: number = req.owner.id
   const limit = (req.query.limit && parseInt(req.query.limit.toString())) || 100
