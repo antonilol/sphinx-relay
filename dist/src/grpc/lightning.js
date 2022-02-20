@@ -35,9 +35,9 @@ const IS_GREENLIGHT = config.lightning_provider === 'GREENLIGHT';
 exports.LND_KEYSEND_KEY = 5482373484;
 exports.SPHINX_CUSTOM_RECORD_KEY = 133773310;
 const FEE_LIMIT_SAT = 10000;
-let lightningClient = null;
-let walletUnlocker = null;
-let routerClient = null;
+let lightningClient;
+let walletUnlocker;
+let routerClient;
 const loadCredentials = (macName) => {
     try {
         const lndCert = fs.readFileSync(config.tls_location);
@@ -113,7 +113,7 @@ const loadWalletUnlocker = () => {
 };
 exports.loadWalletUnlocker = loadWalletUnlocker;
 const unlockWallet = (pwd) => __awaiter(void 0, void 0, void 0, function* () {
-    const wu = yield (0, exports.loadWalletUnlocker)();
+    const wu = (0, exports.loadWalletUnlocker)();
     return new Promise((resolve, reject) => {
         wu.unlockWallet({ wallet_password: ByteBuffer.fromUTF8(pwd) }, (err, response) => {
             if (err) {
@@ -268,8 +268,7 @@ const keysend = (opts, ownerPubkey) => {
     return new Promise(function (resolve, reject) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const randoStr = crypto.randomBytes(32).toString('hex');
-                const preimage = ByteBuffer.fromHex(randoStr);
+                const preimage = ByteBuffer.wrap(crypto.randomBytes(32));
                 const dest_custom_records = {
                     [`${exports.LND_KEYSEND_KEY}`]: preimage,
                 };
@@ -440,8 +439,7 @@ function keysendMessage(opts, ownerPubkey) {
 exports.keysendMessage = keysendMessage;
 function signAscii(ascii, ownerPubkey) {
     return __awaiter(this, void 0, void 0, function* () {
-        const sig = yield signMessage(ascii_to_hexa(ascii), ownerPubkey);
-        return sig;
+        return signMessage(ascii_to_hexa(ascii), ownerPubkey);
     });
 }
 exports.signAscii = signAscii;
@@ -466,8 +464,7 @@ exports.listInvoices = listInvoices;
 function listAllInvoices() {
     return __awaiter(this, void 0, void 0, function* () {
         logger_1.sphinxLogger.info(`=> list all invoices`);
-        const invs = yield paginateInvoices(40);
-        return invs;
+        return paginateInvoices(40);
     });
 }
 exports.listAllInvoices = listAllInvoices;
@@ -560,9 +557,7 @@ exports.listAllPaymentsFull = listAllPaymentsFull;
 // msg is hex
 function signMessage(msg, ownerPubkey) {
     return __awaiter(this, void 0, void 0, function* () {
-        // log('signMessage')
-        const r = yield signBuffer(Buffer.from(msg, 'hex'), ownerPubkey);
-        return r;
+        return signBuffer(Buffer.from(msg, 'hex'), ownerPubkey);
     });
 }
 exports.signMessage = signMessage;
@@ -578,7 +573,7 @@ function signBuffer(msg, ownerPubkey) {
                 const recidBytes = sigBuf.subarray(66, 67);
                 // 31 is the magic EC recid (27+4) for compressed pubkeys
                 const ecRecid = Buffer.from(recidBytes).readUIntBE(0, 1) + 31;
-                const finalRecid = Buffer.from('00', 'hex');
+                const finalRecid = Buffer.allocUnsafe(1);
                 finalRecid.writeUInt8(ecRecid, 0);
                 const finalSig = Buffer.concat([finalRecid, sigBytes], 65);
                 resolve(zbase32.encode(finalSig));

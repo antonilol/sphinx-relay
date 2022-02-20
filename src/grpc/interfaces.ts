@@ -527,6 +527,10 @@ export interface Invoice {
   features: { [k: string]: any }
   is_keysend: boolean
 }
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Payment {
+  // if any fields are needed add them
+}
 interface GreenlightOffchainPayment {
   label: string
   preimage: Buf
