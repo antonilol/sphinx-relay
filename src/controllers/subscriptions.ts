@@ -140,7 +140,7 @@ async function sendSubscriptionPayment(sub, isFirstMessage, owner) {
   const forMe = false
   const text = msgForSubPayment(owner, sub, isFirstMessage, forMe)
 
-  const contact = await models.Contact.findByPk(sub.contactId)
+  const contact = await models.Contact.findByPk(sub.contactId) as unknown as Contact
   const enc = rsa.encrypt(contact.contactKey, text)
 
   network.sendMessage({

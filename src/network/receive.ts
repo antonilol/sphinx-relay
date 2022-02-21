@@ -87,7 +87,7 @@ async function onReceive(payload: Msg, dest: string) {
   if (!owner) return sphinxLogger.error(`=> RECEIVE: owner not found`)
   const tenant: number = owner.id
 
-  const ownerDataValues = owner || owner.dataValues
+  const ownerDataValues = owner && owner.dataValues
 
   if (botTypes.includes(payload.type)) {
     // if is admin on tribe? or is bot maker?
@@ -188,7 +188,7 @@ async function onReceive(payload: Msg, dest: string) {
       }
     }
     // forward boost sats to recipient
-    let realSatsContactId = null
+    let realSatsContactId: number | undefined
     let amtToForward = 0
     if (payload.type === msgtypes.boost && payload.message.replyUuid) {
       const ogMsg = await models.Message.findOne({

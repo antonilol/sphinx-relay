@@ -285,7 +285,7 @@ export async function pinToTribe(req: Request, res: Response): Promise<void> {
   }
   try {
     const td = await tribes.get_tribe_data(chat.uuid)
-    const chatData = chat.dataValues || chat
+    const chatData = chat.dataValues as Chat || chat
     chatData.pin = pin
     await tribes.edit(mergeTribeAndChatData(chatData, td, owner))
     await models.Chat.update({ pin }, { where: { id, tenant } })
@@ -648,8 +648,8 @@ export async function replayChatHistory(chat: Chat, contact: Contact, ownerRecor
       if (!mdate) mdate = new Date()
       const dateString = mdate.toISOString()
 
-      let mediaKeyMap: { chat: string }
-      let newMediaTerms: { muid: string }
+      let mediaKeyMap: { chat: string } | undefined
+      let newMediaTerms: { muid: string } | undefined
       if (m.type === constants.message_types.attachment) {
         if (m.mediaKey && m.mediaToken) {
           const muid =

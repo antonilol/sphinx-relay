@@ -186,8 +186,7 @@ function keysendBotCmd(msg, b, sender) {
     });
 }
 exports.keysendBotCmd = keysendBotCmd;
-function botKeysend(msg_type, bot_uuid, // network.Msg.bot_uuid: any
-botmaker_pubkey, amount, chat_uuid, sender, botmaker_route_hint, msg) {
+function botKeysend(msg_type, bot_uuid, botmaker_pubkey, amount, chat_uuid, sender, botmaker_route_hint, msg) {
     return __awaiter(this, void 0, void 0, function* () {
         const content = (msg && msg.message.content) || '';
         const sender_role = (msg && msg.sender && msg.sender.role) || constants_1.default.chat_roles.reader;
@@ -245,6 +244,8 @@ function receiveBotInstall(payload) {
         const tenant = owner.id;
         if (!chat_uuid || !sender_pub_key)
             return logger_1.sphinxLogger.info('no chat uuid or sender pub key');
+        if (!bot_uuid)
+            return logger_1.sphinxLogger.info('no bot uuid');
         const bot = yield models_1.models.Bot.findOne({
             where: {
                 uuid: bot_uuid,
@@ -293,6 +294,8 @@ function receiveBotCmd(payload) {
         const tenant = owner.id;
         if (!chat_uuid)
             return logger_1.sphinxLogger.error('no chat uuid');
+        if (!bot_uuid)
+            return logger_1.sphinxLogger.info('no bot uuid');
         // const amount = dat.message.amount - check price_per_use
         const bot = yield models_1.models.Bot.findOne({
             where: {

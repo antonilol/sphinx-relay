@@ -156,10 +156,10 @@ export const sendAttachmentMessage = async (req: Request, res: Response): Promis
 
 export function saveMediaKeys(
   muid: string,
-  mediaKeyMap,
+  mediaKeyMap: { chat: string },
   chatId: number,
   messageId: number,
-  mediaType,
+  mediaType: string,
   tenant: number
 ): void {
   if (typeof mediaKeyMap !== 'object') {

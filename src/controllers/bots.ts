@@ -193,7 +193,7 @@ export async function keysendBotCmd(msg: Msg, b: ChatBot, sender: Contact): Prom
 
 export async function botKeysend(
   msg_type: number,
-  bot_uuid: any, // network.Msg.bot_uuid: any
+  bot_uuid: string,
   botmaker_pubkey: string,
   amount: number,
   chat_uuid: string,
@@ -261,6 +261,9 @@ export async function receiveBotInstall(payload: Msg): Promise<void> {
   if (!chat_uuid || !sender_pub_key)
     return sphinxLogger.info('no chat uuid or sender pub key')
 
+  if (!bot_uuid)
+    return sphinxLogger.info('no bot uuid')
+
   const bot: Bot = await models.Bot.findOne({
     where: {
       uuid: bot_uuid,
@@ -309,6 +312,9 @@ export async function receiveBotCmd(payload: Msg): Promise<void> {
   const owner = dat.owner
   const tenant: number = owner.id
   if (!chat_uuid) return sphinxLogger.error('no chat uuid')
+
+  if (!bot_uuid)
+    return sphinxLogger.info('no bot uuid')
   // const amount = dat.message.amount - check price_per_use
 
   const bot = await models.Bot.findOne({

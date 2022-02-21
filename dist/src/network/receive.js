@@ -89,7 +89,7 @@ function onReceive(payload, dest) {
         if (!owner)
             return logger_1.sphinxLogger.error(`=> RECEIVE: owner not found`);
         const tenant = owner.id;
-        const ownerDataValues = owner || owner.dataValues;
+        const ownerDataValues = owner && owner.dataValues;
         if (botTypes.includes(payload.type)) {
             // if is admin on tribe? or is bot maker?
             logger_1.sphinxLogger.info(`=> got bot msg type!`);
@@ -186,7 +186,7 @@ function onReceive(payload, dest) {
                 }
             }
             // forward boost sats to recipient
-            let realSatsContactId = null;
+            let realSatsContactId;
             let amtToForward = 0;
             if (payload.type === msgtypes.boost && payload.message.replyUuid) {
                 const ogMsg = yield models_1.models.Message.findOne({
