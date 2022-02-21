@@ -311,7 +311,7 @@ function receiveBotCmd(payload) {
         });
         if (!botMember)
             return;
-        botMember.update({ msgCount: (botMember || 0) + 1 });
+        botMember.update({ msgCount: (botMember.msgCount || 0) + 1 });
         const contact = yield models_1.models.Contact.findOne({
             where: {
                 tenant,

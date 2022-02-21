@@ -590,7 +590,7 @@ function weave(p: string): string | undefined {
     let payload = ''
     all
       .slice()
-      .sort((a, b) => a.i - b.i)
+      .sort((a, b) => parseInt(a.i) - parseInt(b.i))
       .forEach((obj) => {
         payload += obj.m
       })

@@ -328,7 +328,7 @@ export async function receiveBotCmd(payload: Msg): Promise<void> {
   }) as unknown as BotMember
   if (!botMember) return
 
-  botMember.update({ msgCount: (botMember || 0) + 1 })
+  botMember.update({ msgCount: (botMember.msgCount || 0) + 1 })
 
   const contact = await models.Contact.findOne({
     where: {

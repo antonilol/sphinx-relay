@@ -28,4 +28,5 @@ export interface Contact extends SequelizeFields {
 
   dataValues: { [k: string]: any }
   role?: number
+  key: string
 }
