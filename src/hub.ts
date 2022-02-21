@@ -217,7 +217,7 @@ const checkInvitesHubInterval = (ms: number): void => {
   setInterval(checkInviteHub, ms)
 }
 
-export function sendInvoice(payReq: string, amount: number): void { // correct types?
+export function sendInvoice(payReq: string, amount: number): void { // is amount a number? -> in src/grpc/regular.ts:50 it is used as string
   sphinxLogger.info(`[hub] sending invoice`)
   fetch(config.hub_api_url + '/invoices', {
     method: 'POST',

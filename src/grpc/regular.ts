@@ -5,9 +5,10 @@ import * as jsonUtils from '../utils/json'
 import constants from '../constants'
 import * as bolt11 from '@boltz/bolt11'
 import { sphinxLogger } from '../utils/logger'
+import { Invoice } from './interfaces'
 
 const oktolog = true
-export function loginvoice(response): void {
+export function loginvoice(response: Invoice): void {
   if (!oktolog) return
   const r = JSON.parse(JSON.stringify(response))
   r.r_hash = ''
@@ -22,7 +23,7 @@ export function loginvoice(response): void {
   )
 }
 
-export async function receiveNonKeysend(response): Promise<void> {
+export async function receiveNonKeysend(response: Invoice): Promise<void> {
   const decoded = bolt11.decode(response['payment_request'])
   const paymentHash =
     decoded.tags.find((t) => t.tagName === 'payment_hash')?.data || ''
