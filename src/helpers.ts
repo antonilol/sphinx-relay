@@ -227,7 +227,7 @@ export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export async function parseReceiveParams(payload: network.Msg): Promise<{ chat_members: { [k: string]: Contact }, [k: string]: any }> {
+export async function parseReceiveParams(payload: network.Payload): Promise<{ chat_members: { [k: string]: Contact }, [k: string]: any }> {
   const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const sender_route_hint = dat.sender.route_hint
