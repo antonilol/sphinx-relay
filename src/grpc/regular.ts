@@ -45,7 +45,7 @@ export async function receiveNonKeysend(response: Invoice): Promise<void> {
     if (!owner) return sphinxLogger.error(`subscribeInvoices: no owner found`)
     const tenant: number = owner.id
     const payReq = response['payment_request']
-    const amount = response['amt_paid_sat']
+    const amount = parseInt(response['amt_paid_sat'])
     if (process.env.HOSTING_PROVIDER === 'true') {
       sendInvoice(payReq, amount)
     }

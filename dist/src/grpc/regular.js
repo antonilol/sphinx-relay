@@ -50,7 +50,7 @@ function receiveNonKeysend(response) {
                 return logger_1.sphinxLogger.error(`subscribeInvoices: no owner found`);
             const tenant = owner.id;
             const payReq = response['payment_request'];
-            const amount = response['amt_paid_sat'];
+            const amount = parseInt(response['amt_paid_sat']);
             if (process.env.HOSTING_PROVIDER === 'true') {
                 (0, hub_1.sendInvoice)(payReq, amount);
             }

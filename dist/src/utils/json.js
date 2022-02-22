@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.accountingToJson = exports.botToJson = exports.subscriptionToJson = exports.chatToJson = exports.jsonToContact = exports.inviteToJson = exports.contactToJson = exports.messageToJson = void 0;
+exports.accountingToJson = exports.botToJson = exports.subscriptionToJson = exports.chatToJson = exports.jsonToContact = exports.inviteToJson = exports.contactToJson = exports.anyToJson = exports.messageToJson = void 0;
 const case_1 = require("../utils/case");
 const cronUtils = require("./cron");
 function chatToJson(c) {
@@ -29,6 +29,10 @@ function messageToJson(msg, chat, contact) {
         amount: message.amount ? parseInt(message.amount) : 0, amountMsat: message.amountMsat ? parseInt(message.amountMsat) : 0, statusMap, chat: chat ? chatToJson(chat) : null, contact: contact ? contactToJson(contact) : null }));
 }
 exports.messageToJson = messageToJson;
+function anyToJson(obj, chat) {
+    return messageToJson(obj, chat);
+}
+exports.anyToJson = anyToJson;
 function contactToJson(contact) {
     if (!contact)
         return {};

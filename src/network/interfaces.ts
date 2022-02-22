@@ -1,3 +1,5 @@
+import type { Contact } from '../models'
+
 export interface MessageContent {
   uuid: string
   content: string
@@ -54,6 +56,6 @@ export interface Payload extends Msg {
   network_type?: number
   isTribeOwner?: boolean
   dest?: string
-  owner?: any
+  owner: Contact
   message: PayloadMessageContent
 }

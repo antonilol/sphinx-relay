@@ -304,7 +304,7 @@ export async function addGroupMembers(req: Request, res: Response): Promise<void
   const { contact_ids } = req.body
   const { id } = req.params
 
-  const members: { [k: string]: { [k: string]: string } } = {} //{pubkey:{key,alias}, ...}
+  const members: { [k: string]: { [k: string]: string | number } } = {} //{pubkey:{key,alias}, ...}
   const owner = req.owner
   const chat = await models.Chat.findOne({ where: { id, tenant } }) as unknown as Chat
 
@@ -733,7 +733,7 @@ export async function receiveGroupCreateOrInvite(payload: Msg): Promise<void> {
   socket.sendJson(
     {
       type: 'group_create',
-      response: jsonUtils.messageToJson({ newContacts }, chat),
+      response: jsonUtils.anyToJson({ newContacts }, chat),
     },
     tenant
   )

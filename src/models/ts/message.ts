@@ -13,7 +13,7 @@ export interface Message {
   expirationDate: Date
   messageContent: string
   remoteMessageContent: string
-  status: number
+  status?: number
   statusMap: string
   parentId: number
   subscriptionId: number

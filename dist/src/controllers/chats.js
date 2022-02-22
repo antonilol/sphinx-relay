@@ -653,7 +653,7 @@ function receiveGroupCreateOrInvite(payload) {
         }
         socket.sendJson({
             type: 'group_create',
-            response: jsonUtils.messageToJson({ newContacts }, chat),
+            response: jsonUtils.anyToJson({ newContacts }, chat),
         }, tenant);
         // sendNotification(chat, chat_name, "group", owner);
         if (payload.type === constants_1.default.message_types.group_invite) {

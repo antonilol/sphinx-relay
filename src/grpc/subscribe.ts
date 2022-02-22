@@ -11,7 +11,7 @@ const ERR_CODE_UNAVAILABLE = 14
 const ERR_CODE_STREAM_REMOVED = 2
 const ERR_CODE_UNIMPLEMENTED = 12 // locked
 
-export async function subscribeInvoices(parseKeysendInvoice) {
+export async function subscribeInvoices(parseKeysendInvoice: (response: interfaces.Invoice) => void) {
   return new Promise(async (resolve, reject) => {
     let ownerPubkey = ''
     if (isProxy()) {

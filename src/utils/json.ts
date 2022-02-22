@@ -35,6 +35,10 @@ function messageToJson(msg: Message, chat?: Chat, contact?: Contact): { [k: stri
   })
 }
 
+function anyToJson(obj: any, chat?: Chat): { [k: string]: any } {
+  return messageToJson(obj, chat);
+}
+
 function contactToJson(contact: Contact): { [k: string]: any } {
   if (!contact) return {}
   return toSnake(contact.dataValues || contact)
@@ -61,6 +65,7 @@ function subscriptionToJson(subscription: Subscription, chat?: Chat): { [k: stri
 
 export {
   messageToJson,
+  anyToJson,
   contactToJson,
   inviteToJson,
   jsonToContact,
