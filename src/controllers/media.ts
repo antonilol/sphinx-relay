@@ -12,6 +12,7 @@ import * as zbase32 from '../utils/zbase32'
 import * as schemas from './schemas'
 import { sendConfirmation } from './confirmations'
 import * as network from '../network'
+import { Payload } from '../network'
 import * as short from 'short-uuid'
 import constants from '../constants'
 import { loadConfig } from '../utils/config'
@@ -244,7 +245,7 @@ export const purchase = async (req: Request, res: Response): Promise<void> => {
 
 /* RECEIVERS */
 
-export const receivePurchase = async (payload: network.Msg): Promise<void> => {
+export const receivePurchase = async (payload: Payload): Promise<void> => {
   sphinxLogger.info(['=> received purchase', { payload }], logging.Network)
 
   const date = new Date()
@@ -414,7 +415,7 @@ export const receivePurchase = async (payload: network.Msg): Promise<void> => {
   })
 }
 
-export const receivePurchaseAccept = async (payload: network.Msg): Promise<void> => {
+export const receivePurchaseAccept = async (payload: Payload): Promise<void> => {
   sphinxLogger.info('=> receivePurchaseAccept', logging.Network)
   const date = new Date()
   date.setMilliseconds(0)
@@ -474,7 +475,7 @@ export const receivePurchaseAccept = async (payload: network.Msg): Promise<void>
   )
 }
 
-export const receivePurchaseDeny = async (payload: network.Msg): Promise<void> => {
+export const receivePurchaseDeny = async (payload: Payload): Promise<void> => {
   sphinxLogger.info('=> receivePurchaseDeny', logging.Network)
   const date = new Date()
   date.setMilliseconds(0)
@@ -508,7 +509,7 @@ export const receivePurchaseDeny = async (payload: network.Msg): Promise<void> =
   )
 }
 
-export const receiveAttachment = async (payload: network.Msg): Promise<void> => {
+export const receiveAttachment = async (payload: Payload): Promise<void> => {
   // console.log('received attachment', { payload })
 
   const date = new Date()

@@ -9,6 +9,7 @@ import { failure, success } from '../utils/res'
 import * as timers from '../utils/timers'
 import { sendConfirmation } from './confirmations'
 import * as network from '../network'
+import { Payload } from '../network'
 import * as short from 'short-uuid'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
@@ -373,7 +374,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
   network.sendMessage(sendMessageParams)
 }
 
-export const receiveMessage = async (payload: network.Msg): Promise<void> => {
+export const receiveMessage = async (payload: Payload): Promise<void> => {
   sphinxLogger.info(`received message ${payload}`)
 
   const {
@@ -439,7 +440,7 @@ export const receiveMessage = async (payload: network.Msg): Promise<void> => {
   sendConfirmation({ chat, sender: owner, msg_id, receiver: sender })
 }
 
-export const receiveBoost = async (payload: network.Msg): Promise<void> => {
+export const receiveBoost = async (payload: Payload): Promise<void> => {
   const {
     owner,
     sender,
@@ -514,7 +515,7 @@ export const receiveBoost = async (payload: network.Msg): Promise<void> => {
   }
 }
 
-export const receiveRepayment = async (payload: network.Msg): Promise<void> => {
+export const receiveRepayment = async (payload: Payload): Promise<void> => {
   const { owner, sender, chat, date_string, amount, network_type } =
     await helpers.parseReceiveParams(payload)
 
@@ -550,7 +551,7 @@ export const receiveRepayment = async (payload: network.Msg): Promise<void> => {
   )
 }
 
-export const receiveDeleteMessage = async (payload: network.Msg): Promise<void> => {
+export const receiveDeleteMessage = async (payload: Payload): Promise<void> => {
   sphinxLogger.info('=> received delete message', logging.Network)
   const { owner, sender, chat, chat_type, msg_uuid } =
     await helpers.parseReceiveParams(payload)

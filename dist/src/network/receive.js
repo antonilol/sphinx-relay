@@ -130,7 +130,10 @@ function onReceive(payload, dest) {
             // if (!senderContact) return console.log("=> no sender contact")
             const senderContactId = senderContact && senderContact.id;
             forwardedFromContactId = senderContactId;
-            if (needsPricePerMessage && senderContactId) {
+            if (!chat) {
+                doAction = false;
+            }
+            else if (needsPricePerMessage && senderContactId) {
                 const senderMember = yield models_1.models.ChatMember.findOne({
                     where: { contactId: senderContactId, chatId: chat.id, tenant },
                 });

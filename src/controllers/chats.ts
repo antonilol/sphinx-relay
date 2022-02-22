@@ -3,7 +3,7 @@ import * as jsonUtils from '../utils/json'
 import { success, failure } from '../utils/res'
 import * as helpers from '../helpers'
 import * as network from '../network'
-import { Msg} from '../network'
+import { Payload } from '../network'
 import * as socket from '../utils/socket'
 import { sendNotification } from '../hub'
 import * as md5 from 'md5'
@@ -83,7 +83,7 @@ export async function kickChatMember(req: Request, res: Response): Promise<void>
   success(res, jsonUtils.chatToJson(chat))
 }
 
-export async function receiveGroupKick(payload: Msg): Promise<void> {
+export async function receiveGroupKick(payload: Payload): Promise<void> {
   sphinxLogger.info(`=> receiveGroupKick`, logging.Network)
   const { owner, chat, sender, date_string, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -405,7 +405,7 @@ export const deleteChat = async (req: Request, res: Response): Promise<void> => 
   success(res, { chat_id: id })
 }
 
-export async function receiveGroupJoin(payload: Msg): Promise<void> {
+export async function receiveGroupJoin(payload: Payload): Promise<void> {
   sphinxLogger.info(`=> receiveGroupJoin`, logging.Network)
   const {
     owner,
@@ -545,7 +545,7 @@ export async function receiveGroupJoin(payload: Msg): Promise<void> {
   }
 }
 
-export async function receiveGroupLeave(payload: Msg): Promise<void> {
+export async function receiveGroupLeave(payload: Payload): Promise<void> {
   sphinxLogger.info(`=> receiveGroupLeave`, logging.Network)
   const {
     chat,
@@ -643,7 +643,7 @@ async function validateTribeOwner(chat_uuid: string, pubkey: string) {
   }
   return false
 }
-export async function receiveGroupCreateOrInvite(payload: Msg): Promise<void> {
+export async function receiveGroupCreateOrInvite(payload: Payload): Promise<void> {
   const {
     owner,
     sender_pub_key,

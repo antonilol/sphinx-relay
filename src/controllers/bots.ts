@@ -8,7 +8,7 @@ import { finalAction, Action } from './botapi'
 import * as socket from '../utils/socket'
 import fetch from 'node-fetch'
 import * as SphinxBot from 'sphinx-bot'
-import { Msg } from '../network/interfaces'
+import { Msg, Payload } from '../network/interfaces'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
 import * as short from 'short-uuid'
@@ -248,7 +248,7 @@ export async function botKeysend(
   }
 }
 
-export async function receiveBotInstall(payload: Msg): Promise<void> {
+export async function receiveBotInstall(payload: Payload): Promise<void> {
   sphinxLogger.info(['=> receiveBotInstall', payload], logging.Network)
 
   const dat = payload
@@ -301,7 +301,7 @@ export async function receiveBotInstall(payload: Msg): Promise<void> {
 }
 
 // ONLY FOR BOT MAKER
-export async function receiveBotCmd(payload: Msg): Promise<void> {
+export async function receiveBotCmd(payload: Payload): Promise<void> {
   sphinxLogger.info('=> receiveBotCmd', logging.Network)
 
   const dat = payload
@@ -421,7 +421,7 @@ export function buildBotPayload(msg: Msg): SphinxBot.Message {
 }
 
 //export async function receiveBotRes(payload: Msg): Promise<void> { // TODO which type Msg? Message?
-export async function receiveBotRes(payload: Msg): Promise<void> {
+export async function receiveBotRes(payload: Payload): Promise<void> {
   sphinxLogger.info('=> receiveBotRes', logging.Network) //, payload)
   const dat = payload
   // const dat = payload.content ||  payload // TODO

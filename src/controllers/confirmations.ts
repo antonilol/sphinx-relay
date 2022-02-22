@@ -3,7 +3,7 @@ import { Contact, Chat, Message, models } from '../models'
 import * as socket from '../utils/socket'
 import * as jsonUtils from '../utils/json'
 import * as network from '../network'
-import { Msg } from '../network'
+import { Msg, Payload } from '../network'
 import constants from '../constants'
 import { success, failure200, failure } from '../utils/res'
 import { logging, sphinxLogger } from '../utils/logger'
@@ -43,7 +43,7 @@ export function sendConfirmation({
   })
 }
 
-export async function receiveConfirmation(payload: Msg): Promise<void> {
+export async function receiveConfirmation(payload: Payload): Promise<void> {
   sphinxLogger.info(
     `=> received confirmation ${payload.message && payload.message.id}`,
     logging.Network
@@ -156,7 +156,7 @@ export async function tribeOwnerAutoConfirmation(msg_id: number, chat_uuid: stri
   }
 }
 
-export async function receiveHeartbeat(payload: Msg): Promise<boolean> {
+export async function receiveHeartbeat(payload: Payload): Promise<boolean> {
   sphinxLogger.info(`=> received heartbeat`, logging.Network)
 
   const dat = payload

@@ -9,6 +9,7 @@ import { sendNotification } from '../hub'
 import { success, failure } from '../utils/res'
 import { sendConfirmation } from './confirmations'
 import * as network from '../network'
+import { Payload } from '../network'
 import * as short from 'short-uuid'
 import constants from '../constants'
 import * as bolt11 from '@boltz/bolt11'
@@ -228,7 +229,7 @@ export const listInvoices = async (req: Request, res: Response): Promise<void> =
   })
 }
 
-export const receiveInvoice = async (payload: network.Msg): Promise<void> => {
+export const receiveInvoice = async (payload: Payload): Promise<void> => {
   sphinxLogger.info(`received invoice ${payload}`)
 
   const total_spent = 1

@@ -1,6 +1,7 @@
 import { success, failure } from '../utils/res'
 import { Accounting, Contact, models } from '../models'
 import * as network from '../network'
+import { Payload } from '../network'
 import constants from '../constants'
 import * as short from 'short-uuid'
 import * as lightning from '../grpc/lightning'
@@ -288,7 +289,7 @@ export async function queryOnchainAddress(req: Request, res: Response): Promise<
   }, 1000)
 }
 
-export const receiveQuery = async (payload: network.Msg): Promise<void> => {
+export const receiveQuery = async (payload: Payload): Promise<void> => {
   const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const content = dat.message.content

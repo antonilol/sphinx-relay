@@ -14,7 +14,7 @@ import { logging, sphinxLogger } from '../utils/logger'
 import type { Tribe } from '../models/ts/tribe'
 import { Request, Response } from 'express'
 import { asyncForEach } from '../helpers'
-import { Msg } from '../network'
+import { Payload } from '../network'
 
 export async function joinTribe(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
@@ -155,7 +155,7 @@ export async function joinTribe(req: Request, res: Response): Promise<void> {
   })
 }
 
-export async function receiveMemberRequest(payload: Msg): Promise<void> {
+export async function receiveMemberRequest(payload: Payload): Promise<void> {
   sphinxLogger.info('=> receiveMemberRequest', logging.Network)
   const {
     owner,
@@ -448,7 +448,7 @@ export async function approveOrRejectMember(req: Request, res: Response): Promis
   })
 }
 
-export async function receiveMemberApprove(payload: Msg): Promise<void> {
+export async function receiveMemberApprove(payload: Payload): Promise<void> {
   sphinxLogger.info('-> receiveMemberApprove', logging.Network)
   const { owner, chat, sender, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -509,7 +509,7 @@ export async function receiveMemberApprove(payload: Msg): Promise<void> {
   // sendNotification(chat, chat_name, "group", theOwner);
 }
 
-export async function receiveMemberReject(payload: Msg): Promise<void> {
+export async function receiveMemberReject(payload: Payload): Promise<void> {
   sphinxLogger.info('-> receiveMemberReject', logging.Network)
   const { owner, chat, sender, chat_name, network_type } =
     await helpers.parseReceiveParams(payload)
@@ -548,7 +548,7 @@ export async function receiveMemberReject(payload: Msg): Promise<void> {
   sendNotification(chat, chat_name, 'reject', owner)
 }
 
-export async function receiveTribeDelete(payload: Msg): Promise<void> {
+export async function receiveTribeDelete(payload: Payload): Promise<void> {
   sphinxLogger.info('-> receiveTribeDelete', logging.Network)
   const { owner, chat, sender, network_type } =
     await helpers.parseReceiveParams(payload)

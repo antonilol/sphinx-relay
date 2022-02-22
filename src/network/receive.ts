@@ -24,7 +24,7 @@ import * as bolt11 from '@boltz/bolt11'
 import { loadConfig } from '../utils/config'
 import { sphinxLogger } from '../utils/logger'
 import { asyncForEach } from '../helpers'
-import { Msg } from '../network'
+import { Msg, Payload } from '../network'
 
 const config = loadConfig()
 /*
@@ -70,7 +70,7 @@ const botMakerTypes = [
   constants.message_types.bot_install,
   constants.message_types.bot_cmd,
 ]
-async function onReceive(payload: Msg, dest: string) {
+async function onReceive(payload: Payload, dest: string) {
   if (dest) {
     if (typeof dest !== 'string' || dest.length !== 66)
       return sphinxLogger.error(`INVALID DEST ${dest}`)
@@ -87,7 +87,7 @@ async function onReceive(payload: Msg, dest: string) {
   if (!owner) return sphinxLogger.error(`=> RECEIVE: owner not found`)
   const tenant: number = owner.id
 
-  const ownerDataValues = owner && owner.dataValues
+  const ownerDataValues = owner && owner.dataValues as Contact
 
   if (botTypes.includes(payload.type)) {
     // if is admin on tribe? or is bot maker?
@@ -130,7 +130,9 @@ async function onReceive(payload: Msg, dest: string) {
     // if (!senderContact) return console.log("=> no sender contact")
     const senderContactId = senderContact && senderContact.id
     forwardedFromContactId = senderContactId
-    if (needsPricePerMessage && senderContactId) {
+    if (!chat) {
+      doAction = false
+    } else if (needsPricePerMessage && senderContactId) {
       const senderMember = await models.ChatMember.findOne({
         where: { contactId: senderContactId, chatId: chat.id, tenant },
       }) as unknown as ChatMember
@@ -417,8 +419,8 @@ function parsePayload(data: string): Msg | '' {
 }
 
 // VERIFY PUBKEY OF SENDER from sig
-async function parseAndVerifyPayload(data: string): Promise<Msg | undefined> {
-  let payload: Msg | undefined
+async function parseAndVerifyPayload(data: string): Promise<Payload | undefined> {
+  let payload: Payload | undefined
   const li = data.lastIndexOf('}')
   const msg = data.substring(0, li + 1)
   const sig = data.substring(li + 1)

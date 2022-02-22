@@ -6,6 +6,7 @@ import * as helpers from '../helpers'
 import { failure, success } from '../utils/res'
 import { tokenFromTerms } from '../utils/ldat'
 import * as network from '../network'
+import { Payload } from '../network'
 import * as short from 'short-uuid'
 import constants from '../constants'
 import { Op } from 'sequelize'
@@ -140,7 +141,7 @@ export const sendPayment = async (req: Request, res: Response): Promise<void> =>
   })
 }
 
-export const receivePayment = async (payload: network.Msg): Promise<void> => {
+export const receivePayment = async (payload: Payload): Promise<void> => {
   sphinxLogger.info(`received payment ${{ payload }}`)
 
   const date = new Date()

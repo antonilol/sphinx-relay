@@ -9,6 +9,7 @@ import { Op } from 'sequelize'
 import constants from '../constants'
 import * as tribes from '../utils/tribes'
 import * as network from '../network'
+import { Payload } from '../network'
 import { isProxy, generateNewExternalUser } from '../utils/proxy'
 import { logging, sphinxLogger } from '../utils/logger'
 import * as moment from 'moment'
@@ -461,7 +462,7 @@ export const deleteContact = async (req: Request, res: Response): Promise<void> 
   success(res, {})
 }
 
-export const receiveContactKey = async (payload: network.Msg): Promise<void> => {
+export const receiveContactKey = async (payload: Payload): Promise<void> => {
   const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const sender_route_hint = dat.sender.route_hint
@@ -522,7 +523,7 @@ export const receiveContactKey = async (payload: network.Msg): Promise<void> => 
   }
 }
 
-export const receiveConfirmContactKey = async (payload: network.Msg): Promise<void> => {
+export const receiveConfirmContactKey = async (payload: Payload): Promise<void> => {
   sphinxLogger.info([
     `=> confirm contact key for ${payload.sender && payload.sender.pub_key}`,
     JSON.stringify(payload),
