@@ -153,7 +153,7 @@ export async function claimOnLiquid(req: Request, res: Response) {
     }) as unknown as Contact
     const { asset, to, amount, memo } = req.body
 
-    const res = await people.claimOnLiquid({
+    const r = await people.claimOnLiquid({
       host: 'liquid.sphinx.chat',
       asset,
       to,
@@ -162,7 +162,7 @@ export async function claimOnLiquid(req: Request, res: Response) {
       owner_pubkey: owner.publicKey,
     })
 
-    success(res, res)
+    success(res, r)
   } catch (e) {
     failure(res, e)
   }
