@@ -684,7 +684,7 @@ export async function replayChatHistory(chat: Chat, contact: Contact, ownerRecor
           ...(newMediaTerms && { mediaToken: newMediaTerms }),
           ...(m.mediaType && { mediaType: m.mediaType }),
           ...(dateString && { date: dateString }),
-        },
+        } as unknown as Message,
         isForwarded,
         includeStatus
       )

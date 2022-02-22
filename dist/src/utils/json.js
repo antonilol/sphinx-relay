@@ -29,6 +29,7 @@ function messageToJson(msg, chat, contact) {
         amount: message.amount ? parseInt(message.amount) : 0, amountMsat: message.amountMsat ? parseInt(message.amountMsat) : 0, statusMap, chat: chat ? chatToJson(chat) : null, contact: contact ? contactToJson(contact) : null }));
 }
 exports.messageToJson = messageToJson;
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function anyToJson(obj, chat) {
     return messageToJson(obj, chat);
 }

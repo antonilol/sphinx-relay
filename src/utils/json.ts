@@ -35,6 +35,7 @@ function messageToJson(msg: Message, chat?: Chat, contact?: Contact): { [k: stri
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function anyToJson(obj: any, chat?: Chat): { [k: string]: any } {
   return messageToJson(obj, chat);
 }

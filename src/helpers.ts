@@ -266,7 +266,7 @@ export async function parseReceiveParams(payload: network.Payload): Promise<{ ch
     const ownerRecord = await models.Contact.findOne({
       where: { isOwner: true, publicKey: dest as string },
     }) as unknown as Contact
-    owner = ownerRecord.dataValues
+    owner = ownerRecord.dataValues as Contact
   }
   if (!owner) sphinxLogger.error(`=> parseReceiveParams cannot find owner`)
   if (isConversation) {
@@ -276,12 +276,12 @@ export async function parseReceiveParams(payload: network.Payload): Promise<{ ch
       sender_pub_key,
       sender_route_hint as string,
       sender_alias,
-      owner.dataValues,
+      owner.dataValues as Contact,
       realAmount
     )
     chat = await findOrCreateChatByUUID(
       chat_uuid,
-      [parseInt(owner.id), parseInt(sender.id)],
+      [owner.id, parseInt(sender.id)],
       owner.id
     )
     if (sender.fromGroup) {

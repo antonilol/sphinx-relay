@@ -242,7 +242,7 @@ function parseReceiveParams(payload) {
         if (isConversation) {
             const realAmount = network_type === constants_1.default.network_types.lightning ? amount : 0;
             sender = yield findOrCreateContactByPubkeyAndRouteHint(sender_pub_key, sender_route_hint, sender_alias, owner.dataValues, realAmount);
-            chat = yield findOrCreateChatByUUID(chat_uuid, [parseInt(owner.id), parseInt(sender.id)], owner.id);
+            chat = yield findOrCreateChatByUUID(chat_uuid, [owner.id, parseInt(sender.id)], owner.id);
             if (sender.fromGroup) {
                 // if a private msg received, update the contact
                 yield sender.update({ fromGroup: false });
