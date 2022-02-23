@@ -311,9 +311,8 @@ const sendMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         amount: amount || 0,
         type: msgtype,
         message: msgToSend,
+        realSatsContactId
     };
-    if (realSatsContactId)
-        sendMessageParams.realSatsContactId = realSatsContactId;
     // tribe owner deducts the "price per message + escrow amount"
     if (realSatsContactId && isTribeOwner && amtToStore) {
         sendMessageParams.amount = amtToStore;

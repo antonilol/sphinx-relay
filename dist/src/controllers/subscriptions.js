@@ -188,7 +188,7 @@ function sendSubscriptionPayment(sub, isFirstMessage, owner) {
             }),
             failure: (err) => __awaiter(this, void 0, void 0, function* () {
                 logger_1.sphinxLogger.error('SEND PAY ERROR');
-                let errMessage = constants_1.default.payment_errors[err] || 'Unknown';
+                let errMessage = constants_1.default.payment_errors[typeof err === 'string' ? err : err.message] || 'Unknown';
                 errMessage = 'Payment Failed: ' + errMessage;
                 const message = yield models_1.models.Message.create({
                     chatId: chat.id,

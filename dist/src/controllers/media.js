@@ -126,6 +126,7 @@ const sendAttachmentMessage = (req, res) => __awaiter(void 0, void 0, void 0, fu
         content: remote_text_map || remote_text || text || file_name || '',
         mediaKey: media_key_map,
         mediaType: mediaType,
+        replyUuid: undefined
     };
     if (reply_uuid)
         msg.replyUuid = reply_uuid;
@@ -139,7 +140,7 @@ const sendAttachmentMessage = (req, res) => __awaiter(void 0, void 0, void 0, fu
             logger_1.sphinxLogger.info(['attachment sent', { data }]);
             resUtils.success(res, jsonUtils.messageToJson(message, chat));
         }),
-        failure: (error) => resUtils.failure(res, error.message),
+        failure: (error) => resUtils.failure(res, error),
     });
 });
 exports.sendAttachmentMessage = sendAttachmentMessage;
@@ -209,7 +210,7 @@ const purchase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         purchaser: owner.id, // for tribe, knows who sent
     };
     network.sendMessage({
-        chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: [contact_id] }),
+        chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: JSON.stringify([contact_id]) }),
         sender: owner,
         type: constants_1.default.message_types.purchase,
         realSatsContactId: contact_id,
@@ -219,7 +220,7 @@ const purchase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             logger_1.sphinxLogger.info('purchase sent!');
             resUtils.success(res, jsonUtils.messageToJson(message, chat));
         }),
-        failure: (error) => resUtils.failure(res, error.message),
+        failure: (error) => resUtils.failure(res, error),
     });
 });
 exports.purchase = purchase;
@@ -335,6 +336,7 @@ const receivePurchase = (payload) => __awaiter(void 0, void 0, void 0, function*
         mediaToken: theMediaToken,
         mediaKey: mediaKey.key,
         mediaType: ogMessage.mediaType,
+        purchaser: undefined
     };
     if (purchaser_id)
         msgToSend.purchaser = purchaser_id;

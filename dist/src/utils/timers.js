@@ -106,7 +106,7 @@ function payBack(t) {
             models_1.models.Timer.destroy({ where: { id: t.id } });
             return;
         }
-        const theChat = Object.assign(Object.assign({}, chat.dataValues), { contactIds: [t.receiver] });
+        const theChat = Object.assign(Object.assign({}, chat.dataValues), { contactIds: JSON.stringify([t.receiver]) });
         network.sendMessage({
             chat: theChat,
             sender: owner,

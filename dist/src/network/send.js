@@ -34,18 +34,16 @@ function sendMessage(params) {
         // console.log('-> chat.ownerPubkey', chat.ownerPubkey)
         let theSender = sender.dataValues || sender;
         if (isTribeOwner && !isForwarded) {
-            theSender = Object.assign(Object.assign({}, (sender.dataValues || sender)), { role: constants_1.default.chat_roles.owner });
+            theSender = Object.assign(Object.assign({}, sender), { role: constants_1.default.chat_roles.owner });
         }
-        let msg = newmsg(type, chat, theSender, message, isForwarded);
+        let msg = newmsg(type, chat, theSender, message, !!isForwarded);
         // console.log("=> MSG TO SEND",msg)
         // console.log(type,message)
         if (!(sender && sender.publicKey)) {
             // console.log("NO SENDER?????");
             return;
         }
-        let contactIds = (typeof chat.contactIds === 'string'
-            ? JSON.parse(chat.contactIds)
-            : chat.contactIds) || [];
+        let contactIds = JSON.parse(chat.contactIds);
         let justMe = false;
         if (contactIds.length === 1) {
             if (contactIds[0] === tenant) {
@@ -105,7 +103,7 @@ function sendMessage(params) {
             }
         }
         let yes = true;
-        let no = null;
+        let no;
         logger_1.sphinxLogger.info(`=> sending to ${contactIds.length} 'contacts'`, logger_1.logging.Network);
         yield (0, helpers_1.asyncForEach)(contactIds, (contactId) => __awaiter(this, void 0, void 0, function* () {
             // console.log("=> TENANT", tenant)
@@ -153,8 +151,7 @@ function sendMessage(params) {
             // console.log("==> SENDER",sender)
             // console.log("==> OK SIGN AND SEND", opts);
             try {
-                const r = yield signAndSend(opts, sender, mqttTopic);
-                yes = r;
+                yes = yield signAndSend(opts, sender, mqttTopic);
             }
             catch (e) {
                 logger_1.sphinxLogger.error(`KEYSEND ERROR ${e}`);

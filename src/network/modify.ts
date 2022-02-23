@@ -10,16 +10,16 @@ import { sendMessage } from './send'
 // import { Op } from 'sequelize'
 import constants from '../constants'
 import { sphinxLogger } from '../utils/logger'
-import { Msg } from '.'
+import { Msg, Payload } from '.'
 
 const msgtypes = constants.message_types
 
 export async function modifyPayloadAndSaveMediaKey(
-  payload: Msg,
+  payload: Payload,
   chat: Chat,
   sender: Contact,
   owner: Contact
-): Promise<Msg | { [k: string]: any }> {
+): Promise<Payload> {
   if (payload.type !== msgtypes.attachment) return payload
   try {
     const ret = await downloadAndUploadAndSaveReturningTermsAndKey(
@@ -28,7 +28,7 @@ export async function modifyPayloadAndSaveMediaKey(
       sender,
       owner
     )
-    return fillmsg(payload, ret) // key is re-encrypted later
+    return fillmsg(payload, ret) as Payload // key is re-encrypted later
   } catch (e) {
     sphinxLogger.error(`[modify] error ${e}`)
     return payload
@@ -73,9 +73,9 @@ export async function purchaseFromOriginalSender(
       mediaKey: mediaKey.key,
       originalMuid: mediaKey.originalMuid,
       mediaType: mediaKey.mediaType,
-    }
+    } as unknown as Message
     sendMessage({
-      chat: { ...chat.dataValues, contactIds: [purchaser.id] }, // the merchant id
+      chat: { ...chat.dataValues as Chat, contactIds: JSON.stringify([purchaser.id]) }, // the merchant id
       sender: owner,
       type: constants.message_types.purchase_accept,
       message: msg,
@@ -84,7 +84,7 @@ export async function purchaseFromOriginalSender(
     })
     // PAY THE OG POSTER HERE!!!
     sendMessage({
-      chat: { ...chat.dataValues, contactIds: [mediaKey.sender] },
+      chat: { ...chat.dataValues as Chat, contactIds: JSON.stringify([purchaser.id]) },
       sender: owner,
       type: constants.message_types.purchase,
       amount: amount,
@@ -102,11 +102,11 @@ export async function purchaseFromOriginalSender(
     }) as unknown as Message
     if (!ogmsg) return
     // purchase it from creator (send "purchase")
-    const msg = { mediaToken: mt, purchaser: purchaser.id }
+    const msg = { mediaToken: mt, purchaser: purchaser.id } as unknown as Message
     sendMessage({
-      chat: { ...chat.dataValues, contactIds: [ogmsg.sender] },
+      chat: { ...chat.dataValues as Chat, contactIds: JSON.stringify([purchaser.id]) },
       sender: {
-        ...owner.dataValues,
+        ...owner.dataValues as Contact,
         ...(purchaser && purchaser.alias && { alias: purchaser.alias }),
         role: constants.chat_roles.reader,
       },
@@ -175,13 +175,13 @@ export async function sendFinalMemeIfFirstPurchaser(
   // send it to the purchaser
   sendMessage({
     sender: {
-      ...owner.dataValues,
+      ...owner.dataValues as Contact,
       ...(sender && sender.alias && { alias: sender.alias }),
       role: constants.chat_roles.reader,
     },
     chat: {
-      ...chat.dataValues,
-      contactIds: [ogPurchaser.id],
+      ...chat.dataValues as Chat,
+      contactIds: JSON.stringify([ogPurchaser.id]),
     },
     type: msgtypes.purchase_accept,
     message: {
@@ -299,6 +299,6 @@ export async function downloadAndUploadAndSaveReturningTermsAndKey(
     originalMuid: ogmuid,
     mediaType: typ,
     tenant,
-  }) as unknown as MediaKey
+  })
   return { mediaTerms, mediaKey: encKey }
 }

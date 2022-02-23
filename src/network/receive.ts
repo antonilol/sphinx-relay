@@ -348,7 +348,7 @@ async function forwardMessageToTribe(
     }
   }
 
-  let payload
+  let payload: Payload
   if (sender && typesToModify.includes(ogpayload.type)) {
     payload = await modifyPayloadAndSaveMediaKey(ogpayload, chat, sender, owner)
   } else {

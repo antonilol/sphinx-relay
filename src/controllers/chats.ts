@@ -69,11 +69,11 @@ export async function kickChatMember(req: Request, res: Response): Promise<void>
     },
   })
 
-  const owner = req.owner
-  network.sendMessage({
-    chat: { ...chat.dataValues, contactIds: [contactId] }, // send only to the guy u kicked
+  const owner = req.owner as Contact
+  network.sendMessage({ //            contactIds already exists on Chat but then as a string
+    chat:  chat.dataValues as Chat /*, contactIds: [ contactId ] */ , // send only to the guy u kicked
     sender: owner,
-    message: {},
+    message: {} as Message,
     type: constants.message_types.group_kick,
   })
 
@@ -271,7 +271,7 @@ export async function createGroupChat(req: Request, res: Response): Promise<void
     chat: { ...chatParams, members },
     sender: owner,
     type: constants.message_types.group_create,
-    message: {},
+    message: {} as Message,
     failure: function (e) {
       failure(res, e)
     },
@@ -341,7 +341,7 @@ export async function addGroupMembers(req: Request, res: Response): Promise<void
     chat: { ...chat.dataValues, contactIds: contact_ids, members },
     sender: owner,
     type: constants.message_types.group_invite,
-    message: {},
+    message: {} as Message,
   })
 }
 
@@ -364,7 +364,7 @@ export const deleteChat = async (req: Request, res: Response): Promise<void> => 
     await network.sendMessage({
       chat,
       sender: owner,
-      message: {},
+      message: {} as Message,
       type: constants.message_types.tribe_delete,
       success: function () {
         tribes.delete_tribe(chat.uuid, owner.publicKey)
@@ -384,7 +384,7 @@ export const deleteChat = async (req: Request, res: Response): Promise<void> => 
       network.sendMessage({
         chat,
         sender: owner,
-        message: {},
+        message: {} as Message,
         type: constants.message_types.group_leave,
       })
     }
@@ -752,7 +752,7 @@ export async function receiveGroupCreateOrInvite(payload: Payload): Promise<void
         },
       },
       sender: owner,
-      message: {},
+      message: {} as Message,
       type: constants.message_types.group_join,
     })
   }

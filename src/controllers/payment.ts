@@ -123,7 +123,7 @@ export const sendPayment = async (req: Request, res: Response): Promise<void> =>
     chat: theChat,
     sender: owner,
     type: constants.message_types.direct_payment,
-    message: msgToSend,
+    message: msgToSend as Message,
     amount: amount,
     success: async (data) => {
       // console.log('payment sent', { data })

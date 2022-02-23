@@ -52,7 +52,7 @@ export default async function pay(a) {
   await network.sendMessage({
     chat: theChat,
     sender: {
-      ...owner.dataValues,
+      ...owner.dataValues as Contact,
       alias,
       id: botContactId,
       role: constants.chat_roles.owner,

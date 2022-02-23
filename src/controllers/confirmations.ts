@@ -38,7 +38,7 @@ export function sendConfirmation({
   network.sendMessage({
     chat: theChat,
     sender,
-    message: { id: msg_id },
+    message: { id: msg_id } as unknown as Message,
     type: constants.message_types.confirmation,
   })
 }

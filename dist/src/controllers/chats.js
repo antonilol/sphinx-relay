@@ -82,7 +82,7 @@ function kickChatMember(req, res) {
         });
         const owner = req.owner;
         network.sendMessage({
-            chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: [contactId] }),
+            chat: chat.dataValues /*, contactIds: [ contactId ] */,
             sender: owner,
             message: {},
             type: constants_1.default.message_types.group_kick,

@@ -1,4 +1,4 @@
-import { Message, MediaKey, Contact, models } from '../models'
+import { Message, MediaKey, Contact, models, Chat } from '../models'
 import * as socket from '../utils/socket'
 import * as jsonUtils from '../utils/json'
 import * as resUtils from '../utils/res'
@@ -132,13 +132,14 @@ export const sendAttachmentMessage = async (req: Request, res: Response): Promis
     meta: { ...(amt && { amt }) },
     skipSigning: amt ? true : false, // only sign if its free
   }
-  const msg: { [k: string]: any } = {
+  const msg = {
     mediaTerms, // this gets converted to mediaToken
     id: message.id,
     uuid: uuid,
     content: remote_text_map || remote_text || text || file_name || '',
     mediaKey: media_key_map,
     mediaType: mediaType,
+    replyUuid: undefined
   }
   if (reply_uuid) msg.replyUuid = reply_uuid
   network.sendMessage({
@@ -146,12 +147,12 @@ export const sendAttachmentMessage = async (req: Request, res: Response): Promis
     sender: owner,
     type: constants.message_types.attachment,
     amount: amount || 0,
-    message: msg,
+    message: msg as unknown as Message,
     success: async (data) => {
       sphinxLogger.info(['attachment sent', { data }])
       resUtils.success(res, jsonUtils.messageToJson(message, chat))
     },
-    failure: (error) => resUtils.failure(res, error.message),
+    failure: (error) => resUtils.failure(res, error),
   })
 }
 
@@ -229,17 +230,17 @@ export const purchase = async (req: Request, res: Response): Promise<void> => {
     purchaser: owner.id, // for tribe, knows who sent
   }
   network.sendMessage({
-    chat: { ...chat.dataValues, contactIds: [contact_id] },
+    chat: { ...chat.dataValues as Chat, contactIds: JSON.stringify([contact_id]) },
     sender: owner,
     type: constants.message_types.purchase,
     realSatsContactId: contact_id, // ALWAYS will be keysend, so doesnt matter if tribe owner or not
-    message: msg,
+    message: msg as unknown as Message,
     amount: amount,
     success: async (data) => {
       sphinxLogger.info('purchase sent!')
       resUtils.success(res, jsonUtils.messageToJson(message, chat))
     },
-    failure: (error) => resUtils.failure(res, error.message),
+    failure: (error) => resUtils.failure(res, error),
   })
 }
 
@@ -345,7 +346,7 @@ export const receivePurchase = async (payload: Payload): Promise<void> => {
       sender: owner,
       amount: amount,
       type: constants.message_types.purchase_deny,
-      message: { amount, content: 'Payment Denied', mediaToken },
+      message: { amount, content: 'Payment Denied', mediaToken } as unknown as Message,
       success: async (data) => {
         sphinxLogger.info('purchase_deny sent')
         const denyMsg = await models.Message.create({
@@ -379,17 +380,18 @@ export const receivePurchase = async (payload: Payload): Promise<void> => {
     pubkey: sender.publicKey,
     ownerPubkey: owner.publicKey,
   })
-  const msgToSend: { [k: string]: any } = {
+  const msgToSend = {
     mediaToken: theMediaToken,
     mediaKey: mediaKey.key,
     mediaType: ogMessage.mediaType,
+    purchaser: undefined
   }
   if (purchaser_id) msgToSend.purchaser = purchaser_id
   network.sendMessage({
     chat: { ...chat.dataValues, contactIds: [sender.id] }, // only to sender
     sender: owner,
     type: constants.message_types.purchase_accept,
-    message: msgToSend,
+    message: msgToSend as unknown as Message,
     success: async (data) => {
       sphinxLogger.info('purchase_accept sent!')
       const acceptMsg = await models.Message.create({

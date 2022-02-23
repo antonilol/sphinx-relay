@@ -73,7 +73,7 @@ function purchaseFromOriginalSender(payload, chat, purchaser, owner) {
                 mediaType: mediaKey.mediaType,
             };
             (0, send_1.sendMessage)({
-                chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: [purchaser.id] }),
+                chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: JSON.stringify([purchaser.id]) }),
                 sender: owner,
                 type: constants_1.default.message_types.purchase_accept,
                 message: msg,
@@ -82,7 +82,7 @@ function purchaseFromOriginalSender(payload, chat, purchaser, owner) {
             });
             // PAY THE OG POSTER HERE!!!
             (0, send_1.sendMessage)({
-                chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: [mediaKey.sender] }),
+                chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: JSON.stringify([purchaser.id]) }),
                 sender: owner,
                 type: constants_1.default.message_types.purchase,
                 amount: amount,
@@ -104,7 +104,7 @@ function purchaseFromOriginalSender(payload, chat, purchaser, owner) {
             // purchase it from creator (send "purchase")
             const msg = { mediaToken: mt, purchaser: purchaser.id };
             (0, send_1.sendMessage)({
-                chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: [ogmsg.sender] }),
+                chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: JSON.stringify([purchaser.id]) }),
                 sender: Object.assign(Object.assign(Object.assign({}, owner.dataValues), (purchaser && purchaser.alias && { alias: purchaser.alias })), { role: constants_1.default.chat_roles.reader }),
                 type: constants_1.default.message_types.purchase,
                 realSatsContactId: ogmsg.sender,
@@ -157,7 +157,7 @@ function sendFinalMemeIfFirstPurchaser(payload, chat, sender, owner) {
         // send it to the purchaser
         (0, send_1.sendMessage)({
             sender: Object.assign(Object.assign(Object.assign({}, owner.dataValues), (sender && sender.alias && { alias: sender.alias })), { role: constants_1.default.chat_roles.reader }),
-            chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: [ogPurchaser.id] }),
+            chat: Object.assign(Object.assign({}, chat.dataValues), { contactIds: JSON.stringify([ogPurchaser.id]) }),
             type: msgtypes.purchase_accept,
             message: Object.assign(Object.assign({}, termsAndKey), { mediaType: typ, originalMuid: muid }),
             success: void 0,

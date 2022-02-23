@@ -1,4 +1,4 @@
-import { Message, Chat, models } from '../models'
+import { Message, Chat, Contact, models } from '../models'
 import { Op } from 'sequelize'
 import { indexBy } from 'underscore'
 import { sendNotification, resetNotifyTribeCount } from '../hub'
@@ -252,7 +252,7 @@ export async function deleteMessage(req: Request, res: Response): Promise<void> 
     chat: chat,
     sender: owner,
     type: constants.message_types.delete,
-    message: { id, uuid },
+    message: { id, uuid } as unknown as Message,
   })
 }
 
@@ -282,7 +282,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
   const date = new Date()
   date.setMilliseconds(0)
 
-  const owner = req.owner
+  const owner = req.owner as Contact
   const chat = await helpers.findOrCreateChat({
     chat_id,
     owner_id: owner.id,
@@ -290,7 +290,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
   })
   if (!chat) return failure(res, 'counldnt findOrCreateChat')
 
-  let realSatsContactId
+  let realSatsContactId: number | undefined
   // IF BOOST NEED TO SEND ACTUAL SATS TO OG POSTER
   if (!chat) {
     return failure(res, 'no Chat')
@@ -357,14 +357,14 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
   }
   if (reply_uuid) msgToSend.replyUuid = reply_uuid
 
-  const sendMessageParams: { [k: string]: any } = {
+  const sendMessageParams = {
     chat: chat,
     sender: owner,
     amount: amount || 0,
     type: msgtype,
-    message: msgToSend,
+    message: msgToSend as Message,
+    realSatsContactId
   }
-  if (realSatsContactId) sendMessageParams.realSatsContactId = realSatsContactId
   // tribe owner deducts the "price per message + escrow amount"
   if (realSatsContactId && isTribeOwner && amtToStore) {
     sendMessageParams.amount = amtToStore

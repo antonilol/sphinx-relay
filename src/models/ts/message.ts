@@ -18,7 +18,7 @@ export interface Message {
   parentId: number
   subscriptionId: number
   mediaKey: string
-  mediaType: string
+  mediaType?: string
   mediaToken: string
   seen: boolean
   createdAt: Date

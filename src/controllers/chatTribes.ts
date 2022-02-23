@@ -88,7 +88,7 @@ export async function joinTribe(req: Request, res: Response): Promise<void> {
   const chatStatus = is_private
     ? constants.chat_statuses.pending
     : constants.chat_statuses.approved
-  const chatParams: { [k: string]: any } = {
+  const chatParams = {
     uuid: uuid,
     contactIds: JSON.stringify(contactIds),
     photoUrl: img || '',
@@ -103,7 +103,7 @@ export async function joinTribe(req: Request, res: Response): Promise<void> {
     status: chatStatus,
     priceToJoin: amount || 0,
     tenant,
-  }
+  } as Chat
   if (my_alias) chatParams.myAlias = my_alias
   if (my_photo_url) chatParams.myPhotoUrl = my_photo_url
 
@@ -111,7 +111,7 @@ export async function joinTribe(req: Request, res: Response): Promise<void> {
     ? constants.message_types.member_request
     : constants.message_types.group_join
   const contactIdsToSend = is_private
-    ? [theTribeOwner.id] // ONLY SEND TO TRIBE OWNER IF ITS A REQUEST
+    ? JSON.stringify([theTribeOwner.id]) // ONLY SEND TO TRIBE OWNER IF ITS A REQUEST
     : chatParams.contactIds
   // console.log("=> joinTribe: typeToSend", typeToSend);
   // console.log("=> joinTribe: contactIdsToSend", contactIdsToSend);
@@ -132,7 +132,7 @@ export async function joinTribe(req: Request, res: Response): Promise<void> {
     },
     amount: amount || 0,
     sender: theOwner,
-    message: {},
+    message: {} as Message,
     type: typeToSend,
     failure: function (e) {
       failure(res, e)
@@ -430,14 +430,14 @@ export async function approveOrRejectMember(req: Request, res: Response): Promis
   }
 
   const owner = req.owner
-  const chatToSend = chat.dataValues || chat
+  const chatToSend = chat.dataValues as Chat || chat
 
   network.sendMessage({
     // send to the requester
-    chat: { ...chatToSend, contactIds: [member.contactId] },
+    chat: { ...chatToSend, contactIds: JSON.stringify([member.contactId]) },
     amount: 0,
     sender: owner,
-    message: {},
+    message: {} as Message,
     type: msgType,
   })
 
@@ -484,7 +484,7 @@ export async function receiveMemberApprove(payload: Payload): Promise<void> {
     tenant
   )
 
-  const amount = chat.priceToJoin || 0
+  const amount: number = chat.priceToJoin || 0
   const theChat = chat.dataValues || chat
   const theOwner = owner.dataValues || owner
   const theAlias = chat.myAlias || owner.alias
@@ -502,7 +502,7 @@ export async function receiveMemberApprove(payload: Payload): Promise<void> {
     },
     amount,
     sender: theOwner,
-    message: {},
+    message: {} as Message,
     type: constants.message_types.group_join,
   })
 

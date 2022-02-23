@@ -91,11 +91,11 @@ export async function payBack(t: Timer): Promise<void> {
     models.Timer.destroy({ where: { id: t.id } })
     return
   }
-  const theChat = { ...chat.dataValues, contactIds: [t.receiver] }
+  const theChat = { ...chat.dataValues as Chat, contactIds: JSON.stringify([t.receiver]) }
   network.sendMessage({
     chat: theChat,
     sender: owner,
-    message: { id: t.msgId, amount: t.amount },
+    message: { id: t.msgId, amount: t.amount } as unknown as Message,
     amount: t.amount,
     type: constants.message_types.repayment,
     realSatsContactId: t.receiver,

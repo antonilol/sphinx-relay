@@ -12,7 +12,19 @@ import { asyncForEach } from '../helpers'
 
 type NetworkType = undefined | 'mqtt' | 'lightning'
 
-export async function sendMessage(params): Promise<void> {
+export async function sendMessage(params: {
+  chat: Chat,
+  sender: Contact,
+  type: number,
+  message: Message,
+  amount?: number,
+  success?: (b: boolean) => void,
+  failure?: (e: Error | string) => void,
+  skipPubKey?: string,
+  isForwarded?: boolean,
+  forwardedFromContactId?: number,
+  realSatsContactId?: number
+}): Promise<void> {
   const {
     type,
     chat,
@@ -35,14 +47,14 @@ export async function sendMessage(params): Promise<void> {
   // console.log('-> sender.publicKey', sender.publicKey)
   // console.log('-> chat.ownerPubkey', chat.ownerPubkey)
 
-  let theSender = sender.dataValues || sender
+  let theSender = sender.dataValues as Contact || sender
   if (isTribeOwner && !isForwarded) {
     theSender = {
-      ...(sender.dataValues || sender),
+      ...sender,
       role: constants.chat_roles.owner,
     }
   }
-  let msg = newmsg(type, chat, theSender, message, isForwarded)
+  let msg = newmsg(type, chat, theSender, message, !!isForwarded)
 
   // console.log("=> MSG TO SEND",msg)
 
@@ -52,10 +64,7 @@ export async function sendMessage(params): Promise<void> {
     return
   }
 
-  let contactIds: number[] =
-    (typeof chat.contactIds === 'string'
-      ? JSON.parse(chat.contactIds)
-      : chat.contactIds) || []
+  let contactIds: number[] = JSON.parse(chat.contactIds)
   let justMe = false
   if (contactIds.length === 1) {
     if (contactIds[0] === tenant) {
@@ -120,8 +129,8 @@ export async function sendMessage(params): Promise<void> {
     }
   }
 
-  let yes: any = true
-  let no: any = null
+  let yes = true
+  let no: Error | string | undefined
 
   sphinxLogger.info(
     `=> sending to ${contactIds.length} 'contacts'`,
@@ -179,8 +188,7 @@ export async function sendMessage(params): Promise<void> {
     // console.log("==> SENDER",sender)
     // console.log("==> OK SIGN AND SEND", opts);
     try {
-      const r = await signAndSend(opts, sender, mqttTopic)
-      yes = r
+      yes = await signAndSend(opts, sender, mqttTopic)
     } catch (e) {
       sphinxLogger.error(`KEYSEND ERROR ${e}`)
       no = e

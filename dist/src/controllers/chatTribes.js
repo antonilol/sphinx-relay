@@ -101,7 +101,7 @@ function joinTribe(req, res) {
             ? constants_1.default.message_types.member_request
             : constants_1.default.message_types.group_join;
         const contactIdsToSend = is_private
-            ? [theTribeOwner.id] // ONLY SEND TO TRIBE OWNER IF ITS A REQUEST
+            ? JSON.stringify([theTribeOwner.id]) // ONLY SEND TO TRIBE OWNER IF ITS A REQUEST
             : chatParams.contactIds;
         // console.log("=> joinTribe: typeToSend", typeToSend);
         // console.log("=> joinTribe: contactIdsToSend", contactIdsToSend);
@@ -404,7 +404,7 @@ function approveOrRejectMember(req, res) {
         const chatToSend = chat.dataValues || chat;
         network.sendMessage({
             // send to the requester
-            chat: Object.assign(Object.assign({}, chatToSend), { contactIds: [member.contactId] }),
+            chat: Object.assign(Object.assign({}, chatToSend), { contactIds: JSON.stringify([member.contactId]) }),
             amount: 0,
             sender: owner,
             message: {},

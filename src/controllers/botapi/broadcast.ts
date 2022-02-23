@@ -60,7 +60,7 @@ export default async function broadcast(a: any) {
   await network.sendMessage({
     chat: theChat,
     sender: {
-      ...owner.dataValues,
+      ...owner.dataValues as Contact,
       alias,
       id: botContactId,
       role: constants.chat_roles.reader,

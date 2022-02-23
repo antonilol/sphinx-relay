@@ -17,7 +17,7 @@ export async function isBotMsg(
   m: Msg,
   sentByMe: boolean,
   sender: Contact,
-  forwardedFromContactId: number
+  forwardedFromContactId?: number
 ): Promise<boolean> {
   const tenant: number = sender.id
   if (!tenant) {
