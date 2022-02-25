@@ -58,7 +58,7 @@ export async function sendMessage(params: {
     type,
     chat,
     theSender,
-    message.dataValues as MessageContent,
+    message as unknown as MessageContent,
     !!isForwarded
   )
 

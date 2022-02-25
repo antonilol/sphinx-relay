@@ -338,7 +338,7 @@ export async function addGroupMembers(req: Request, res: Response): Promise<void
 
   network.sendMessage({
     // send ONLY to new members
-    chat: { ...chat.dataValues, contactIds: contact_ids, members },
+    chat: { ...chat.dataValues as Chat, contactIds: contact_ids, members },
     sender: owner,
     type: constants.message_types.group_invite,
     message: {} as Message,

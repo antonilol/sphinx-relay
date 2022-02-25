@@ -356,12 +356,12 @@ async function forwardMessageToTribe(
   }
 
   const type = payload.type
-  const message = payload.message
+  const message = payload.message as Message
   sendMessage({
     type,
     message,
     sender: {
-      ...owner.dataValues,
+      ...owner.dataValues as Contact,
       alias: (payload.sender && payload.sender.alias) || '',
       photoUrl: (payload.sender && payload.sender.photo_url) || '',
       role: constants.chat_roles.reader,

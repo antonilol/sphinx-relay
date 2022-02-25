@@ -33,4 +33,5 @@ export interface Message {
   dataValues: { [k: string]: any }
   update: Function
   save: Function
+  skipPaymentProcessing: boolean
 }

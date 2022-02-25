@@ -92,7 +92,7 @@ export async function purchaseFromOriginalSender(
       message: {
         mediaToken: mt,
         skipPaymentProcessing: true,
-      },
+      } as Message,
       success: void 0,
       failure: void 0,
     })
@@ -188,7 +188,7 @@ export async function sendFinalMemeIfFirstPurchaser(
       ...termsAndKey,
       mediaType: typ,
       originalMuid: muid,
-    },
+    } as Message,
     success: void 0,
     receive: void 0,
     isForwarded: true,
