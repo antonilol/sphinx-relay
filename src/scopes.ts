@@ -19,7 +19,7 @@ export const routes: { [k: string]: string[] } = {
 }
 
 export function allowedJwtRoutes(jwt: JwtBody, path: string): boolean {
-  const scopes = jwt.scope.split(',')
+  const scopes = (jwt as any).scope.split(',')
   let ok = false
   scopes.forEach((sc) => {
     if (routes[sc]) {

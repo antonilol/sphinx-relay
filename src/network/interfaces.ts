@@ -23,6 +23,8 @@ export interface ChatContent {
   name?: string
   groupKey?: string
   host?: string
+  myAlias?: string
+  myPhotoUrl?: string
 }
 
 export interface SenderContent {

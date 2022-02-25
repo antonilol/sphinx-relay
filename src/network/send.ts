@@ -7,7 +7,7 @@ import { typesToForward } from './receive'
 import * as intercept from './intercept'
 import constants from '../constants'
 import { logging, sphinxLogger } from '../utils/logger'
-import { Msg } from './interfaces'
+import { Msg, MessageContent, ChatContent } from './interfaces'
 import { asyncForEach } from '../helpers'
 
 type NetworkType = undefined | 'mqtt' | 'lightning'
@@ -54,7 +54,13 @@ export async function sendMessage(params: {
       role: constants.chat_roles.owner,
     }
   }
-  let msg = newmsg(type, chat, theSender, message, !!isForwarded)
+  let msg = newmsg(
+    type,
+    chat,
+    theSender,
+    message.dataValues as MessageContent,
+    !!isForwarded
+  )
 
   // console.log("=> MSG TO SEND",msg)
 
@@ -247,9 +253,9 @@ function checkIfAutoConfirm(data, tenant) {
 
 export function newmsg(
   type: number,
-  chat: Chat,
+  chat: ChatContent,
   sender: Contact,
-  message: Message, // or Msg    (TODO)
+  message: MessageContent, // or Msg    (TODO)
   isForwarded: boolean,
   includeStatus?: boolean
 ): Msg {
