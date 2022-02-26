@@ -5,7 +5,7 @@ import * as interfaces from '../grpc/interfaces'
 import { ACTIONS } from '../controllers'
 import * as tribes from '../utils/tribes'
 import * as signer from '../utils/signer'
-import { Contact, Chat, ChatMember, Message, models } from '../models'
+import { Contact, Chat, ChatMember, Message, models, Timer } from '../models'
 import { sendMessage } from './send'
 import {
   modifyPayloadAndSaveMediaKey,
@@ -144,15 +144,19 @@ async function onReceive(payload: Payload, dest: string) {
         doAction = false
       }
       if (chat.escrowAmount && senderContactId) {
-        timers.addTimer({
-          // pay them back
-          amount: chat.escrowAmount,
-          millis: chat.escrowMillis,
-          receiver: senderContactId,
-          msgId: payload.message.id,
-          chatId: chat.id,
-          tenant,
-        })
+        if (payload.message.id === undefined) {
+          sphinxLogger.error("cant pay back escrow! no message id")
+        } else {
+          timers.addTimer({
+            // pay them back
+            amount: chat.escrowAmount,
+            millis: chat.escrowMillis,
+            receiver: senderContactId,
+            msgId: payload.message.id,
+            chatId: chat.id,
+            tenant,
+          } as Timer)
+        }
       }
     }
     // check price to join AND private chat

@@ -146,15 +146,20 @@ function onReceive(payload, dest) {
                     doAction = false;
                 }
                 if (chat.escrowAmount && senderContactId) {
-                    timers.addTimer({
-                        // pay them back
-                        amount: chat.escrowAmount,
-                        millis: chat.escrowMillis,
-                        receiver: senderContactId,
-                        msgId: payload.message.id,
-                        chatId: chat.id,
-                        tenant,
-                    });
+                    if (payload.message.id === undefined) {
+                        logger_1.sphinxLogger.error("cant pay back escrow! no message id");
+                    }
+                    else {
+                        timers.addTimer({
+                            // pay them back
+                            amount: chat.escrowAmount,
+                            millis: chat.escrowMillis,
+                            receiver: senderContactId,
+                            msgId: payload.message.id,
+                            chatId: chat.id,
+                            tenant,
+                        });
+                    }
                 }
             }
             // check price to join AND private chat

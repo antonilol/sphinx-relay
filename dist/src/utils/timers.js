@@ -47,7 +47,7 @@ function removeTimersByContactIdChatId(contactId, chatId, tenant) {
     });
 }
 exports.removeTimersByContactIdChatId = removeTimersByContactIdChatId;
-function addTimer({ amount, millis, receiver, msgId, chatId, tenant, }) {
+function addTimer({ amount, millis, receiver, msgId, chatId, tenant }) {
     return __awaiter(this, void 0, void 0, function* () {
         const now = new Date().valueOf();
         const when = now + millis;

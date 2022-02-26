@@ -37,8 +37,8 @@ export async function addTimer({
   receiver,
   msgId,
   chatId,
-  tenant,
-}): Promise<void> {
+  tenant
+}: Timer): Promise<void> {
   const now = new Date().valueOf()
   const when = now + millis
   const t = await models.Timer.create({
