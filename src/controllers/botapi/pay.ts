@@ -63,7 +63,7 @@ export default async function pay(a) {
       id: message.id,
       uuid: message.uuid,
       replyUuid: message.replyUuid,
-    },
+    } as Message,
     type: constants.message_types.boost,
     success: () => ({ success: true }),
     failure: (e) => {
