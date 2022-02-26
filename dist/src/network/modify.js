@@ -161,7 +161,6 @@ function sendFinalMemeIfFirstPurchaser(payload, chat, sender, owner) {
             type: msgtypes.purchase_accept,
             message: Object.assign(Object.assign({}, termsAndKey), { mediaType: typ, originalMuid: muid }),
             success: void 0,
-            receive: void 0,
             isForwarded: true,
         });
     });

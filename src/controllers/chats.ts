@@ -743,14 +743,14 @@ export async function receiveGroupCreateOrInvite(payload: Payload): Promise<void
   if (payload.type === constants.message_types.group_invite) {
     network.sendMessage({
       chat: {
-        ...chat.dataValues,
+        ...chat.dataValues as Chat,
         members: {
           [owner.publicKey]: {
             key: owner.contactKey,
             alias: owner.alias || '',
           },
         },
-      },
+      } as unknown as Chat,
       sender: owner,
       message: {} as Message,
       type: constants.message_types.group_join,

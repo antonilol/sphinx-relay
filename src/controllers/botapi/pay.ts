@@ -58,7 +58,7 @@ export default async function pay(a) {
       role: constants.chat_roles.owner,
     },
     message: {
-      content: '',
+      // content: '', // content doesnt exist on type Message, and it empty so can be removed?
       amount: message.amount,
       id: message.id,
       uuid: message.uuid,

@@ -356,7 +356,7 @@ async function forwardMessageToTribe(
   }
 
   const type = payload.type
-  const message = payload.message as Message
+  const message = payload.message as unknown as Message
   sendMessage({
     type,
     message,
@@ -371,7 +371,6 @@ async function forwardMessageToTribe(
     skipPubKey: payload.sender.pub_key, // dont forward back to self
     realSatsContactId,
     success: void 0,
-    receive: void 0,
     isForwarded: true,
     forwardedFromContactId,
   })

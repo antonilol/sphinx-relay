@@ -355,7 +355,6 @@ function forwardMessageToTribe(ogpayload, sender, realSatsContactId, amtToForwar
             skipPubKey: payload.sender.pub_key,
             realSatsContactId,
             success: void 0,
-            receive: void 0,
             isForwarded: true,
             forwardedFromContactId,
         });

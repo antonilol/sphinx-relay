@@ -147,7 +147,7 @@ async function sendSubscriptionPayment(sub, isFirstMessage, owner) {
     chat: chat,
     sender: owner,
     type: constants.message_types.direct_payment,
-    message: { amount: sub.amount, content: enc },
+    message: { amount: sub.amount, content: enc } as unknown as Message,
     amount: sub.amount,
     success: async (data) => {
       const shouldEnd = checkSubscriptionShouldEndAfterThisPayment(subscription)

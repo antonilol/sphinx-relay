@@ -15,6 +15,7 @@ import type { Tribe } from '../models/ts/tribe'
 import { Request, Response } from 'express'
 import { asyncForEach } from '../helpers'
 import { Payload } from '../network'
+import { MessageContent } from '../network/interfaces'
 
 export async function joinTribe(req: Request, res: Response): Promise<void> {
   if (!req.owner) return failure(res, 'no owner')
@@ -684,7 +685,7 @@ export async function replayChatHistory(chat: Chat, contact: Contact, ownerRecor
           ...(newMediaTerms && { mediaToken: newMediaTerms }),
           ...(m.mediaType && { mediaType: m.mediaType }),
           ...(dateString && { date: dateString }),
-        } as unknown as Message,
+        } as unknown as MessageContent,
         isForwarded,
         includeStatus
       )

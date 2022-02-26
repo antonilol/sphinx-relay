@@ -188,9 +188,8 @@ export async function sendFinalMemeIfFirstPurchaser(
       ...termsAndKey,
       mediaType: typ,
       originalMuid: muid,
-    } as Message,
+    } as unknown as Message,
     success: void 0,
-    receive: void 0,
     isForwarded: true,
   })
 }

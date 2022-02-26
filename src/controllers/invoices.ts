@@ -203,7 +203,7 @@ export const createInvoice = async (req: Request, res: Response): Promise<void> 
           message: {
             id: message.id,
             invoice: message.paymentRequest,
-          },
+          } as unknown as Message,
         })
       }
     } catch (err) {

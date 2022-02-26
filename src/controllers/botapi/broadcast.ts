@@ -70,7 +70,7 @@ export default async function broadcast(a: any) {
       id: message.id,
       uuid: message.uuid,
       replyUuid: message.replyUuid,
-    },
+    } as unknown as Message,
     type: constants.message_types.bot_res,
     success: () => ({ success: true }),
     failure: (e) => {

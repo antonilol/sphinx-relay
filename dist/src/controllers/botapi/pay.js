@@ -61,7 +61,7 @@ function pay(a) {
             chat: theChat,
             sender: Object.assign(Object.assign({}, owner.dataValues), { alias, id: botContactId, role: constants_1.default.chat_roles.owner }),
             message: {
-                content: '',
+                // content: '', // content doesnt exist on type Message, and it empty so can be removed?
                 amount: message.amount,
                 id: message.id,
                 uuid: message.uuid,
