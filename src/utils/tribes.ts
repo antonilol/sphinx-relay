@@ -424,7 +424,7 @@ export async function delete_tribe(uuid: string, owner_pubkey: string): Promise<
   }
 }
 
-export async function get_tribe_data(uuid): Promise<Tribe> {
+export async function get_tribe_data(uuid: string): Promise<Tribe> {
   const host = getHost()
   try {
     let protocol = 'https'

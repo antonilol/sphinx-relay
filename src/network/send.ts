@@ -209,8 +209,8 @@ export async function sendMessage(params: {
 }
 
 export async function signAndSend(
-  opts,
-  owner: { [k: string]: any },
+  opts: { dest: string, amt?: number, data?: { [k: string]: any }, route_hint?: string },
+  owner: Contact,
   mqttTopic?: string,
   replayingHistory?: boolean
 ): Promise<boolean> {
@@ -237,7 +237,7 @@ export async function signAndSend(
       }
     })
   } else {
-    await LND.keysendMessage({ ...opts, data }, ownerPubkey)
+    await LND.keysendMessage({ ...opts as LND.KeysendOpts, data }, ownerPubkey)
   }
   return true
 }

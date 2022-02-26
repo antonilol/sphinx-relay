@@ -277,7 +277,7 @@ export async function sendPayment(
   })
 }
 
-interface KeysendOpts {
+export interface KeysendOpts {
   amt: number
   dest: string
   data?: string
