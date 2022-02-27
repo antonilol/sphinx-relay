@@ -15,7 +15,7 @@ const tribes_1 = require("./tribes");
 const node_fetch_1 = require("node-fetch");
 const logger_1 = require("./logger");
 const config = (0, config_1.loadConfig)();
-function createOrEditPerson({ host, owner_alias, owner_pubkey, owner_route_hint, owner_contact_key, description, img, tags, price_to_meet, extras, }, id) {
+function createOrEditPerson({ host, owner_alias, owner_pubkey, owner_route_hint, owner_contact_key, description, img, tags, price_to_meet, extras }, id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = yield (0, tribes_1.genSignedTimestamp)(owner_pubkey);
@@ -67,7 +67,7 @@ function deletePerson(host, id, owner_pubkey) {
     });
 }
 exports.deletePerson = deletePerson;
-function claimOnLiquid({ host, asset, to, amount, memo, owner_pubkey, }) {
+function claimOnLiquid({ host, asset, to, amount, memo, owner_pubkey }) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = yield (0, tribes_1.genSignedTimestamp)(owner_pubkey);

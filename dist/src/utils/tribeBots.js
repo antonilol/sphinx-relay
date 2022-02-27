@@ -40,7 +40,7 @@ function delete_bot({ uuid, owner_pubkey }) {
     });
 }
 exports.delete_bot = delete_bot;
-function declare_bot({ uuid, name, description, tags, img, price_per_use, owner_pubkey, unlisted, deleted, owner_route_hint, owner_alias, }) {
+function declare_bot({ uuid, name, description, tags, img, price_per_use, owner_pubkey, unlisted, deleted, owner_route_hint, owner_alias }) {
     return __awaiter(this, void 0, void 0, function* () {
         const host = (0, tribes_1.getHost)();
         try {

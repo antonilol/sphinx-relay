@@ -282,6 +282,31 @@ export async function publish(topic: string, msg: string, ownerPubkey: string, c
     })
 }
 
+// good name? made this because 2 functions used similar object pattern args
+export interface TribeInterface {
+  uuid: string,
+  name: string,
+  description: string,
+  tags: any[],
+  img: string,
+  group_key?: string,
+  host: string,
+  price_per_message: number,
+  price_to_join: number,
+  owner_alias: string,
+  owner_pubkey: string,
+  escrow_amount: number,
+  escrow_millis: number,
+  unlisted: boolean,
+  is_private: boolean,
+  app_url: string,
+  feed_url: string,
+  feed_type: number,
+  deleted?: boolean,
+  owner_route_hint: string,
+  pin: string
+}
+
 export async function declare({
   uuid,
   name,
@@ -302,8 +327,8 @@ export async function declare({
   feed_url,
   feed_type,
   owner_route_hint,
-  pin,
-}): Promise<void> {
+  pin
+}: TribeInterface): Promise<void> {
   try {
     let protocol = 'https'
     if (config.tribes_insecure) protocol = 'http'
@@ -363,7 +388,7 @@ export async function edit({
   owner_route_hint,
   owner_pubkey,
   pin,
-}): Promise<void> {
+}: TribeInterface): Promise<void> {
   try {
     const token = await genSignedTimestamp(owner_pubkey)
     let protocol = 'https'
@@ -465,7 +490,13 @@ export async function putstats({
   host,
   member_count,
   chatId,
-  owner_pubkey,
+  owner_pubkey
+}: {
+  uuid: string,
+  host: string,
+  member_count: number,
+  chatId: number,
+  owner_pubkey: string
 }): Promise<void> {
   if (!uuid) return
   const bots = await makeBotsJSON(chatId)

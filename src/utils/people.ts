@@ -16,7 +16,18 @@ export async function createOrEditPerson(
     img,
     tags,
     price_to_meet,
-    extras,
+    extras
+  }: {
+    host: string,
+    owner_alias: string,
+    owner_pubkey: string,
+    owner_route_hint: string,
+    owner_contact_key: string,
+    description: string,
+    img: string,
+    tags: any[],
+    price_to_meet: number,
+    extras: { [k: string]: any }
   },
   id?: number
 ): Promise<{ [k: string]: any }> {
@@ -74,7 +85,14 @@ export async function claimOnLiquid({
   to,
   amount,
   memo,
-  owner_pubkey,
+  owner_pubkey
+}: {
+  host: string,
+  asset: string,
+  to: string,
+  amount: number,
+  memo: string,
+  owner_pubkey: string
 }): Promise<{ [k: string]: any }> {
   try {
     const token = await genSignedTimestamp(owner_pubkey)
