@@ -266,7 +266,7 @@ export async function parseReceiveParams(payload: network.Payload): Promise<{ ch
     const ownerRecord = await models.Contact.findOne({
       where: { isOwner: true, publicKey: dest as string },
     }) as unknown as Contact
-    owner = ownerRecord.dataValues as Contact
+    owner = ownerRecord
   }
   if (!owner) sphinxLogger.error(`=> parseReceiveParams cannot find owner`)
   if (isConversation) {

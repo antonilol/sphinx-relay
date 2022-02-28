@@ -235,7 +235,7 @@ function parseReceiveParams(payload) {
             const ownerRecord = yield models_1.models.Contact.findOne({
                 where: { isOwner: true, publicKey: dest },
             });
-            owner = ownerRecord.dataValues;
+            owner = ownerRecord;
         }
         if (!owner)
             logger_1.sphinxLogger.error(`=> parseReceiveParams cannot find owner`);
