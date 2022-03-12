@@ -31,6 +31,7 @@ export const sendPayment = async (req: Request, res: Response): Promise<void> =>
     remote_text_map,
     contact_ids,
     reply_uuid,
+    parent_id,
   } = req.body
 
   sphinxLogger.info(`[send payment] ${req.body}`)
@@ -84,6 +85,7 @@ export const sendPayment = async (req: Request, res: Response): Promise<void> =>
   if (text) msg.messageContent = text
   if (remote_text) msg.remoteMessageContent = remote_text
   if (reply_uuid) msg.replyUuid = reply_uuid
+  if (parent_id) msg.parentId = parent_id
 
   if (muid) {
     const myMediaToken = await tokenFromTerms({
@@ -111,6 +113,7 @@ export const sendPayment = async (req: Request, res: Response): Promise<void> =>
   }
   if (remote_text) msgToSend.content = remote_text
   if (reply_uuid) msgToSend.replyUuid = reply_uuid
+  if (parent_id) msgToSend.parentId = parent_id
 
   // if contact_ids, replace that in "chat" below
   // if remote text map, put that in
@@ -159,6 +162,7 @@ export const receivePayment = async (payload: Payload): Promise<void> => {
     sender_alias,
     msg_uuid,
     reply_uuid,
+    parent_id,
     network_type,
     sender_photo_url,
   } = await helpers.parseReceiveParams(payload)
@@ -189,6 +193,7 @@ export const receivePayment = async (payload: Payload): Promise<void> => {
     msg.senderPic = sender_photo_url
   }
   if (reply_uuid) msg.replyUuid = reply_uuid
+  if (parent_id) msg.parentId = parent_id
 
   const message = await models.Message.create(msg) as unknown as Message
 

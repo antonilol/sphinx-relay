@@ -46,6 +46,8 @@ export async function set(app: Express): Promise<void> {
   app.put('/chat/:id', chats.addGroupMembers)
   app.put('/kick/:chat_id/:contact_id', chats.kickChatMember)
   app.post('/tribe', chatTribes.joinTribe)
+  app.post('/tribe_channel', chatTribes.createChannel)
+  app.delete('/tribe_channel', chatTribes.deleteChannel)
   app.put(
     '/member/:contactId/:status/:messageId',
     chatTribes.approveOrRejectMember

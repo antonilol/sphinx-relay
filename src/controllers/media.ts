@@ -64,6 +64,7 @@ export const sendAttachmentMessage = async (req: Request, res: Response): Promis
     ttl,
     price, // IF AMOUNT>0 THEN do NOT sign or send receipt
     reply_uuid,
+    parent_id,
   } = req.body
 
   sphinxLogger.info(['[send attachment]', req.body])
@@ -120,6 +121,7 @@ export const sendAttachmentMessage = async (req: Request, res: Response): Promis
     tenant,
   }
   if (reply_uuid) mm.replyUuid = reply_uuid
+  if (parent_id) mm.parentId = parent_id
   const message = await models.Message.create(mm) as unknown as Message
 
   sphinxLogger.info(['saved attachment msg from me', message.id])
@@ -139,9 +141,11 @@ export const sendAttachmentMessage = async (req: Request, res: Response): Promis
     content: remote_text_map || remote_text || text || file_name || '',
     mediaKey: media_key_map,
     mediaType: mediaType,
-    replyUuid: undefined
+    replyUuid: undefined,
+    parentId: undefined
   }
   if (reply_uuid) msg.replyUuid = reply_uuid
+  if (parent_id) msg.parentId = parent_id
   network.sendMessage({
     chat: chat,
     sender: owner,
@@ -530,6 +534,7 @@ export const receiveAttachment = async (payload: Payload): Promise<void> => {
     sender_alias,
     msg_uuid,
     reply_uuid,
+    parent_id,
     network_type,
     sender_photo_url,
   } = await helpers.parseReceiveParams(payload)
@@ -555,6 +560,7 @@ export const receiveAttachment = async (payload: Payload): Promise<void> => {
   if (mediaKey) msg.mediaKey = mediaKey
   if (mediaType) msg.mediaType = mediaType
   if (reply_uuid) msg.replyUuid = reply_uuid
+  if (parent_id) msg.parentId = parent_id
   const isTribe = chat_type === constants.chat_types.tribe
   if (isTribe) {
     msg.senderAlias = sender_alias

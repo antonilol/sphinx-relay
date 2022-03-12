@@ -66,6 +66,8 @@ export default async function migrate(): Promise<void> {
 
   addTableColumn('sphinx_messages', 'network_type', 'INTEGER')
 
+  addTableColumn('sphinx_messages', 'parent_id', 'INTEGER')
+
   addTableColumn('sphinx_chats', 'meta')
 
   addTableColumn('sphinx_contacts', 'tip_amount', 'BIGINT')

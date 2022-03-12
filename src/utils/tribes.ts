@@ -519,6 +519,74 @@ export async function putstats({
   }
 }
 
+export async function createChannel({
+  tribe_uuid,
+  host,
+  name,
+  owner_pubkey
+}: {
+  tribe_uuid: string,
+  host: string,
+  name: string,
+  owner_pubkey: string
+}) {
+  if (!tribe_uuid) return
+  if (!name) return
+  try {
+    const token = await genSignedTimestamp(owner_pubkey)
+    let protocol = 'https'
+    if (config.tribes_insecure) protocol = 'http'
+    const r = await fetch(protocol + '://' + host + '/channel?token=' + token, {
+      method: 'POST',
+      body: JSON.stringify({
+        tribe_uuid,
+        name,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!r.ok) {
+      throw 'failed to create tribe channel ' + r.status
+    }
+    const j = await r.json()
+    return j
+  } catch (e) {
+    sphinxLogger.error(`[tribes] unauthorized to create channel`)
+    throw e
+  }
+}
+
+export async function deleteChannel({
+  id,
+  host,
+  owner_pubkey
+}: {
+  id: number,
+  host: string,
+  owner_pubkey: string
+}) {
+  if (!id) return
+  try {
+    const token = await genSignedTimestamp(owner_pubkey)
+    let protocol = 'https'
+    if (config.tribes_insecure) protocol = 'http'
+    const r = await fetch(
+      protocol + '://' + host + '/channel/' + id + '?token=' + token,
+      {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+    if (!r.ok) {
+      throw 'failed to delete channel' + r.status
+    }
+    const j = await r.json()
+    return j
+  } catch (e) {
+    sphinxLogger.error(`[tribes] unauthorized to create channel`)
+    throw e
+  }
+}
+
 export async function genSignedTimestamp(ownerPubkey: string): Promise<string> {
   // console.log('genSignedTimestamp')
   const now = moment().unix()

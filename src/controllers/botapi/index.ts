@@ -25,6 +25,7 @@ export interface Action {
   reply_uuid?: string
   route_hint?: string
   recipient_id?: number
+  parent_id?: number
 }
 
 export async function processAction(req: Request, res: Response) {
@@ -51,6 +52,7 @@ export async function processAction(req: Request, res: Response) {
     msg_uuid,
     reply_uuid,
     recipient_id,
+    parent_id,
   } = body
 
   if (!bot_id) return failure(res, 'no bot_id')
@@ -74,6 +76,7 @@ export async function processAction(req: Request, res: Response) {
     chat_uuid: chat_uuid || '',
     msg_uuid: msg_uuid || '',
     reply_uuid: reply_uuid || '',
+    parent_id: parent_id || 0,
     recipient_id: recipient_id ? parseInt(recipient_id) : 0,
   }
 
@@ -97,6 +100,7 @@ export async function finalAction(a: Action) {
     chat_uuid,
     msg_uuid,
     reply_uuid,
+    parent_id,
     recipient_id,
   } = a
 
@@ -155,6 +159,9 @@ export async function finalAction(a: Action) {
     }
     if (reply_uuid) {
       data.message.replyUuid = reply_uuid
+    }
+    if (parent_id) {
+      data.message.parentId = parent_id
     }
     try {
       await network.signAndSend({ dest, data, route_hint }, owner, topic)

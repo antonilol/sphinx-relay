@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ava_1 = require("ava");
-const helpers_1 = require("../utils/helpers");
+const helpers_1 = require("../../helpers");
 const del_1 = require("../utils/del");
 const get_1 = require("../utils/get");
 const nodes_1 = require("../nodes");
@@ -35,7 +35,7 @@ function clearAllChats(t) {
             }
             //delete any chat that node is a part of
             yield (0, helpers_1.asyncForEach)(chats, (c) => __awaiter(this, void 0, void 0, function* () {
-                const deletion = yield (0, del_1.deleteChat)(t, node, c);
+                const deletion = yield (0, del_1.deleteChat)(t, node, c.id);
                 t.true(deletion, 'node should delete chat');
             }));
             console.log(`${node.alias} deleted all chats`);
