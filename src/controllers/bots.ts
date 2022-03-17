@@ -252,18 +252,17 @@ export async function botKeysend(
   }
 }
 
-export async function receiveBotInstall(payload: Payload): Promise<void> {
-  sphinxLogger.info(['=> receiveBotInstall', payload], logging.Network)
+export async function receiveBotInstall(dat: Payload): Promise<void> {
+  sphinxLogger.info(['=> receiveBotInstall', dat], logging.Network)
 
-  const dat = payload
   const sender_pub_key = dat.sender && dat.sender.pub_key
   const bot_uuid = dat.bot_uuid
   const chat_uuid = dat.chat && dat.chat.uuid
   const owner = dat.owner
   const tenant: number = owner.id
 
-  if (!chat_uuid || !sender_pub_key)
-    return sphinxLogger.info('no chat uuid or sender pub key')
+  if (!chat_uuid || !sender_pub_key || !bot_uuid)
+    return sphinxLogger.info('=> no chat uuid or sender pub key or bot_uuid')
 
   if (!bot_uuid)
     return sphinxLogger.info('no bot uuid')
@@ -300,25 +299,21 @@ export async function receiveBotInstall(payload: Payload): Promise<void> {
   }
 
   // sender id needs to be in the msg
-  payload.sender.id = contact.id
-  postToBotServer(payload, bot, SphinxBot.MSG_TYPE.INSTALL)
+  dat.sender.id = contact.id || 0
+  postToBotServer(dat, bot, SphinxBot.MSG_TYPE.INSTALL)
 }
 
 // ONLY FOR BOT MAKER
-export async function receiveBotCmd(payload: Payload): Promise<void> {
+export async function receiveBotCmd(dat: Payload): Promise<void> {
   sphinxLogger.info('=> receiveBotCmd', logging.Network)
 
-  const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const bot_uuid = dat.bot_uuid
   const chat_uuid = dat.chat && dat.chat.uuid
   const sender_id = dat.sender && dat.sender.id
   const owner = dat.owner
   const tenant: number = owner.id
-  if (!chat_uuid) return sphinxLogger.error('no chat uuid')
-
-  if (!bot_uuid)
-    return sphinxLogger.info('no bot uuid')
+  if (!chat_uuid || !bot_uuid) return sphinxLogger.error('no chat uuid')
   // const amount = dat.message.amount - check price_per_use
 
   const bot = await models.Bot.findOne({
@@ -351,9 +346,9 @@ export async function receiveBotCmd(payload: Payload): Promise<void> {
   }
 
   // sender id needs to be in the msg
-  payload.sender.id = sender_id || 0
+  dat.sender.id = sender_id || 0
 
-  postToBotServer(payload, bot, SphinxBot.MSG_TYPE.MESSAGE)
+  postToBotServer(dat, bot, SphinxBot.MSG_TYPE.MESSAGE)
   // forward to the entire Action back over MQTT
 }
 
@@ -424,11 +419,8 @@ export function buildBotPayload(msg: Msg): SphinxBot.Message {
   return m
 }
 
-//export async function receiveBotRes(payload: Msg): Promise<void> { // TODO which type Msg? Message?
-export async function receiveBotRes(payload: Payload): Promise<void> {
+export async function receiveBotRes(dat: Payload): Promise<void> {
   sphinxLogger.info('=> receiveBotRes', logging.Network) //, payload)
-  const dat = payload
-  // const dat = payload.content ||  payload // TODO
 
   if (!dat.chat || !dat.message || !dat.sender) {
     return sphinxLogger.error('=> receiveBotRes error, no chat||msg||sender')
@@ -465,8 +457,8 @@ export async function receiveBotRes(payload: Payload): Promise<void> {
     // console.log("=> is tribeOwner, do finalAction!")
     // IF IS TRIBE ADMIN forward to the tribe
     // received the entire action?
-    const bot_id = payload.bot_id
-    const recipient_id = payload.recipient_id
+    const bot_id = dat.bot_id
+    const recipient_id = dat.recipient_id
     finalAction(<Action>{
       bot_id,
       action,

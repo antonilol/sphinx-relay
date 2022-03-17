@@ -56,3 +56,7 @@ export default class ChatBot extends Model<ChatBot> {
 
   dataValues: { [k: string]: any }
 }
+
+export interface ChatBotRecord extends ChatBot {
+  dataValues: ChatBot
+}

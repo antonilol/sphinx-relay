@@ -229,7 +229,7 @@ export const listInvoices = async (req: Request, res: Response): Promise<void> =
   })
 }
 
-export const receiveInvoice = async (payload: Payload): Promise<void> => {
+export const receiveInvoice = async (payload: network.Payload): Promise<void> => {
   sphinxLogger.info(`received invoice ${payload}`)
 
   const total_spent = 1

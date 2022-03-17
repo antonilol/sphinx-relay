@@ -15,12 +15,20 @@ export interface MessageContent {
   purchaser?: number
   invoice?: string
   parentId?: number
+  push?: boolean
+}
+
+// from group join msgs, etc
+export interface ChatMember {
+  role: number
+  key: string
+  alias: string
 }
 
 export interface ChatContent {
   uuid: string
   type?: number
-  members?: { [k: string]: any }
+  members?: { [k: string]: ChatMember }
   name?: string
   groupKey?: string
   host?: string
@@ -43,6 +51,9 @@ export interface Msg {
   message: MessageContent
   chat: ChatContent
   sender: SenderContent
+}
+
+export interface BotMsg extends Msg {
   bot_id?: any
   bot_uuid?: string
   bot_name?: string
@@ -55,7 +66,7 @@ interface PayloadMessageContent extends MessageContent {
   skipPaymentProcessing?: boolean
 }
 
-export interface Payload extends Msg {
+export interface Payload extends BotMsg {
   network_type?: number
   isTribeOwner?: boolean
   dest?: string

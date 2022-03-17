@@ -83,5 +83,10 @@ export default class Contact extends Model<Contact> {
   @Column
   blocked: boolean
 
-  dataValues: { [k: string]: any }
+  @Column
+  hmacKey: string
+}
+
+export interface ContactRecord extends Contact {
+  dataValues: Contact
 }

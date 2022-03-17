@@ -107,3 +107,7 @@ export default class Message extends Model<Message> {
 /*
 ALTER TABLE sphinx_invites ALTER COLUMN invoice TYPE text;
 */
+
+export interface MessageRecord extends Message {
+  dataValues: Message
+}

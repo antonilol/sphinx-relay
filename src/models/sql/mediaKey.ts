@@ -50,3 +50,7 @@ export default class MediaKey extends Model<MediaKey> {
 
   dataValues: { [k: string]: any }
 }
+
+export interface MediaKeyRecord extends MediaKey {
+  dataValues: MediaKey
+}

@@ -15,7 +15,7 @@ import { asyncForEach } from '../helpers'
 const config = loadConfig()
 const IS_GREENLIGHT = config.lightning_provider === 'GREENLIGHT'
 
-export async function getQR(): Promise<string> {
+export async function getIP(): Promise<string> {
   let theIP
 
   const public_url = config.public_url
@@ -47,6 +47,11 @@ export async function getQR(): Promise<string> {
       theIP = `${config.node_http_protocol}://${theIP}`
     }
   }
+  return theIP
+}
+
+export async function getQR(): Promise<string> {
+  const theIP = await getIP()
   return Buffer.from(`ip::${theIP}::${password || ''}`).toString('base64')
 }
 

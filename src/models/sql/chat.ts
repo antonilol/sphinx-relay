@@ -119,3 +119,7 @@ export default class Chat extends Model<Chat> {
 
   dataValues: { [k: string]: any }
 }
+
+export interface ChatRecord extends Chat {
+  dataValues: Chat
+}

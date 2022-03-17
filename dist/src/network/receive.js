@@ -89,7 +89,7 @@ function onReceive(payload, dest) {
         if (!owner)
             return logger_1.sphinxLogger.error(`=> RECEIVE: owner not found`);
         const tenant = owner.id;
-        const ownerDataValues = owner && owner.dataValues;
+        const ownerDataValues = owner.dataValues || owner;
         if (botTypes.includes(payload.type)) {
             // if is admin on tribe? or is bot maker?
             logger_1.sphinxLogger.info(`=> got bot msg type!`);
@@ -395,9 +395,7 @@ function receiveMqttMessage(topic, message) {
             const dest = arr[0];
             onReceive(payload, dest);
         }
-        catch (e) {
-            // dont care about the error
-        }
+        catch (e) { }
     });
 }
 exports.receiveMqttMessage = receiveMqttMessage;

@@ -1,4 +1,4 @@
-import { Chat, Contact, models } from './models'
+import { models, Chat, Contact, ContactRecord, ChatRecord } from './models'
 import * as md5 from 'md5'
 import * as network from './network'
 import constants from './constants'
@@ -19,7 +19,9 @@ export const findOrCreateChat = async (params: { chat_id: number, owner_id: numb
   } else {
     if (!owner_id || !recipient_id) return
     sphinxLogger.info(`chat does not exists, create new`)
-    const owner = await models.Contact.findOne({ where: { id: owner_id } }) as unknown as Contact
+    const owner: ContactRecord = await models.Contact.findOne({
+      where: { id: owner_id },
+    })
     const recipient = await models.Contact.findOne({
       where: { id: recipient_id, tenant: owner_id },
     }) as unknown as Contact
@@ -204,10 +206,10 @@ export async function findOrCreateContactByPubkeyAndRouteHint(
   return sender
 }
 
-export async function findOrCreateChatByUUID(chat_uuid: string, contactIds: number[], tenant: number): Promise<Chat> {
+export async function findOrCreateChatByUUID(chat_uuid: string, contactIds: number[], tenant: number): Promise<ChatRecord> {
   let chat = await models.Chat.findOne({
     where: { uuid: chat_uuid, tenant, deleted: false },
-  }) as unknown as Chat
+  }) as unknown as ChatRecord
   if (!chat) {
     const date = new Date()
     date.setMilliseconds(0)
@@ -218,7 +220,7 @@ export async function findOrCreateChatByUUID(chat_uuid: string, contactIds: numb
       updatedAt: date,
       type: 0, // conversation
       tenant,
-    }) as unknown as Chat
+    }) as unknown as ChatRecord
   }
   return chat
 }
@@ -227,7 +229,7 @@ export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export async function parseReceiveParams(payload: network.Payload): Promise<{ chat_members: { [k: string]: Contact }, [k: string]: any }> {
+export async function parseReceiveParams(payload: network.Payload): Promise<{ chat_members: { [k: string]: network.ChatMember }, [k: string]: any }> {
   const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const sender_route_hint = dat.sender.route_hint
@@ -260,14 +262,14 @@ export async function parseReceiveParams(payload: network.Payload): Promise<{ ch
 
   const isConversation =
     !chat_type || (chat_type && chat_type == constants.chat_types.conversation)
-  let sender
-  let chat
-  let owner = dat.owner
+  let sender: ContactRecord
+  let chat: ChatRecord
+  let owner: Contact = dat.owner
   if (!owner) {
     const ownerRecord = await models.Contact.findOne({
       where: { isOwner: true, publicKey: dest as string },
-    }) as unknown as Contact
-    owner = ownerRecord
+    }) as unknown as ContactRecord
+    owner = ownerRecord.dataValues
   }
   if (!owner) sphinxLogger.error(`=> parseReceiveParams cannot find owner`)
   if (isConversation) {
@@ -277,12 +279,12 @@ export async function parseReceiveParams(payload: network.Payload): Promise<{ ch
       sender_pub_key,
       sender_route_hint as string,
       sender_alias,
-      owner.dataValues as Contact,
+      owner,
       realAmount
     )
     chat = await findOrCreateChatByUUID(
       chat_uuid,
-      [owner.id, parseInt(sender.id)],
+      [owner.id, sender.id],
       owner.id
     )
     if (sender.fromGroup) {
@@ -296,7 +298,7 @@ export async function parseReceiveParams(payload: network.Payload): Promise<{ ch
     }) as unknown as Contact
     // inject a "sender" with an alias
     if (!sender && chat_type == constants.chat_types.tribe) {
-      sender = { id: 0, alias: sender_alias }
+      sender = <ContactRecord>{ id: 0, alias: sender_alias }
     }
     chat = await models.Chat.findOne({
       where: { uuid: chat_uuid, tenant: owner.id },

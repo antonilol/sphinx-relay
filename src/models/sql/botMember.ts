@@ -37,3 +37,7 @@ export default class BotMember extends Model<BotMember> {
 
   dataValues: { [k: string]: any }
 }
+
+export interface BotMemberRecord extends BotMember {
+  dataValues: BotMember
+}

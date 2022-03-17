@@ -35,3 +35,7 @@ export default class ChatMember extends Model<ChatMember> {
 
   dataValues: { [k: string]: any }
 }
+
+export interface ChatMemberRecord extends ChatMember {
+  dataValues: ChatMember
+}

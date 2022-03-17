@@ -1,4 +1,4 @@
-import { Contact, Invite, Chat, Subscription, ChatMember, models } from '../models'
+import { Contact, Invite, Chat, Subscription, ChatMember, models, ContactRecord } from '../models'
 import * as crypto from 'crypto'
 import * as socket from '../utils/socket'
 import * as helpers from '../helpers'
@@ -191,7 +191,7 @@ export const generateToken = async (req: Request, res: Response): Promise<void> 
     }
     where.publicKey = pubkey
   }
-  const owner = await models.Contact.findOne({ where }) as unknown as Contact
+  const owner = await models.Contact.findOne({ where }) as unknown as ContactRecord
   if (!owner) {
     return failure(res, 'no owner')
   }
@@ -235,11 +235,31 @@ export const generateToken = async (req: Request, res: Response): Promise<void> 
     if (isProxy()) {
       tribes.subscribe(`${pubkey}/#`, network.receiveMqttMessage) // add MQTT subsription
     }
-    owner.update({ authToken: hash })
+    await owner.update({ authToken: hash })
   }
 
   success(res, {
     id: (owner && owner.id) || 0,
+  })
+}
+
+export const registerHmacKey = async (req: Request, res: Response): Promise<void> => {
+  if (!req.body.encrypted_key) {
+    return failure(res, 'no encrypted_key found')
+  }
+  const transportTokenKey = fs.readFileSync(
+    config.transportPrivateKeyLocation,
+    'utf8'
+  )
+  let hmacKey = rsa.decrypt(transportTokenKey, req.body.encrypted_key)
+  if (!hmacKey) {
+    return failure(res, 'no decrypted hmac key')
+  }
+  const tenant: number = req.owner.id
+  await models.Contact.update({ hmacKey }, { where: { tenant, isOwner: true } })
+
+  success(res, {
+    registered: true,
   })
 }
 
@@ -462,7 +482,7 @@ export const deleteContact = async (req: Request, res: Response): Promise<void> 
   success(res, {})
 }
 
-export const receiveContactKey = async (payload: Payload): Promise<void> => {
+export const receiveContactKey = async (payload: network.Payload): Promise<void> => {
   const dat = payload
   const sender_pub_key = dat.sender.pub_key
   const sender_route_hint = dat.sender.route_hint
@@ -523,7 +543,7 @@ export const receiveContactKey = async (payload: Payload): Promise<void> => {
   }
 }
 
-export const receiveConfirmContactKey = async (payload: Payload): Promise<void> => {
+export const receiveConfirmContactKey = async (payload: network.Payload): Promise<void> => {
   sphinxLogger.info([
     `=> confirm contact key for ${payload.sender && payload.sender.pub_key}`,
     JSON.stringify(payload),

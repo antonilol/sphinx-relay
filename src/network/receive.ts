@@ -24,7 +24,7 @@ import * as bolt11 from '@boltz/bolt11'
 import { loadConfig } from '../utils/config'
 import { sphinxLogger } from '../utils/logger'
 import { asyncForEach } from '../helpers'
-import { Msg, Payload } from '../network'
+import { Msg, Payload } from './interfaces'
 
 const config = loadConfig()
 /*
@@ -87,7 +87,7 @@ async function onReceive(payload: Payload, dest: string) {
   if (!owner) return sphinxLogger.error(`=> RECEIVE: owner not found`)
   const tenant: number = owner.id
 
-  const ownerDataValues = owner && owner.dataValues as Contact
+  const ownerDataValues = owner.dataValues || owner
 
   if (botTypes.includes(payload.type)) {
     // if is admin on tribe? or is bot maker?
@@ -294,7 +294,12 @@ async function doTheAction(data, owner) {
   }
 }
 
-async function uniqueifyAlias(payload, sender, chat, owner): Promise<any> {
+async function uniqueifyAlias(
+  payload: Payload,
+  sender,
+  chat,
+  owner
+): Promise<Payload> {
   if (!chat || !sender || !owner) return payload
   if (!(payload && payload.sender)) return payload
   const senderContactId = sender.id // og msg sender
@@ -332,7 +337,7 @@ async function uniqueifyAlias(payload, sender, chat, owner): Promise<any> {
 }
 
 async function forwardMessageToTribe(
-  ogpayload,
+  ogpayload: Payload,
   sender,
   realSatsContactId,
   amtToForwardToRealSatsContactId,
@@ -405,16 +410,14 @@ export async function receiveMqttMessage(topic: string, message: Buffer): Promis
     const arr = topic.split('/')
     const dest = arr[0]
     onReceive(payload, dest)
-  } catch (e) {
-    // dont care about the error
-  }
+  } catch (e) {}
 }
 
 export async function initTribesSubscriptions(): Promise<void> {
   tribes.connect(receiveMqttMessage)
 }
 
-function parsePayload(data: string): Msg | '' {
+function parsePayload(data: string): Payload | '' {
   const li = data.lastIndexOf('}')
   const msg = data.substring(0, li + 1)
   const payload = JSON.parse(msg)
@@ -537,7 +540,7 @@ export async function parseKeysendInvoice(i: interfaces.Invoice): Promise<void> 
   let sender_pubkey: string | undefined
   if (data) {
     try {
-      const payload = parsePayload(data)
+      const payload: Payload = parsePayload(data)
       if (payload && payload.type === constants.message_types.keysend) {
         // console.log('====> IS KEYSEND TYPE')
         // console.log('====> MEMOOOO', i.memo)

@@ -30,3 +30,10 @@ export function failure200(res: Response, e: Error | string): void {
   })
   res.end()
 }
+
+export function unauthorized(res: Response): void {
+  res.writeHead(401, 'Access invalid for user', {
+    'Content-Type': 'text/plain',
+  })
+  res.end('invalid credentials')
+}

@@ -39,3 +39,7 @@ export default class Invite extends Model<Invite> {
 
   dataValues: { [k: string]: any }
 }
+
+export interface InviteRecord extends Invite {
+  dataValues: Invite
+}

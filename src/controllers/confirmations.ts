@@ -43,7 +43,7 @@ export function sendConfirmation({
   })
 }
 
-export async function receiveConfirmation(payload: Payload): Promise<void> {
+export async function receiveConfirmation(payload: network.Payload): Promise<void> {
   sphinxLogger.info(
     `=> received confirmation ${payload.message && payload.message.id}`,
     logging.Network
@@ -156,7 +156,7 @@ export async function tribeOwnerAutoConfirmation(msg_id: number, chat_uuid: stri
   }
 }
 
-export async function receiveHeartbeat(payload: Payload): Promise<boolean> {
+export async function receiveHeartbeat(payload: network.Payload): Promise<boolean> {
   sphinxLogger.info(`=> received heartbeat`, logging.Network)
 
   const dat = payload
@@ -246,7 +246,7 @@ export async function healthcheck(req: Request, res: Response): Promise<void> {
   }, 1000)
 }
 
-export async function receiveHeartbeatConfirmation(payload: Msg): Promise<void> {
+export async function receiveHeartbeatConfirmation(payload: network.Payload): Promise<void> {
   sphinxLogger.info(`=> received heartbeat confirmation`, logging.Network)
 
   const dat = payload

@@ -39,3 +39,7 @@ export default class Bot extends Model<Bot> {
 
   dataValues: { [k: string]: any }
 }
+
+export interface BotRecord extends Bot {
+  dataValues: Bot
+}

@@ -72,6 +72,7 @@ export async function set(app: Express): Promise<void> {
   app.delete('/contacts/:id', contacts.deleteContact)
   app.get('/latest_contacts', contacts.getLatestContacts)
   app.post('/generate_external', contacts.generateOwnerWithExternalSigner)
+  app.post('/hmac_key', contacts.registerHmacKey)
 
   app.post('/profile', personal.createPeopleProfile)
   app.delete('/profile', personal.deletePersonProfile)
@@ -132,6 +133,7 @@ export async function set(app: Express): Promise<void> {
   app.get('/query/onchain_address/:app', queries.queryOnchainAddress)
   app.get('/utxos', queries.listUTXOs)
 
+  app.post('/webhook', actions.processWebhook)
   app.post('/action', actions.processAction)
   app.get('/bots', bots.getBots)
   app.post('/bot', bots.createBot)
