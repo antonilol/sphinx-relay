@@ -250,7 +250,10 @@ function subscribeResponse(res) {
             r.extratlvs.forEach((tlv) => {
                 // console.log("TLV TYPE", tlv.type, typeof tlv.type, `${LND_KEYSEND_KEY}`)
                 // if(tlv.type===`${LND_KEYSEND_KEY}`) is_keysend=true
-                custom_records[tlv.type] = tlv.value;
+                custom_records[tlv.type] =
+                    tlv.value instanceof ByteBuffer
+                        ? tlv.value.toBuffer()
+                        : Buffer.from(tlv.value);
             });
         }
         if (r.label.startsWith('keysend'))

@@ -11,7 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.streamHsmRequests = exports.recover = exports.register = exports.sign_challenge = exports.get_challenge = exports.schedule = exports.startGreenlightInit = exports.get_greenlight_grpc_uri = exports.keepalive = exports.initGreenlight = void 0;
 const fs = require("fs");
-const grpc = require("grpc");
+const grpc = require("@grpc/grpc-js");
+const proto_1 = require("./proto");
 const libhsmd_1 = require("./libhsmd");
 const config_1 = require("../utils/config");
 const ByteBuffer = require("bytebuffer");
@@ -38,7 +39,7 @@ function keepalive() {
     }, 59000);
 }
 exports.keepalive = keepalive;
-let schedulerClient = null;
+let schedulerClient;
 const loadSchedulerCredentials = () => {
     const glCert = fs.readFileSync(config.scheduler_tls_location);
     const glPriv = fs.readFileSync(config.scheduler_key_location);
@@ -47,7 +48,7 @@ const loadSchedulerCredentials = () => {
 };
 function loadScheduler() {
     // 35.236.110.178:2601
-    const descriptor = grpc.load('proto/scheduler.proto');
+    const descriptor = (0, proto_1.loadProto)('scheduler');
     const scheduler = descriptor.scheduler;
     const options = {
         'grpc.ssl_target_name_override': 'localhost',
@@ -106,14 +107,14 @@ function startGreenlightInit() {
 exports.startGreenlightInit = startGreenlightInit;
 function schedule(pubkey) {
     logger_1.sphinxLogger.info('=> Greenlight schedule');
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
         try {
             const s = loadScheduler();
             s.schedule({
                 node_id: ByteBuffer.fromHex(pubkey),
             }, (err, response) => {
                 // console.log('=> schedule', err, response);
-                if (!err) {
+                if (!err && response) {
                     GREENLIGHT_GRPC_URI = response.grpc_uri;
                     resolve(response);
                 }
@@ -125,7 +126,7 @@ function schedule(pubkey) {
         catch (e) {
             logger_1.sphinxLogger.error(e);
         }
-    }));
+    });
 }
 exports.schedule = schedule;
 function recoverGreenlight(gid) {
@@ -175,14 +176,14 @@ function registerGreenlight(gid, rootkey, secretPath) {
     });
 }
 function get_challenge(node_id) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
         try {
             const s = loadScheduler();
             s.getChallenge({
                 node_id: ByteBuffer.fromHex(node_id),
                 scope: 'REGISTER',
             }, (err, response) => {
-                if (!err) {
+                if (!err && response) {
                     resolve(Buffer.from(response.challenge).toString('hex'));
                 }
                 else {
@@ -193,7 +194,7 @@ function get_challenge(node_id) {
         catch (e) {
             reject(e);
         }
-    }));
+    });
 }
 exports.get_challenge = get_challenge;
 function sign_challenge(challenge) {
@@ -205,7 +206,7 @@ function sign_challenge(challenge) {
 }
 exports.sign_challenge = sign_challenge;
 function register(pubkey, bip32_key, challenge, signature) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
         try {
             const s = loadScheduler();
             s.register({
@@ -216,7 +217,7 @@ function register(pubkey, bip32_key, challenge, signature) {
                 signature: ByteBuffer.fromHex(signature),
             }, (err, response) => {
                 logger_1.sphinxLogger.info(`${err} ${response}`);
-                if (!err) {
+                if (!err && response) {
                     resolve(response);
                 }
                 else {
@@ -227,11 +228,11 @@ function register(pubkey, bip32_key, challenge, signature) {
         catch (e) {
             reject(e);
         }
-    }));
+    });
 }
 exports.register = register;
 function recover(pubkey, challenge, signature) {
-    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
         try {
             const s = loadScheduler();
             s.recover({
@@ -240,7 +241,7 @@ function recover(pubkey, challenge, signature) {
                 signature: ByteBuffer.fromHex(signature),
             }, (err, response) => {
                 logger_1.sphinxLogger.info(`${err} ${response}`);
-                if (!err) {
+                if (!err && response) {
                     resolve(response);
                 }
                 else {
@@ -251,7 +252,7 @@ function recover(pubkey, challenge, signature) {
         catch (e) {
             reject(e);
         }
-    }));
+    });
 }
 exports.recover = recover;
 function streamHsmRequests() {
@@ -275,6 +276,7 @@ function streamHsmRequests() {
                             logger_1.sphinxLogger.info(response.raw.toString('hex'));
                             sig = libhsmd_1.default.Handle(capabilities_bitset, 0, null, response.raw.toString('hex'));
                         }
+                        ;
                         lightning.respondHsmRequest({
                             request_id: response.request_id,
                             raw: ByteBuffer.fromHex(sig),
@@ -294,7 +296,7 @@ function streamHsmRequests() {
                 logger_1.sphinxLogger.info(`[HSMD] Status ${status.code} ${status}`);
             });
             call.on('error', function (err) {
-                logger_1.sphinxLogger.error(`[HSMD] Error ${err.code}`);
+                logger_1.sphinxLogger.error(`[HSMD] Error ${err.name} ${err.message}`);
             });
             call.on('end', function () {
                 logger_1.sphinxLogger.info(`[HSMD] Closed stream`);

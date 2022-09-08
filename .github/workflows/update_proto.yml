@@ -1,7 +1,7 @@
 name: Update proto files
 on:
   schedule:
-    - cron: "0 0 1 * *"
+    - cron: '0 0 1 * *'
 
 jobs:
   update_proto:
@@ -19,8 +19,14 @@ jobs:
         run: |
           find lnd/lnrpc -name '*.proto' -exec bash -c 'test -e proto/`basename {}` && cp {} proto' \;
           sed -i 's/^import.*\//import "/' proto/*
+          git add proto
+      - name: update generated types
+        run: |
+          bash grpc_gen_types.sh
+          git add src/grpc/types
+      - name: commit changes
+        run: |
           git config user.name 'Github Actions'
           git config user.email github-actions@github.com
-          git add proto
-          git commit -m "Update proto files" || echo -n
+          git commit -m 'Update proto files and types' || echo -n
           git push

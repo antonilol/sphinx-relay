@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "outDir": "src/grpc/types",
+    "target": "es6",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "declaration": true,
+    "emitDeclarationOnly": true
+  },
+  "include": ["_tmp_grpc_types"]
+}

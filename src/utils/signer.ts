@@ -1,4 +1,5 @@
-import * as grpc from 'grpc'
+import { loadProto } from '../grpc/proto'
+import { SignerClient } from '../grpc/types/signrpc/Signer'
 import * as Lightning from '../grpc/lightning'
 import * as ByteBuffer from 'bytebuffer'
 import { loadConfig } from './config'
@@ -8,16 +9,16 @@ import { sphinxLogger } from './logger'
 const config = loadConfig()
 const LND_IP = config.lnd_ip || 'localhost'
 
-let signerClient = <any>null
+let signerClient: SignerClient | undefined
 
-export const loadSigner = () => {
+export function loadSigner(): SignerClient {
   if (signerClient) {
     return signerClient
   } else {
     try {
       const credentials = Lightning.loadCredentials('signer.macaroon')
-      const lnrpcDescriptor = grpc.load('proto/signer.proto')
-      const signer: any = lnrpcDescriptor.signrpc
+      const lnrpcDescriptor = loadProto('signer')
+      const signer = lnrpcDescriptor.signrpc
       signerClient = new signer.Signer(
         LND_IP + ':' + config.lnd_port,
         credentials
@@ -32,15 +33,15 @@ export const loadSigner = () => {
 }
 
 export const signMessage = (msg) => {
-  return new Promise(async (resolve, reject) => {
-    const signer = await loadSigner()
+  return new Promise((resolve, reject) => {
+    const signer = loadSigner()
     try {
       const options = {
-        msg: ByteBuffer.fromHex(msg),
+        msg: Buffer.from(msg, 'hex'),
         key_loc: { key_family: 6, key_index: 0 },
       }
       signer.signMessage(options, function (err, sig) {
-        if (err || !sig.signature) {
+        if (err || !sig || !sig.signature) {
           reject(err)
         } else {
           const buf = ByteBuffer.wrap(sig.signature)
@@ -54,12 +55,12 @@ export const signMessage = (msg) => {
 }
 
 export const signBuffer = (msg) => {
-  return new Promise(async (resolve, reject) => {
-    const signer = await loadSigner()
+  return new Promise((resolve, reject) => {
+    const signer = loadSigner()
     try {
       const options = { msg }
       signer.signMessage(options, function (err, sig) {
-        if (err || !sig.signature) {
+        if (err || !sig || !sig.signature) {
           reject(err)
         } else {
           const buf = ByteBuffer.wrap(sig.signature)
@@ -73,8 +74,8 @@ export const signBuffer = (msg) => {
 }
 
 function verifyMessage(msg, sig, pubkey): Promise<{ [k: string]: any }> {
-  return new Promise(async (resolve, reject) => {
-    const signer = await loadSigner()
+  return new Promise((resolve, reject) => {
+    const signer = loadSigner()
     if (msg.length === 0) {
       return reject('invalid msg')
     }
@@ -86,12 +87,12 @@ function verifyMessage(msg, sig, pubkey): Promise<{ [k: string]: any }> {
     }
     try {
       const options = {
-        msg: ByteBuffer.fromHex(msg),
-        signature: ByteBuffer.fromBase64(sig),
-        pubkey: ByteBuffer.fromHex(pubkey),
+        msg: Buffer.from(msg, 'hex'),
+        signature: Buffer.from(sig, 'base64'),
+        pubkey: Buffer.from(pubkey, 'hex'),
       }
       signer.verifyMessage(options, function (err, res) {
-        if (err) {
+        if (err || !res) {
           reject(err)
         } else {
           resolve(res)

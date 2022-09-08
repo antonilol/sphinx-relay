@@ -1,5 +1,8 @@
 import * as fs from 'fs'
-import * as grpc from 'grpc'
+import * as grpc from '@grpc/grpc-js'
+import { loadProto } from './proto'
+import { NodeClient } from './types/greenlight/Node'
+import type { SchedulerClient } from './types/scheduler/Scheduler'
 import libhsmd from './libhsmd'
 import { loadConfig } from '../utils/config'
 import * as ByteBuffer from 'bytebuffer'
@@ -27,7 +30,7 @@ export function keepalive(): void {
   }, 59000)
 }
 
-let schedulerClient = <any>null
+let schedulerClient: SchedulerClient | undefined
 
 const loadSchedulerCredentials = () => {
   const glCert = fs.readFileSync(config.scheduler_tls_location)
@@ -36,10 +39,10 @@ const loadSchedulerCredentials = () => {
   return grpc.credentials.createSsl(glCert, glPriv, glChain)
 }
 
-function loadScheduler() {
+function loadScheduler(): SchedulerClient {
   // 35.236.110.178:2601
-  const descriptor = grpc.load('proto/scheduler.proto')
-  const scheduler: any = descriptor.scheduler
+  const descriptor = loadProto('scheduler')
+  const scheduler = descriptor.scheduler
   const options = {
     'grpc.ssl_target_name_override': 'localhost',
   }
@@ -109,7 +112,7 @@ interface ScheduleResponse {
 }
 export function schedule(pubkey: string): Promise<ScheduleResponse> {
   sphinxLogger.info('=> Greenlight schedule')
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const s = loadScheduler()
       s.schedule(
@@ -118,7 +121,7 @@ export function schedule(pubkey: string): Promise<ScheduleResponse> {
         },
         (err, response) => {
           // console.log('=> schedule', err, response);
-          if (!err) {
+          if (!err && response) {
             GREENLIGHT_GRPC_URI = response.grpc_uri
             resolve(response)
           } else {
@@ -185,7 +188,7 @@ async function registerGreenlight(
 }
 
 export function get_challenge(node_id: string): Promise<string> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const s = loadScheduler()
       s.getChallenge(
@@ -194,7 +197,7 @@ export function get_challenge(node_id: string): Promise<string> {
           scope: 'REGISTER',
         },
         (err, response) => {
-          if (!err) {
+          if (!err && response) {
             resolve(Buffer.from(response.challenge).toString('hex'))
           } else {
             reject(err)
@@ -227,7 +230,7 @@ export function register(
   challenge: string,
   signature: string
 ): Promise<RegisterResponse> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const s = loadScheduler()
       s.register(
@@ -240,7 +243,7 @@ export function register(
         },
         (err, response) => {
           sphinxLogger.info(`${err} ${response}`)
-          if (!err) {
+          if (!err && response) {
             resolve(response)
           } else {
             reject(err)
@@ -258,7 +261,7 @@ export function recover(
   challenge: string,
   signature: string
 ): Promise<RegisterResponse> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const s = loadScheduler()
       s.recover(
@@ -269,7 +272,7 @@ export function recover(
         },
         (err, response) => {
           sphinxLogger.info(`${err} ${response}`)
-          if (!err) {
+          if (!err && response) {
             resolve(response)
           } else {
             reject(err)
@@ -292,15 +295,12 @@ export interface HsmRequest {
   context: HsmRequestContext
   raw: Buffer
 }
-interface HsmResponse {
-  request_id: number
-  raw: ByteBuffer
-}
+
 export async function streamHsmRequests(): Promise<void> {
   const capabilities_bitset = 1087 // 1 + 2 + 4 + 8 + 16 + 32 + 1024
   try {
     const lightning = await loadLightning(true) // try proxy
-    const call = lightning.streamHsmRequests({})
+    const call = (<NodeClient>lightning).streamHsmRequests({})
     call.on('data', async function (response) {
       sphinxLogger.info(`DATA ${response}`)
       try {
@@ -324,8 +324,8 @@ export async function streamHsmRequests(): Promise<void> {
             response.raw.toString('hex')
           )
         }
-        lightning.respondHsmRequest(
-          <HsmResponse>{
+        ;(<NodeClient>lightning).respondHsmRequest(
+          {
             request_id: response.request_id,
             raw: ByteBuffer.fromHex(sig),
           },
@@ -342,7 +342,7 @@ export async function streamHsmRequests(): Promise<void> {
       sphinxLogger.info(`[HSMD] Status ${status.code} ${status}`)
     })
     call.on('error', function (err) {
-      sphinxLogger.error(`[HSMD] Error ${err.code}`)
+      sphinxLogger.error(`[HSMD] Error ${err.name} ${err.message}`)
     })
     call.on('end', function () {
       sphinxLogger.info(`[HSMD] Closed stream`)

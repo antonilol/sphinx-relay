@@ -40,7 +40,7 @@ export interface GetInfoResponse {
   testnet: boolean
 }
 interface GreenlightAddress {
-  type: number
+  type: string
   addr: string
   port: number
 }
@@ -173,10 +173,10 @@ export function addInvoiceResponse(
 /* LIST CHANNELS */
 interface ChannelConstraints {
   csv_delay: number
-  chan_reserve_sat: number
-  dust_limit_sat: number
-  max_pending_amt_msat: number
-  min_htlc_msat: number
+  chan_reserve_sat: string
+  dust_limit_sat: string
+  max_pending_amt_msat: string
+  min_htlc_msat: string
   max_accepted_htlcs: number
 }
 interface HTLC {
@@ -199,10 +199,10 @@ export interface Channel {
   commit_fee: string
   commit_weight: string
   fee_per_kw: string
-  unsettled_balance: number
-  total_satoshis_sent: number
-  total_satoshis_received: number
-  num_updates: number
+  unsettled_balance: string
+  total_satoshis_sent: string
+  total_satoshis_received: string
+  num_updates: string
   pending_htlcs: HTLC[]
   csv_delay: number
   private: boolean
@@ -210,22 +210,22 @@ export interface Channel {
   chan_status_flags: string
   local_chan_reserve_sat: string
   remote_chan_reserve_sat: string
-  lifetime: number
-  uptime: number
+  lifetime: string
+  uptime: string
   close_address: string
-  push_amount_sat: number
+  push_amount_sat: string
   thaw_height: number
-  local_constraints: ChannelConstraints
-  remote_constraints: ChannelConstraints
+  local_constraints: ChannelConstraints | null
+  remote_constraints: ChannelConstraints | null
 }
 export interface ListChannelsResponse {
   channels: Channel[]
 }
 interface GreenlightHTLC {
   direction: string
-  id: number
+  id: string
   amount: string // int64
-  expiry: number
+  expiry: string
   payment_hash: string
   state: string
   local_trimmed: boolean
@@ -351,13 +351,13 @@ export function listPeersResponse(
 }
 
 export type Buf = Buffer | ByteBuffer | ArrayBuffer
-type DestCustomRecords = { [k: string]: Buf }
+type DestCustomRecords = { [k: string]: Buffer }
 export interface KeysendRequest {
   amt: number
   final_cltv_delta: number
-  dest: Buf
+  dest: Buffer
   dest_custom_records: DestCustomRecords
-  payment_hash: Buf
+  payment_hash: Buffer
   dest_features: number[]
   route_hints?: RouteHint[]
   fee_limit?: { [k: string]: number }
@@ -376,7 +376,7 @@ interface GreenlightTLV {
   type: string
   value: Buf
 }
-interface GreenlightKeysendRequest {
+export interface GreenlightKeysendRequest {
   node_id: Buf
   amount: GreenlightAmount
   label: string
@@ -441,7 +441,7 @@ export interface Route {
 export interface SendPaymentResponse {
   payment_error: string
   payment_preimage: Buf
-  payment_route: Route
+  payment_route?: Route | null
   payment_hash: Buf
 }
 enum GreenlightPaymentStatus {
@@ -496,13 +496,13 @@ enum InvoiceHTLCState {
 }
 interface InvoiceHTLC {
   chan_id: string
-  htlc_index: number
+  htlc_index: string
   amt_msat: string
   accept_height: number
   accept_time: string
   resolve_time: string
   expiry_height: number
-  state: InvoiceHTLCState
+  state: keyof typeof InvoiceHTLCState
   custom_records: DestCustomRecords
 }
 export interface Invoice {
@@ -526,7 +526,7 @@ export interface Invoice {
   amt_paid: string
   amt_paid_sat: string
   amt_paid_msat: string
-  state: InvoiceState
+  state: keyof typeof InvoiceState
   htlcs: InvoiceHTLC[]
   features: { [k: string]: any }
   is_keysend: boolean
@@ -560,7 +560,10 @@ export function subscribeResponse(
       r.extratlvs.forEach((tlv) => {
         // console.log("TLV TYPE", tlv.type, typeof tlv.type, `${LND_KEYSEND_KEY}`)
         // if(tlv.type===`${LND_KEYSEND_KEY}`) is_keysend=true
-        custom_records[tlv.type] = tlv.value
+        custom_records[tlv.type] =
+          tlv.value instanceof ByteBuffer
+            ? tlv.value.toBuffer()
+            : Buffer.from(tlv.value)
       })
     }
     if (r.label.startsWith('keysend')) is_keysend = true
@@ -590,7 +593,7 @@ export interface Addr {
 export interface ConnectPeerArgs {
   addr: Addr
 }
-interface GreenlightConnectPeerArgs {
+export interface GreenlightConnectPeerArgs {
   node_id: string
   addr: string
 }
