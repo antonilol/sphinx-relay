@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reconnectToLightning = exports.subscribeInvoices = void 0;
+exports.subscribeCLN = exports.reconnectToLightning = exports.subscribeInvoices = void 0;
 const lightning_1 = require("./lightning");
 const network = require("../network");
 const unlock_1 = require("../utils/unlock");
@@ -17,6 +17,11 @@ const regular_1 = require("./regular");
 const interfaces = require("./interfaces");
 const proxy_1 = require("../utils/proxy");
 const logger_1 = require("../utils/logger");
+const config_1 = require("../utils/config");
+const helpers_1 = require("../helpers");
+const models_1 = require("../models");
+const config = (0, config_1.loadConfig)();
+const IS_CLN = config.lightning_provider === 'CLN';
 const ERR_CODE_UNAVAILABLE = 14;
 const ERR_CODE_STREAM_REMOVED = 2;
 const ERR_CODE_UNIMPLEMENTED = 12; // locked
@@ -26,8 +31,11 @@ function subscribeInvoices(parseKeysendInvoice) {
         if ((0, proxy_1.isProxy)()) {
             ownerPubkey = yield (0, proxy_1.getProxyRootPubkey)();
         }
-        const lightning = yield (0, lightning_1.loadLightning)(true, ownerPubkey); // try proxy
+        const lightning = yield (0, lightning_1.loadLightning)(false, ownerPubkey); // try proxy
         const cmd = interfaces.subscribeCommand();
+        if (IS_CLN) {
+            return subscribeCLN(cmd, lightning);
+        }
         const call = lightning[cmd]({});
         call.on('data', function (response) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -115,4 +123,82 @@ function reconnectToLightning(innerCtx, callback, noCache) {
     });
 }
 exports.reconnectToLightning = reconnectToLightning;
+function subscribeCLN(cmd, lightning) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let lastpay_index = yield getInvoicesLength(lightning);
+        yield models_1.Contact.update({ lastPayIndex: lastpay_index }, { where: { id: 1 } });
+        while (true) {
+            //   // pull the last invoice, and run "parseKeysendInvoice"
+            //   // increment the lastpay_index (+1)
+            //   // wait a second and do it again with new lastpay_index
+            lightning[cmd]({ lastpay_index }, function (err, response) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (err == null) {
+                        if (response.description.includes('keysend')) {
+                            const invoice = convertToLndInvoice(response);
+                            console.log('Invoice Response ===', invoice);
+                            const owner = (yield models_1.Contact.findOne({
+                                where: { id: 1 },
+                            }));
+                            // If the payindex is greater than that in the db update the db and parse the invoice
+                            const payIndex = Number(invoice.settle_index);
+                            if (payIndex > owner.lastPayIndex) {
+                                yield models_1.Contact.update({ lastPayIndex: payIndex }, { where: { id: 1 } });
+                                lastpay_index += 1;
+                                // const inv = interfaces.subscribeResponse(invoice);
+                            }
+                        }
+                    }
+                    else {
+                        console.log(err);
+                    }
+                });
+            });
+            yield (0, helpers_1.sleep)(1000);
+        }
+    });
+}
+exports.subscribeCLN = subscribeCLN;
+const convertToLndInvoice = (response) => {
+    return {
+        memo: response.label,
+        r_preimage: response.payment_preimage,
+        r_hash: response.payment_hash,
+        value: convertMsatToSat(response.amount_received_msat),
+        value_msat: response.msatoshi_received,
+        settled: response.status === 'PAID' ? true : false,
+        creation_date: '',
+        settle_date: response.paid_at,
+        payment_request: response.bolt11,
+        description_hash: Buffer.from(''),
+        expiry: response.expires_at,
+        fallback_addr: '',
+        cltv_expiry: '',
+        route_hints: [],
+        private: false,
+        add_index: '',
+        settle_index: response.pay_index,
+        amt_paid: convertMsatToSat(response.amount_received_msat),
+        amt_paid_sat: convertMsatToSat(response.amount_received_msat),
+        amt_paid_msat: response.amount_received_msat.msat,
+        state: response.status,
+        htlcs: [],
+        features: {},
+        is_keysend: response.description.includes('keysend'),
+    };
+};
+const convertMsatToSat = (value) => {
+    return String(Number(value.msat) / 1000);
+};
+const getInvoicesLength = (lightning) => {
+    return new Promise((resolve, reject) => {
+        lightning['ListInvoices']({}, function (err, response) {
+            if (err === null) {
+                resolve(response.invoices.filter((invoice) => invoice.status === 'PAID')
+                    .length);
+            }
+            reject(1);
+        });
+    });
+};
 //# sourceMappingURL=subscribe.js.map

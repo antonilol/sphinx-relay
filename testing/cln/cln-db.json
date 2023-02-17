@@ -1,0 +1,6 @@
+{
+  "development": {
+    "dialect": "sqlite",
+    "storage": "/Users/apple/Desktop/Sphinx/sphinx-relay/testing/cln/cln.db"
+  }
+}

@@ -94,6 +94,9 @@ export default class Contact extends Model<Contact> {
 
   @Column
   isAdmin: boolean
+
+  @Column
+  lastPayIndex: number
 }
 
 export interface ContactRecord extends Contact {

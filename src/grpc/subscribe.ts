@@ -5,6 +5,13 @@ import { receiveNonKeysend } from './regular'
 import * as interfaces from './interfaces'
 import { isProxy, getProxyRootPubkey } from '../utils/proxy'
 import { sphinxLogger, logging } from '../utils/logger'
+import { loadConfig } from '../utils/config'
+import { sleep } from '../helpers'
+import { Contact } from '../models'
+
+const config = loadConfig()
+
+const IS_CLN = config.lightning_provider === 'CLN'
 
 const ERR_CODE_UNAVAILABLE = 14
 const ERR_CODE_STREAM_REMOVED = 2
@@ -15,12 +22,19 @@ export function subscribeInvoices(
 ): Promise<void | null> {
   return new Promise(async (resolve, reject) => {
     let ownerPubkey = ''
+
     if (isProxy()) {
       ownerPubkey = await getProxyRootPubkey()
     }
-    const lightning = await loadLightning(true, ownerPubkey) // try proxy
+
+    const lightning = await loadLightning(false, ownerPubkey) // try proxy
 
     const cmd = interfaces.subscribeCommand()
+
+    if (IS_CLN) {
+      return subscribeCLN(cmd, lightning)
+    }
+
     const call = lightning[cmd]({})
     call.on('data', async function (response) {
       // console.log("=> INVOICE RAW", response)
@@ -37,6 +51,7 @@ export function subscribeInvoices(
         receiveNonKeysend(inv)
       }
     })
+
     call.on('status', function (status) {
       sphinxLogger.info(`Status ${status.code} ${status}`, logging.Lightning)
       // The server is unavailable, trying to reconnect.
@@ -106,4 +121,98 @@ export async function reconnectToLightning(
       }
     }, 5000)
   }
+}
+
+export async function subscribeCLN(
+  cmd: string,
+  lightning: any
+): Promise<void | null> {
+  let lastpay_index = await getInvoicesLength(lightning)
+
+  await Contact.update({ lastPayIndex: lastpay_index }, { where: { id: 1 } })
+
+  while (true) {
+    //   // pull the last invoice, and run "parseKeysendInvoice"
+    //   // increment the lastpay_index (+1)
+    //   // wait a second and do it again with new lastpay_index
+    lightning[cmd]({ lastpay_index }, async function (err, response) {
+      if (err == null) {
+        if (response.description.includes('keysend')) {
+          const invoice = convertToLndInvoice(response)
+
+          console.log('Invoice Response ===', invoice)
+
+          const owner: Contact = (await Contact.findOne({
+            where: { id: 1 },
+          })) as Contact
+
+          // If the payindex is greater than that in the db update the db and parse the invoice
+          const payIndex = Number(invoice.settle_index)
+
+          if (payIndex > owner.lastPayIndex) {
+            await Contact.update(
+              { lastPayIndex: payIndex },
+              { where: { id: 1 } }
+            )
+            lastpay_index += 1
+
+            // const inv = interfaces.subscribeResponse(invoice);
+          }
+        }
+      } else {
+        console.log(err)
+      }
+    })
+
+    await sleep(1000)
+  }
+}
+
+const convertToLndInvoice = (response: {
+  [key: string]: any
+}): interfaces.Invoice => {
+  return {
+    memo: response.label,
+    r_preimage: response.payment_preimage,
+    r_hash: response.payment_hash,
+    value: convertMsatToSat(response.amount_received_msat),
+    value_msat: response.msatoshi_received,
+    settled: response.status === 'PAID' ? true : false,
+    creation_date: '',
+    settle_date: response.paid_at,
+    payment_request: response.bolt11,
+    description_hash: Buffer.from(''),
+    expiry: response.expires_at,
+    fallback_addr: '',
+    cltv_expiry: '',
+    route_hints: [],
+    private: false,
+    add_index: '',
+    settle_index: response.pay_index,
+    amt_paid: convertMsatToSat(response.amount_received_msat),
+    amt_paid_sat: convertMsatToSat(response.amount_received_msat),
+    amt_paid_msat: response.amount_received_msat.msat,
+    state: response.status,
+    htlcs: [],
+    features: {},
+    is_keysend: response.description.includes('keysend'),
+  }
+}
+
+const convertMsatToSat = (value: { msat: string }): string => {
+  return String(Number(value.msat) / 1000)
+}
+
+const getInvoicesLength = (lightning: any): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    lightning['ListInvoices']({}, function (err, response) {
+      if (err === null) {
+        resolve(
+          response.invoices.filter((invoice) => invoice.status === 'PAID')
+            .length
+        )
+      }
+      reject(1)
+    })
+  })
 }

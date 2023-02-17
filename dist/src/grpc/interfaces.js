@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.txIndexFromChannelId = exports.greenlightSignMessagePayload = exports.connectPeerResponse = exports.connectPeerRequest = exports.subscribeResponse = exports.InvoiceState = exports.subscribeCommand = exports.keysendResponse = exports.keysendRequest = exports.listPeersResponse = exports.listPeersRequest = exports.listChannelsRequest = exports.listChannelsCommand = exports.listChannelsResponse = exports.addInvoiceResponse = exports.addInvoiceCommand = exports.addInvoiceRequest = exports.getInfoResponse = void 0;
+exports.txIndexFromChannelId = exports.greenlightSignMessagePayload = exports.connectPeerResponse = exports.connectPeerRequest = exports.subscribeResponse = exports.InvoiceState = exports.subscribeCommand = exports.keysendResponse = exports.keysendRequest = exports.listPeersResponse = exports.listPeersRequest = exports.listChannelsRequest = exports.listChannelsCommand = exports.listChannelsResponse = exports.addInvoiceResponse = exports.addInvoiceCommand = exports.addInvoiceRequest = exports.getInfoResponse = exports.getInfoCommand = void 0;
 const config_1 = require("../utils/config");
 const crypto = require("crypto");
 const lightning_1 = require("./lightning");
@@ -8,6 +8,17 @@ const long = require("long");
 const config = (0, config_1.loadConfig)();
 const IS_LND = config.lightning_provider === 'LND';
 const IS_GREENLIGHT = config.lightning_provider === 'GREENLIGHT';
+const IS_CLN = config.lightning_provider === 'CLN';
+function getInfoCommand() {
+    if (IS_LND)
+        return 'getInfo';
+    if (IS_GREENLIGHT)
+        return 'getInfo';
+    if (IS_CLN)
+        return 'getinfo';
+    return 'getInfo';
+}
+exports.getInfoCommand = getInfoCommand;
 function getInfoResponse(res) {
     if (IS_LND) {
         // LND
@@ -31,6 +42,23 @@ function getInfoResponse(res) {
             testnet: false,
         };
     }
+    if (IS_CLN) {
+        const r = res;
+        return {
+            identity_pubkey: Buffer.from(r.id).toString('hex'),
+            version: r.version,
+            alias: r.alias,
+            color: r.color,
+            num_peers: r.num_peers,
+            num_active_channels: r.num_active_channels,
+            num_pending_channels: r.num_pending_channels,
+            // FAKE VALUES
+            synced_to_chain: true,
+            synced_to_graph: true,
+            best_header_timestamp: 0,
+            testnet: false,
+        };
+    }
     return {};
 }
 exports.getInfoResponse = getInfoResponse;
@@ -47,6 +75,14 @@ function addInvoiceRequest(req) {
             description: req.memo,
         };
     }
+    if (IS_CLN) {
+        return {
+            amount_msat: { value: 'msat', amount: { msat: req.value } },
+            label: makeLabel(),
+            description: req.memo || '',
+            fallbacks: [],
+        };
+    }
     return {};
 }
 exports.addInvoiceRequest = addInvoiceRequest;
@@ -61,6 +97,8 @@ function addInvoiceCommand() {
         return 'addInvoice';
     if (IS_GREENLIGHT)
         return 'createInvoice';
+    if (IS_CLN)
+        return 'invoice';
     return 'addInvoice';
 }
 exports.addInvoiceCommand = addInvoiceCommand;
@@ -68,6 +106,14 @@ function addInvoiceResponse(res) {
     if (IS_LND)
         return res;
     if (IS_GREENLIGHT) {
+        const r = res;
+        return {
+            payment_request: r.bolt11,
+            r_hash: r.payment_hash,
+            add_index: 0,
+        };
+    }
+    if (IS_CLN) {
         const r = res;
         return {
             payment_request: r.bolt11,
@@ -108,6 +154,8 @@ function listChannelsCommand() {
         return 'listChannels';
     if (IS_GREENLIGHT)
         return 'listPeers';
+    if (IS_CLN)
+        return 'listChannels';
     return 'listChannels';
 }
 exports.listChannelsCommand = listChannelsCommand;
@@ -118,6 +166,8 @@ function listChannelsRequest(args) {
             opts.peer = Buffer.from(args.peer, 'hex');
         if (IS_GREENLIGHT)
             opts.node_id = args.peer;
+        if (IS_CLN)
+            opts.destination = Buffer.from(args.peer, 'hex');
     }
     return opts;
 }
@@ -195,6 +245,12 @@ var GreenlightPaymentStatus;
     GreenlightPaymentStatus[GreenlightPaymentStatus["COMPLETE"] = 1] = "COMPLETE";
     GreenlightPaymentStatus[GreenlightPaymentStatus["FAILED"] = 2] = "FAILED";
 })(GreenlightPaymentStatus || (GreenlightPaymentStatus = {}));
+var ClnPaymentStatus;
+(function (ClnPaymentStatus) {
+    ClnPaymentStatus[ClnPaymentStatus["COMPLETE"] = 0] = "COMPLETE";
+    ClnPaymentStatus[ClnPaymentStatus["PENDING"] = 1] = "PENDING";
+    ClnPaymentStatus[ClnPaymentStatus["FAILED"] = 2] = "FAILED";
+})(ClnPaymentStatus || (ClnPaymentStatus = {}));
 function keysendResponse(res) {
     if (IS_LND)
         return res;
@@ -211,6 +267,18 @@ function keysendResponse(res) {
             payment_route: route,
         };
     }
+    if (IS_CLN) {
+        const r = res;
+        const route = {};
+        route.total_amt_msat = r.amount_msat.msat + '';
+        route.total_amt = Math.round(r.amount_msat.msat / 1000) + '';
+        return {
+            payment_error: r.status === ClnPaymentStatus.FAILED ? 'payment failed' : '',
+            payment_preimage: r.payment_preimage,
+            payment_hash: r.payment_hash,
+            payment_route: route,
+        };
+    }
     return {};
 }
 exports.keysendResponse = keysendResponse;
@@ -219,6 +287,8 @@ function subscribeCommand() {
         return 'subscribeInvoices';
     if (IS_GREENLIGHT)
         return 'streamIncoming';
+    if (IS_CLN)
+        return 'waitAnyInvoice';
     return 'subscribeInvoices';
 }
 exports.subscribeCommand = subscribeCommand;
@@ -228,6 +298,7 @@ var InvoiceState;
     InvoiceState["SETTLED"] = "SETTLED";
     InvoiceState["CANCELED"] = "CANCELED";
     InvoiceState["ACCEPTED"] = "ACCEPTED";
+    InvoiceState["PAID"] = "PAID";
 })(InvoiceState = exports.InvoiceState || (exports.InvoiceState = {}));
 var InvoiceHTLCState;
 (function (InvoiceHTLCState) {

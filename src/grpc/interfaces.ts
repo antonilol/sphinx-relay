@@ -8,6 +8,7 @@ const config = loadConfig()
 
 const IS_LND = config.lightning_provider === 'LND'
 const IS_GREENLIGHT = config.lightning_provider === 'GREENLIGHT'
+const IS_CLN = config.lightning_provider === 'CLN'
 
 /* GET INFO */
 interface Feature {
@@ -54,8 +55,31 @@ interface GreenlightGetInfoResponse {
   blockheight: number
   network: string
 }
+interface ClnAddress {
+  item_type: number
+  addr: string
+  port: number
+}
+interface ClnGetInfoResponse {
+  id: Buffer
+  alias: string
+  color: string
+  num_peers: number
+  address: ClnAddress
+  version: string
+  blockheight: number
+  network: string
+  num_pending_channels: number
+  num_active_channels: number
+}
+export function getInfoCommand(): string {
+  if (IS_LND) return 'getInfo'
+  if (IS_GREENLIGHT) return 'getInfo'
+  if (IS_CLN) return 'getinfo'
+  return 'getInfo'
+}
 export function getInfoResponse(
-  res: GetInfoResponse | GreenlightGetInfoResponse
+  res: GetInfoResponse | GreenlightGetInfoResponse | ClnGetInfoResponse
 ): GetInfoResponse {
   if (IS_LND) {
     // LND
@@ -73,6 +97,23 @@ export function getInfoResponse(
       // FAKE VALUES
       num_active_channels: 0,
       num_pending_channels: 0,
+      synced_to_chain: true,
+      synced_to_graph: true,
+      best_header_timestamp: 0,
+      testnet: false,
+    }
+  }
+  if (IS_CLN) {
+    const r = res as ClnGetInfoResponse
+    return <GetInfoResponse>{
+      identity_pubkey: Buffer.from(r.id).toString('hex'),
+      version: r.version,
+      alias: r.alias,
+      color: r.color,
+      num_peers: r.num_peers,
+      num_active_channels: r.num_active_channels,
+      num_pending_channels: r.num_pending_channels,
+      // FAKE VALUES
       synced_to_chain: true,
       synced_to_graph: true,
       best_header_timestamp: 0,
@@ -111,18 +152,46 @@ interface GreenlightAddInvoiceRequest {
   label: string
   description: string
 }
+interface ClnAddInvoiceRequest {
+  amount_msat: ClnAmountOrAny
+  description: string
+  label: string
+  expiry?: number
+  fallbacks: string[]
+  preimage?: Buffer
+  exposeprivatechannels?: boolean
+  cltv?: number
+  deschashonly?: boolean
+}
+type ClnAmountOrAnyValue = 'msat' | 'any'
+interface ClnAmountOrAny {
+  value: ClnAmountOrAnyValue
+  any?: boolean
+  amount?: ClnAmount
+}
+interface ClnAmount {
+  msat: number
+}
 function makeLabel() {
   return crypto.randomBytes(16).toString('hex').toUpperCase()
 }
 export function addInvoiceRequest(
   req: AddInvoiceRequest
-): AddInvoiceRequest | GreenlightAddInvoiceRequest {
+): AddInvoiceRequest | GreenlightAddInvoiceRequest | ClnAddInvoiceRequest {
   if (IS_LND) return req
   if (IS_GREENLIGHT) {
     return <GreenlightAddInvoiceRequest>{
       amount: { unit: 'satoshi', satoshi: req.value + '' },
       label: makeLabel(),
       description: req.memo,
+    }
+  }
+  if (IS_CLN) {
+    return <ClnAddInvoiceRequest>{
+      amount_msat: { value: 'msat', amount: { msat: req.value } },
+      label: makeLabel(),
+      description: req.memo || '',
+      fallbacks: [],
     }
   }
   return <AddInvoiceRequest>{}
@@ -150,17 +219,34 @@ interface GreenlightInvoice {
   payment_hash: Buffer
   payment_preimage: Buffer
 }
+
+interface ClnInvoice {
+  bolt11: string
+  payment_hash: Buffer
+  payment_secret: Buffer
+  expires_at: number
+}
 export function addInvoiceCommand(): string {
   if (IS_LND) return 'addInvoice'
   if (IS_GREENLIGHT) return 'createInvoice'
+  if (IS_CLN) return 'invoice'
   return 'addInvoice'
 }
+
 export function addInvoiceResponse(
-  res: AddInvoiceResponse | GreenlightInvoice
+  res: AddInvoiceResponse | GreenlightInvoice | ClnInvoice
 ): AddInvoiceResponse {
   if (IS_LND) return res as AddInvoiceResponse
   if (IS_GREENLIGHT) {
     const r = res as GreenlightInvoice
+    return <AddInvoiceResponse>{
+      payment_request: r.bolt11,
+      r_hash: r.payment_hash,
+      add_index: 0,
+    }
+  }
+  if (IS_CLN) {
+    const r = res as ClnInvoice
     return <AddInvoiceResponse>{
       payment_request: r.bolt11,
       r_hash: r.payment_hash,
@@ -259,8 +345,17 @@ interface GreenlightPeer {
 interface GreenlightListPeersResponse {
   peers: GreenlightPeer[]
 }
+interface ClnChannel {
+  //
+}
+interface ClnListChannelsResponse {
+  channels: ClnChannel[]
+}
 export function listChannelsResponse(
-  res: ListChannelsResponse | GreenlightListPeersResponse
+  res:
+    | ListChannelsResponse
+    | GreenlightListPeersResponse
+    | ClnListChannelsResponse
 ): ListChannelsResponse {
   if (IS_LND) return res as ListChannelsResponse
   if (IS_GREENLIGHT) {
@@ -287,6 +382,7 @@ export function listChannelsResponse(
 export function listChannelsCommand(): string {
   if (IS_LND) return 'listChannels'
   if (IS_GREENLIGHT) return 'listPeers'
+  if (IS_CLN) return 'listChannels'
   return 'listChannels'
 }
 export interface ListChannelsArgs {
@@ -301,6 +397,7 @@ export function listChannelsRequest(args?: ListChannelsArgs): {
   if (args && args.peer) {
     if (IS_LND) opts.peer = Buffer.from(args.peer, 'hex')
     if (IS_GREENLIGHT) opts.node_id = args.peer
+    if (IS_CLN) opts.destination = Buffer.from(args.peer, 'hex')
   }
   return opts
 }
@@ -456,8 +553,24 @@ export interface GreenlightPayment {
   amount: GreenlightAmount
   amount_sent: GreenlightAmount
 }
+enum ClnPaymentStatus {
+  COMPLETE = 0,
+  PENDING = 1,
+  FAILED = 2,
+}
+export interface ClnPayment {
+  payment_preimage: Buffer
+  destination?: Buffer
+  payment_hash: Buffer
+  created_at: number
+  parts: number
+  amount_msat: ClnAmount
+  amount_sent_msat: ClnAmount
+  warning_partial_completion?: string
+  status: ClnPaymentStatus
+}
 export function keysendResponse(
-  res: SendPaymentResponse | GreenlightPayment
+  res: SendPaymentResponse | GreenlightPayment | ClnPayment
 ): SendPaymentResponse {
   if (IS_LND) return res as SendPaymentResponse
   if (IS_GREENLIGHT) {
@@ -474,12 +587,26 @@ export function keysendResponse(
       payment_route: route,
     }
   }
+  if (IS_CLN) {
+    const r = res as ClnPayment
+    const route = <Route>{}
+    route.total_amt_msat = r.amount_msat.msat + ''
+    route.total_amt = Math.round(r.amount_msat.msat / 1000) + ''
+    return <SendPaymentResponse>{
+      payment_error:
+        r.status === ClnPaymentStatus.FAILED ? 'payment failed' : '',
+      payment_preimage: r.payment_preimage,
+      payment_hash: r.payment_hash,
+      payment_route: route,
+    }
+  }
   return <SendPaymentResponse>{}
 }
 
 export function subscribeCommand(): string {
   if (IS_LND) return 'subscribeInvoices'
   if (IS_GREENLIGHT) return 'streamIncoming'
+  if (IS_CLN) return 'waitAnyInvoice'
   return 'subscribeInvoices'
 }
 export enum InvoiceState {
@@ -487,6 +614,7 @@ export enum InvoiceState {
   SETTLED = 'SETTLED',
   CANCELED = 'CANCELED',
   ACCEPTED = 'ACCEPTED',
+  PAID = 'PAID',
 }
 enum InvoiceHTLCState {
   ACCEPTED = 0,
@@ -533,6 +661,21 @@ export interface Invoice {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Payment {
   // if any fields are needed add them
+}
+
+export interface CLNInvoice {
+  label: string
+  description: string
+  payment_hash: any
+  status: string
+  expires_at: string
+  amount_msat: { msat: string }
+  bolt11: string
+  bolt12: string
+  pay_index: string
+  amount_received_msat: { msat: string }
+  paid_at: string
+  payment_preimage: any
 }
 interface GreenlightOffchainPayment {
   label: string

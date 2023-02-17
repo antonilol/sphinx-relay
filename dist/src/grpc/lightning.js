@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getChanInfo = exports.channelBalance = exports.complexBalances = exports.openChannel = exports.connectPeer = exports.pendingChannels = exports.listChannels = exports.listPeers = exports.addInvoice = exports.getInfo = exports.verifyAscii = exports.verifyMessage = exports.verifyBytes = exports.signBuffer = exports.signMessage = exports.listAllPaymentsFull = exports.listPaymentsPaginated = exports.listAllPayments = exports.listAllInvoices = exports.listInvoices = exports.signAscii = exports.keysendMessage = exports.loadRouter = exports.keysend = exports.sendPayment = exports.newAddress = exports.UNUSED_NESTED_PUBKEY_HASH = exports.UNUSED_WITNESS_PUBKEY_HASH = exports.NESTED_PUBKEY_HASH = exports.WITNESS_PUBKEY_HASH = exports.queryRoute = exports.setLock = exports.getLock = exports.getHeaders = exports.unlockWallet = exports.loadWalletUnlocker = exports.loadLightning = exports.loadCredentials = exports.isGL = exports.isLND = exports.SPHINX_CUSTOM_RECORD_KEY = exports.LND_KEYSEND_KEY = void 0;
+exports.getChanInfo = exports.channelBalance = exports.complexBalances = exports.openChannel = exports.connectPeer = exports.pendingChannels = exports.listChannels = exports.listPeers = exports.addInvoice = exports.getInfo = exports.verifyAscii = exports.verifyMessage = exports.verifyBytes = exports.signBuffer = exports.signMessage = exports.listAllPaymentsFull = exports.listPaymentsPaginated = exports.listAllPayments = exports.listAllInvoices = exports.listInvoices = exports.signAscii = exports.keysendMessage = exports.loadRouter = exports.keysend = exports.sendPayment = exports.newAddress = exports.UNUSED_NESTED_PUBKEY_HASH = exports.UNUSED_WITNESS_PUBKEY_HASH = exports.NESTED_PUBKEY_HASH = exports.WITNESS_PUBKEY_HASH = exports.queryRoute = exports.setLock = exports.getLock = exports.getHeaders = exports.unlockWallet = exports.loadWalletUnlocker = exports.loadLightning = exports.loadCredentials = exports.isCLN = exports.isGL = exports.isLND = exports.SPHINX_CUSTOM_RECORD_KEY = exports.LND_KEYSEND_KEY = void 0;
 const fs = require("fs");
 const grpc = require("@grpc/grpc-js");
 const proto_1 = require("./proto");
@@ -30,6 +30,7 @@ const config = (0, config_1.loadConfig)();
 const LND_IP = config.lnd_ip || 'localhost';
 const IS_LND = config.lightning_provider === 'LND';
 const IS_GREENLIGHT = config.lightning_provider === 'GREENLIGHT';
+const IS_CLN = config.lightning_provider === 'CLN';
 exports.LND_KEYSEND_KEY = 5482373484;
 exports.SPHINX_CUSTOM_RECORD_KEY = 133773310;
 const FEE_LIMIT_SAT = 10000;
@@ -45,6 +46,10 @@ function isGL(client) {
     return IS_GREENLIGHT;
 }
 exports.isGL = isGL;
+function isCLN(client) {
+    return IS_CLN;
+}
+exports.isCLN = isCLN;
 function loadCredentials(macName) {
     try {
         // console.log('=> loadCredentials', macName)
@@ -64,7 +69,7 @@ function loadCredentials(macName) {
     }
 }
 exports.loadCredentials = loadCredentials;
-const loadGreenlightCredentials = () => {
+const loadMTLSCredentials = () => {
     const glCert = fs.readFileSync(config.tls_location);
     const glPriv = fs.readFileSync(config.tls_key_location);
     const glChain = fs.readFileSync(config.tls_chain_location);
@@ -84,7 +89,7 @@ function loadLightning(tryProxy, ownerPubkey, noCache) {
             return lightningClient;
         }
         if (IS_GREENLIGHT) {
-            const credentials = loadGreenlightCredentials();
+            const credentials = loadMTLSCredentials();
             const descriptor = (0, proto_1.loadProto)('greenlight');
             const greenlight = descriptor.greenlight;
             const options = {
@@ -95,6 +100,16 @@ function loadLightning(tryProxy, ownerPubkey, noCache) {
                 throw new Error('no lightning client');
             }
             return (lightningClient = new greenlight.Node(uri[1], credentials, options));
+        }
+        if (IS_CLN) {
+            const credentials = loadMTLSCredentials();
+            const descriptor = (0, proto_1.loadProto)('cln/node');
+            const cln = descriptor.cln;
+            const options = {
+                'grpc.ssl_target_name_override': 'localhost',
+            };
+            const uri = config.lnd_ip + ':' + config.lnd_port;
+            return (lightningClient = new cln.Node(uri, credentials, options));
         }
         // LND
         const credentials = loadCredentials();
@@ -165,6 +180,13 @@ function queryRoute(pub_key, amt, route_hint, ownerPubkey) {
         const lightning = yield loadLightning(true, ownerPubkey); // try proxy
         if (isGL(lightning)) {
             // shim for now
+            return {
+                success_prob: 1,
+                routes: [],
+            };
+        }
+        if (IS_CLN) {
+            // shim for now, because no route_hint avail
             return {
                 success_prob: 1,
                 routes: [],
@@ -267,6 +289,10 @@ function sendPayment(payment_request, ownerPubkey) {
                             reject(err);
                         }
                     });
+                }
+                else if (isCLN(lightning)) {
+                    // TODO CLN RPC
+                    reject(new Error('Unimplemented'));
                 }
                 else {
                     const call = lightning.sendPayment();
@@ -703,12 +729,12 @@ function verifyAscii(ascii, sig, ownerPubkey) {
 exports.verifyAscii = verifyAscii;
 function getInfo(tryProxy, noCache) {
     return __awaiter(this, void 0, void 0, function* () {
-        // log('getInfo')
         return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
             try {
                 // try proxy
-                const lightning = yield loadLightning(tryProxy === false ? false : true, undefined, noCache);
-                lightning.getInfo({}, function (err, response) {
+                const lightning = yield loadLightning(tryProxy === false ? false : true, undefined, noCache); // try proxy
+                const cmd = interfaces.getInfoCommand();
+                lightning[cmd]({}, function (err, response) {
                     if (err == null) {
                         resolve(interfaces.getInfoResponse(response));
                     }
@@ -862,6 +888,10 @@ function openChannel(args) {
         if (isGL(lightning)) {
             return;
         }
+        if (isCLN(lightning)) {
+            // TODO CLN RPC
+            return;
+        }
         return new Promise((resolve, reject) => {
             lightning.openChannelSync(opts, function (err, response) {
                 if (err == null && response) {
@@ -913,6 +943,10 @@ function channelBalance(ownerPubkey) {
         if (isGL(lightning)) {
             return;
         }
+        if (isCLN(lightning)) {
+            // TODO CLN RPC
+            return;
+        }
         return new Promise((resolve, reject) => {
             lightning.channelBalance({}, function (err, response) {
                 if (err == null && response) {
@@ -933,6 +967,10 @@ function getChanInfo(chan_id, tryProxy) {
         const lightning = yield loadLightning(tryProxy === false ? false : true); // try proxy
         if (isGL(lightning)) {
             return; // skip for now
+        }
+        if (isCLN(lightning)) {
+            // TODO CLN RPC
+            return;
         }
         return new Promise((resolve, reject) => {
             if (!chan_id) {
